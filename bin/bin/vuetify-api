@@ -1,0 +1,4 @@
+#!/bin/sh
+
+c="$(echo "" | menu-wrapper -i -p "v-")"
+[ -n "$c" ] && $BROWSER "https://vuetifyjs.com/en/api/v-$c"

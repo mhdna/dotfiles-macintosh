@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	menu="tofi"
+else
+	menu="menu-wrapper"
+fi
+
+case "$(printf "English\nArabic\nTranslate" | $menu)" in #  -p 'Action:'
+'Arabic') maim -s /tmp/temp.png pic-selected- && tesseract /tmp/temp.png /tmp/output -l ara && cat /tmp/output.txt | wl-copy && notify-send 'Ocr done' ;;
+'English') maim -s /tmp/temp.png pic-selected- && tesseract /tmp/temp.png /tmp/output -l eng && cat /tmp/output.txt | wl-copy && notify-send 'Ocr done' ;;
+'Translate') maim -s /tmp/temp.png pic-selected- && tesseract /tmp/temp.png /tmp/output -l eng && notify-send "$(trans -b --no-bidi --target=arabic -i /tmp/output.txt)" ;;
+*) exit 1 ;;
+esac

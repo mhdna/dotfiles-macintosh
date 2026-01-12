@@ -1,0 +1,24 @@
+#/bin/bash
+
+# Initialize variable to hold expression
+expression=""
+
+# Loop to read input from dmenu
+while true; do
+    # Run dmenu and get user input
+    # input=$(echo -e "$expression" | menu-wrapper --fn 'Mono 28' -c -p "Calculator:")
+    input=$(echo -e "$expression" | bemenu -b -i -l 25 --single-instance --fn 'Mono 30' --fb '#151515' --tb '#65411f' --hb '#65411f' --cb '#151515' --scb '#151515' --ab '#151515' --sb '#151515' --nb '#151515' --tf '#ffffff' --hf '#ffffff' --scf '#888888' $ARGS -p "Calculator:")
+
+    # Break the loop if user cancels
+    [ -z "$input" ] && break
+
+    # Evaluate the expression
+    result=$(echo "$input" | bc -l)
+	result="$result\\n$(simplify_fractions "$input")"
+
+    # Print the result
+    echo "$result"
+
+    # Update expression with result
+    expression="$result"
+done

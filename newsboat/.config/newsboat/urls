@@ -1,0 +1,228 @@
+https://youtube.com/feeds/videos.xml?channel_id=UCqPP4dbgr9Uddnzzuzr8qXQ "!" "politics"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC9_XmAwE5szLHF76FjMylaw "!" "politics" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCnkTo_wMqGtLiA4xX7roORg "!politics" "!" "news"
+"query:Politics:(tags # \"politics\") and (unread = \"yes\")"
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCDV0Kgy7jSyPpEJhWNZY9bA "!" "chess"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCweCc7bSMX5J4jEH7HFImng "!" "chess"
+"query:Chess:(tags # \"chess\") and (unread = \"yes\")"
+
+https://youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA "!" "tech"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCg6gPGh8HU2U01vaFCAsvmQ "yt" "!" "news"
+https://youtube.com/feeds/videos.xml?channel_id=UCQFR7eBvWA0yaX60TaxZnMw "!" "tech"
+"query:Tech News:(tags # \"tech\") and (unread = \"yes\")"
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCvjgXvBlbQiydffZU7m1_aw "Coding Train" "!" "programming" "!" "news"
+https://lukesmith.xyz/rss.xml "~Luke Blog" "!" "programming" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC_mYaQAE6-71rjSN6CeCA-g "!" "programming" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC9-y-6csu5WGm29I7JiwpnA "!" "programming"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCf93fPKwotph47H3_KDcRyg "!programming"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA "yt" "!" "news"
+https://videos.lukesmith.xyz/feeds/videos.xml?videoChannelId=2 "!" "programming" "!" "news"
+https://youtube.com/feeds/videos.xml?channel_id=UCnGblT_CyMwswTIH9QmJ3YQ "!" "programming"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCngn7SVujlvskHRvRKc1cTw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCSX3MR0gnKDxyXAyljWzm0Q "!" "programming"
+"query:Programming:(tags # \"programming\") and (unread = \"yes\")"
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCtJmfVv0a52Bu7BnJJtZXKw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCqW7G8SmyeEeQYzLOk5tdSg "!" "science"
+"query:Science:(tags # \"science\") and (unread = \"yes\")"
+
+https://arabic.khamenei.ir/feed/service/11665 "!" "islam" "~القائد- بيانات" "!" "news"
+https://arabic.khamenei.ir/feed/service/11663 "!" "islam" "~القائد - فيديوهات" "!" "news"
+http://arabic.bayanmanavi.ir/rss "!" "islam" "!" "news"
+"query:Islam:(tags # \"islam\") and (unread = \"yes\")"
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCJIfeSCssxSC_Dhc5s7woww "!" "podcasts"
+"query:Podcasts:(tags # \"podcasts\") and (unread = \"yes\")"
+
+
+
+https://youtube.com/feeds/videos.xml?channel_id=UClBCi5TpnTXorbRke79UyLw "!" "entertain"
+https://youtube.com/feeds/videos.xml?channel_id=UCm9K6rby98W8JigLoZOh6FQ "!" "entertain"
+https://youtube.com/feeds/videos.xml?channel_id=UCX5lX80yKjkzyXQWkkm3rOQ "!" "entertain"
+https://youtube.com/feeds/videos.xml?channel_id=UCAL3JXZSzSm8AlZyD3nQdBA "!" "entertain"
+"query:Entertainment:(tags # \"entertain\") and (unread = \"yes\")"
+
+
+https://www.archlinux.org/feeds/news/ "!" "arch" "!" "news"
+"query:Arch News:(tags # \"arch\") and (unread = \"yes\")"
+
+https://alahednews.com.lb/rss "!" "news" "!" "news"
+https://youtube.com/feeds/videos.xml?channel_id=UCkf4VIqu3Acnfzuk3kRIFwA "!" "tech" "~gotbletu" "!" "news"
+Programming "!" "news"
+# https://www.youtube.com/feeds/videos.xml?channel_id=UCMlGfpWw-RUdWX_JbLCukXg "!" "cpp" # cppcon
+# https://www.youtube.com/feeds/videos.xml?channel_id=UC-yuWVUplUJZvieEligKBkA "!" "cpp"
+# "query:C++:(tags # \"cpp\") and (unread = \"yes\")"
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UC9x0AN7BWHpCDHSm9NiJFJQ "!" "hack" "!" "news"
+
+https://youtube.com/feeds/videos.xml?channel_id=UC4kRorAXuIkyIX6vwXKaLWg "!" "notreally"
+https://youtube.com/feeds/videos.xml?channel_id=UCJbrYikmhm0N9jkWK39uc0Q "!" "entertain"
+https://landchad.net/rss.xml "!" "news"
+https://feeds.feedburner.com/takimag "~taki magazine" "!" "news"
+https://blog.vero.site/index.xml "~Mit student/ super competitor" "!" "news"
+https://renerocks.ai/feed.xml "!" "news"
+https://jeffkreeftmeijer.com/feed.xml
+https://edivad.wordpress.com/feed "~Emacs and java guy" "!" "news"
+https://bitspook.in/archive/feed.xml "~The emacs math guy" "!" "news"
+# https://dawranliou.com/atom.xml # emacs
+# https://zsxh.github.io/rss.xml # emacs
+# https://vaticancatholic.com/feed/ # christian
+# https://endtimes.video/feed/ # christian
+https://github.com/arkenfox/user.js/commits/master.atom "!" "news"
+# https://www.leader.ir/ar/rss "!" "news"
+# https://arabic.khamenei.ir/feed/service/11678 "~Leader Istifta" "!" "news"
+# https://arabic.khamenei.ir/feed/service/11672 "~Leader Papers" "!" "news"
+# https://arabic.khamenei.ir/feed/service/13311 "~Leader Audio" "!" "news"
+# https://arabic.khamenei.ir/feed/service/11678 "~Leader Istifta" "!" "news"
+http://feeds.feedburner.com/codinghorror "!" "news"
+http://lambda-the-ultimate.org/rss.xml "!" "news"
+http://syndication.thedailywtf.com/TheDailyWtf "!" "news"
+http://martinfowler.com/bliki/bliki.atom "!" "news"
+http://www.joelonsoftware.com/rss.xml "!" "news"
+http://feeds.feedburner.com/freetechbooks "!" "news"
+http://feeds.feedburner.com/PaulGrahamUnofficialRssFeed "!" "news"
+http://www.tbray.org/ongoing/ongoing.atom "!" "news"
+
+https://ratfactor.com/atom.xml "!" "news"
+https://feeds.feedburner.com/RazibKhansTotalFeed "!" "news"
+# http://feeds.feedburner.com/dcb
+http://joeystanley.com/feed.xml "!" "news"
+https://thuleanperspective.com/feed/ "!" "news"
+
+https://youtube.com/feeds/videos.xml?channel_id=UCKtiMrNZq0gGbPTnsMu7Bsw "~That motivation girl" "!" "news"
+https://feeds.feedburner.com/RazibKhansTotalFeed "!" "news"
+
+# https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9 "~Jazeera Ar" "!" "news"
+# https://almanar.com.lb/rss "!" "news"
+https://thehackernews.com/feeds/posts/default "!" "news"
+https://nakedsecurity.sophos.com/feed "!" "news"
+https://www.aljazeera.com/xml/rss/all.xml "!" "news"
+https://youtube.com/feeds/videos.xml?channel_id=UCZAENaOaceQUMd84GDc26EA "~Survive the Jive" "!" "news"
+https://xkcd.com/atom.xml "!" "news"
+
+
+# http://original.antiwar.com/feed/ "~AntiWar" "!" "news"
+http://feeds.feedburner.com/TEDTalks_video "~tedtalks" "!" "news"
+# https://youtube.com/feeds/videos.xml?channel_id=UChd1pIwy_XxhpuxPEUp0rxA "!" "news"
+# https://youtube.com/feeds/videos.xml?channel_id=UCdttmnJddGQZsXRL_DbqgWA
+# https://aitnews.com/feed "!" "news"
+# https://youtube.com/feeds/videos.xml?channel_id=UCas4oX0ZqRNzdSIkOu71QOg
+# https://youtube.com/feeds/videos.xml?channel_id=UCahYlNszeMy_PHffYvgAOHg
+# https://youtube.com/feeds/videos.xml?channel_id=UChq-W5PT7T-0-tsoRhpTPAg
+# https://www.youtube.com/feeds/videos.xml?channel_id=UCMiyV_Ib77XLpzHPQH_q0qQ
+# https://youtube.com/feeds/videos.xml?channel_id=UCEHvaZ336u7TIsUQ2c6SAeQ
+https://www.youtube.com/feeds/videos.xml?channel_id=UC7UkQQsdz7tXd08rkRjG6CA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCdNo5yauE8IU-vS8_dO3qew "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC-4KnPMmZzwAzW7SbVATUZQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC6wnWcQbkNrgdxhQWm-V--Q "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UChbuH4HULlesX_rzlozkT6Q "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCLIvNqBJtlcw9ymmRhyAacw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC3SSOFNqu9ulGcAMEAuH88Q "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCZiL6BoryLWxyapUuVYW27g "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC7zOqLljh5UoI6vqubCKlzQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCkD7IZ3DZUeH-bdNAGUyIYw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCld68syR8Wi-GY_n4CaoJGA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCngn7SVujlvskHRvRKc1cTw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCljOhRB2a3sQgLCdK9CHQvQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCr3cBLTYmIK9kY0F_OdFWFQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCg6gPGh8HU2U01vaFCAsvmQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCVls1GmFKf6WlTraIb_IaJg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCkzyo69rqBoBJUyQ9jo53Bw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCqPoFn6HYi9YULPsUwef1Bw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCjMZjGhrFq_4llVS_x2XJ_w "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCLXAviTgz5MuJrR_rbLGNWg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCpeJ2iK57lu-BV8UxHpk05w "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCL5K-o0mmBAfaf8QLg_T9Pw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC9MAhZQQd9egwWCxrwSIsJQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC31GyoVAjRLLK9Nh4298PzA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCS7kHEzoKbWgUEG3g1-vAeg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCBIt1VN5j37PVM8LLSuTTlw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCe6eisvsctSPvBhmincn6kA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCFLFc8Lpbwt4jPtY1_Ai5yA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCfkVDqmekjzsOPgok2swREQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCh7mi5sI3BSzKReLzXpgimA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCabO18-tFjFrUv01cFVWitg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCwsqr7l3iWoAN8kiNKATaLQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCH7z2x9v6L9Rjncs2lK4IlA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCJu5uNExWKx1Vrv6Ah5SHfA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC6Umj85x9h8f7NyuDy14p6w "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCKBG0BuqQpN3QqLH3b9hrpg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCtJmfVv0a52Bu7BnJJtZXKw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC8F8MJyWevV2EzzLxZnSRLg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCgnQxBxj5UO2B2DxHuYN1AQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCu1NJiJlhrhmF5ZgT-0yWdA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC5RkBPuSzbyudZI0UA1B_Vw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCjr2bPAyPV7t35MvcgT3W8Q "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCRCPQvTs96frBB8X5eGVE4w "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCCU1HNO3Z9oKVmrAAUQlr6w "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC4a5m_aUZQ-PARanwoOKHAw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCHrD4qdeQc1BbpG6EPqDBcA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCYskjD6IuQJrxrW3I0EriZA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCn8BvgYQZl4swqZplaa488A "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCwjLh640nGXSGa9iHRS31ag "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC6NVrqrnd0YOUkZYAa3__Uw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCSghSKdNwkFUI4_kfOvUpPg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCahYlNszeMy_PHffYvgAOHg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC3oLbGlXeDOyY61c2uzFgsg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCFj9KQcceK3XduMOVNyXrVg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCa0sRbILjrvUAkUYhf9e5KA "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCFq4pOuTiZmfJyCxaYTT3Hg "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCEHvaZ336u7TIsUQ2c6SAeQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCyQw44YqPM0kDCHYQmGPVeQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCqlRE8sYdSeijg83yIDpq2w "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCqPA-LeFoPFbaIHl4EIG09g "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCnGblT_CyMwswTIH9QmJ3YQ "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCKxYzKM7d3RnF0vhYqpGd1A "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCCq9JNI2LLj3t7Qn_WrfPhw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCMu3WK_vRPO1429qt3r82_A "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCEJptdT8FtyO8ijdAhN8B-g "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCgAnTAonJ0S2gwb8ifX0b6g "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCZd0fbbNawp8CLNb-abRKrw "yt" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCkB_WxR3toCpgrnFhHOUL1g "yt" "!" "news"
+https://youtube.com/feeds/videos.xml?channel_id=UCMmaBzfCCwZ2KqaBJjkj0fw
+http://andreasmhallberg.github.io/feed.xml
+https://eureka.redwill.se/atom.xml "!" "news"
+
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UC79XhRzbR3YSnm3ODqgZ6EQ "!" "go"
+https://claudiodangelis.com/feed.xml "!" "go"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC79XhRzbR3YSnm3ODqgZ6EQ "!" "go"
+https://claudiodangelis.com/feed.xml "!" "go"
+"query:Go:(tags # \"go\") and (unread = \"yes\")"
+
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCP7WmQ_U4GB3K51Od9QvM0w "!" "hack" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCMIL2NVef3QpQ80Q2p_n7Kg "!" "hack"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCVCcYvyMbN_azmwZLm593AA "!" "hack" "~FlareXes - hack guy" "!" "news"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCW6xlqxSY3gGur4PkGPEUeA "!" "hack"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCVeW9qkBjo3zosnqUbG7CFw "!" "hack"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC7e_BXvNfjKFCgqR4LkUe9A "!" "hack"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC3ts8coMP645hZw9JSD3pqQ "!" "hack"
+"query:Hacking:(tags # \"hack\") and (unread = \"yes\")"
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCFegjd76TsdL9dxQLpFPdPA "!" "programming"
+https://youtube.com/feeds/videos.xml?channel_id=UCNLRcEn78Vc62C3GkMvBgtA "!" "programming"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCcaTUtGzOiS4cqrgtcsHYWg "!" "tech" "~jvscholz - cool vintage programming" "!" "news"
+# https://feeds.bbci.co.uk/news/rss.xml?edition=int
+# https://www.youtube.com/feeds/videos?channel_id=UCX5lX80yKjkzyXQWkkm3rOQ
+# https://www.youtube.com/feeds/videos?channel_id=UCdttmnJddGQZsXRL_DbqgWA
+# https://www.youtube.com/feeds/videos?channel_id=UC59Cpk70K2TwdmApJOTuW9g
+# https://www.youtube.com/feeds/videos?channel_id=UC7YOGHUfC1Tb6E4pudI9STA
+# https://www.youtube.com/feeds/videos?channel_id=UCQFR7eBvWA0yaX60TaxZnMw
+# https://www.youtube.com/feeds/videos?channel_id=UCqPP4dbgr9Uddnzzuzr8qXQ
+# https://www.youtube.com/feeds/videos?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ
+# https://www.youtube.com/feeds/videos?channel_id=UC4Cxai0CjeakRNj1HXXcDCA
+# https://www.youtube.com/feeds/videos?channel_id=UCudvZnZVRdR55d_Rjk1XnSQ
+# http://arabic.bayanmanavi.ir.domains.blog.ir/rss/
+https://www.youtube.com/feeds/videos.xml?channel_id=UCrqM0Ym_NbK1fqeQG2VIohg "Computers" "!"
+https://blog.meain.io/feed.xml "blogs" "!"
+https://gosamples.dev/index.xml "go" "!"
+https://www.youtube.com/feeds/videos.xml?channel_id=UCx9QVEApa5BKLw9r8cnOFEA "go" "!"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC3P6PrEBAVH1UaiPOzZ-u-w "go" "!"
+https://www.youtube.com/feeds/videos.xml?channel_id=UC_2WbOWf6K_-6tX8LiBfHqQ "entertainment" "!"

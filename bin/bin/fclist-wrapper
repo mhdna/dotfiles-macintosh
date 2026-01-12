@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# a cleaner way to view fc-list
+
+fc-list | awk -F ":" '{ print $2 }' | uniq

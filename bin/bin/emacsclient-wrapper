@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Open file in emacsclient if already open, otherwise create a new emacsclient for it
+
+if emacsclient -e "(if (> (length (frame-list)) 1) 't 'nil)" | grep -q t; then
+	emacsclient -n "$@"
+else
+	emacsclient -c "$@"
+fi

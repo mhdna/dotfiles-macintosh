@@ -1,0 +1,10 @@
+#!/bin/sh
+
+vesktop  --disable-smooth-scrolling
+# hour="$(date +%H)"
+
+# if [[ "$hour" -gt 14 && "$hour" -lt 16 ]]; then
+# 	/usr/bin/vesktop
+# else
+# 	notify-send -t 3000 "Discord isn't allowed before 14:00 and after 16:00"
+# fi

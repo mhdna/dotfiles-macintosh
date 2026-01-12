@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+menu() {
+	fzf --prompt="$@"
+}
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	# menu() {
+	# 	tofi --placeholder-text "$@"
+	# }
+	clip="wl-paste"     # Clipboard
+	clipp="wl-paste -p" # Primary clipboard
+else
+	# menu() {
+	# 	menu-wrapper -p "$@"
+	# }
+	clip="xclip -sel c -o" # Clipboard
+	clipp="xclip -o"       # Primary clipboard
+fi
+
+# languages=("To Arabic" "To Arabic (speak)" "English-English Stardict" "Arabic-English" "Persian-English" "To Spanish")
+languages=("en:ar" "English (Dict)" "en: (speak)" "ar:en" "en:pr" ":es")
+
+# [ "$STATUSBAR" = "i3blocks" ] && e="$TERMINAL -e" || e=""
+e=""
+# e="$TERMINAL -c transs -e"
+# e="$TERMINAL -e"
+
+notify_error() {
+	notify-send -t 500 -u critical "$@"
+}
+
+sdcv_notify() {
+	word="$1"
+	full="$(sdcv -n "$word")"
+	[ -z "$(echo "$word" | tr -d ' ')" ] && notify_error "Empty Word" && exit 0
+	def="$(echo "$full" | sed '1,/.*noun\|verb\|adjective\|adverb.*/ { d }')"
+	[ -n "$def" ] && notify-send -t 20000 "${word^}" "$def" || notify_error "${word^}" "No definition is available"
+}
+
+translate_shell_notify() {
+	word="$1"
+	[ -z "$(echo "$word" | tr -d ' ')" ] && notify_error "Empty Word" && exit 0
+	notify-send "Trans" "\\n$(trans -b --no-bidi -no-ansi :en "$word")\\n\\n$(trans -b --no-bidi -no-ansi :ar "$word")"
+}
+
+case "${1:-$(printf '%s\n' "${languages[@]}" | menu "Language:")}" in
+
+# Command line arguments
+"-p")
+	# Primary clipboard
+	word="$($clipp)"
+	sdcv_notify "$word"
+	;;
+# trans --no-bidi -b --target="arabic" "$($clipp)")";;
+# Clipboard clipboard
+"-c")
+	word="$($clip)"
+	sdcv_notify "$word"
+	;;
+"-ap")
+	word="$($clipp)"
+	translate_shell_notify "$word"
+	;;
+"-ac")
+	word="$($clip)"
+	translate_shell_notify "$word"
+	;;
+
+# --no-bidi
+# notify-send "$(trans -b --target="arabic" "$(wl-paste)")";;
+# "${languages[0]}" | "ar") trans -I ":ar" ;;
+"${languages[0]}" | ar) $e trans -I ":ar" ;; # --speak
+"${languages[1]}" | "-s" | enen) $e sdcv --color ;;
+"${languages[2]}") trans en:ar --speak -I ;;
+"${languages[3]}" | aren) $e trans -I "ar:en" ;;
+"${languages[4]}" | faen) $e trans -I "fa:en" ;;
+"${languages[5]}" | es) $e trans -I ":es" ;;
+*) exit 1 ;;
+esac

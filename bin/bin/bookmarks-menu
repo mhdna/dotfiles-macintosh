@@ -1,0 +1,129 @@
+#!/bin/sh
+
+sn_file="$HOME/personal/bookmarks/snippets"
+bm_file="$HOME/personal/bookmarks/bookmarks"
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    menu() {
+        tofi --placeholder-text "$@"
+    }
+    empty_menu="tofi"
+    clip="wl-paste"
+else
+    menu() {
+        menu-wrapper -p "$@"
+    }
+    empty_menu="menu-wrapper"
+    clip="xclip -sel c -o"
+fi
+
+url="${1:-$($clip)}"
+
+notify() {
+    notify-send -t 1500 "$@"
+}
+
+err() {
+    notify "$1" "⛔ $2"
+}
+
+success() {
+    notify "$1" "✅ $2"
+}
+
+browser() {
+    $BROWSER "$1"
+}
+
+get_title() {
+    net_title="$(curl -s "$url" | grep -o '<title>.*</title>' | sed 's/<title>\|<\/title>//g')"
+    title="${net_title:-$(menu \"Title for "$url": \" <&-)}"
+}
+
+html_template() {
+    echo "
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>$1</title>
+    </head>
+    <body>
+    <h1>$1</h1>
+    </body>
+    </html>
+    " >>"$2"
+}
+
+bm_show() {
+    url=$(grep -v '^#' "$bm_file" | $empty_menu | cut -d' ' -f1)
+
+    [ -n "$url" ] && browser "$url"
+}
+
+bm_add() {
+    gettag() {
+        tag=$(menu "Tags (split with a ,): " <&-)
+    }
+
+    if grep -q "\<$url\>" "$bm_file"; then
+        err "Bookmark" "Already exists"
+    else
+        gettag && echo "$url :$tag": >>"$bm_file" && success "Bookmark" "$url\\ngot saved"
+    fi
+}
+
+bm_rm() {
+    line="$(cat "$bm_file" | menu "Bookmark to remove")"
+    [ -z "$line" ] && exit 0
+    confirm="$(printf "Yes\\nNo" | menu "Remove $line?")"
+    [ "$confirm" != "Yes" ] && exit 0
+
+    tmp_file="$(dirname "$bm_file")/.bookmarks.tmp"
+
+    grep -vF "$line" "$bm_file" >"$tmp_file" &&
+        mv "$tmp_file" "$bm_file" &&
+        rm -f "$tmp_file" &&
+        success "Bookmark" "$line\\ngot removed"
+}
+
+sn_show() {
+    url=$(grep -v '^#' "$sn_file" | $empty_menu | cut -d';' -f2)
+
+    [ -n "$url" ] && browser "$url"
+}
+
+sn_add() {
+    get_title() {
+        title=$(menu "Title:" <&-)
+    }
+
+    if grep -q "$url" "$sn_file"; then
+        err "Snippet" "Already exists"
+    else
+        get_title && echo "$title; $url" >>"$sn_file" && success "Snippet" "$url\\ngot saved"
+    fi
+}
+
+sn_rm() {
+    line="$(menu "Snippet to remove" <"$sn_file")"
+    [ -z "$line" ] && exit 0
+    confirm="$(printf "Yes\\nNo" | menu "Remove $line?")"
+    [ "$confirm" != "Yes" ] && exit 0
+
+    tmp_file="$(dirname "$sn_file")/.snippets.tmp"
+
+    grep -vF "$line" "$sn_file" >"$tmp_file" &&
+        mv "$tmp_file" "$sn_file" &&
+        rm -f "$tmp_file" &&
+        success "Snippet" "$line\\ngot removed"
+}
+
+c=("Bookmark Add" "Bookmarks" "Bookmark Remove" "Snippet Add" "Snippets" "Snippet Remove")
+case "${1:-$(printf "%s\n" "${c[@]}" | $empty_menu)}" in
+"${c[0]}") bm_add ;;
+"${c[1]}") bm_show ;;
+"${c[2]}") bm_rm ;;
+"${c[3]}") sn_add ;;
+"${c[4]}") sn_show ;;
+"${c[5]}") sn_rm ;;
+esac

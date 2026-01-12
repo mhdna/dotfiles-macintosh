@@ -1,0 +1,39 @@
+#!/bin/sh
+
+daemon="sb-mpdup"
+# ! pidof -xs "$daemon" >/dev/null 2>&1 && "$daemon" &
+# disown >/dev/null 2>&1
+
+[ "$1" == "-d" ] && { ! pidof -xs "$daemon" >/dev/null 2>&1 && $daemon >/dev/null 2>&1; } && exit 0
+
+print() {
+	status=$(mpc status %state%)
+	if [ "$status" = "playing" ]; then
+		color="#00ff00"
+	else
+		color="#ff0000"
+	fi
+	status="<span color=\"$color\">M: $status</span>"
+	echo "$status"
+}
+
+case $BLOCK_BUTTON in
+1)
+	print
+	setsid -f qterminal -e ncmpcpp
+	;;
+2)
+	mympc -t >/dev/null 2>&1
+	print
+	;;
+4)
+	mympc -n >/dev/null 2>&1
+	print
+	;;
+5)
+	mympc -p >/dev/null 2>&1
+	print
+	;;
+6) $TERMINAL -e $EDITOR "$0" ;;
+*) print ;;
+esac

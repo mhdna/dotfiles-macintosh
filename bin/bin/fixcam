@@ -1,0 +1,25 @@
+#!/bin/sh
+# Simple script to set my webcam settings
+# Key Light 35
+# Hair Light 30
+# device=$(v4l2-ctl --list-devices | grep "C920" -A 1 | grep "/dev/video." -o)
+# device=$(v4l2-ctl --list-devices | grep "C920" -A 1 | grep "/dev/video." -o)
+device=/dev/video0
+
+v4l2-ctl -d $device --set-ctrl=gamma=50 \
+          --set-ctrl=contrast=25 \
+          --set-ctrl=brightness=40 \
+          --set-ctrl=saturation=100 \
+          --set-ctrl=hue=40
+# # v4l2-ctl -d $device --set-ctrl=focus_auto=0
+# # v4l2-ctl -d $device --set-ctrl=exposure_auto=0
+# v4l2-ctl -d $device --set-ctrl=white_balance_temperature_auto=0
+# # v4l2-ctl -d $device --set-ctrl=focus_absolute=20
+# # v4l2-ctl -d $device --set-ctrl=exposure_absolute=200
+# v4l2-ctl -d $device --set-ctrl=saturation=90
+# v4l2-ctl -d $device --set-ctrl=contrast=10
+# v4l2-ctl -d $device --set-ctrl=sharpness=108
+# v4l2-ctl -d $device --set-ctrl=white_balance_temperature=4500
+# # v4l2-ctl -d $device --set-ctrl=zoom_absolute=0
+# v4l2-ctl -d $device --set-ctrl=brightness=70
+# # v4l2-ctl -d $device --set-ctrl=gain=50

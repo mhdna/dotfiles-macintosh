@@ -1,0 +1,4 @@
+#!/bin/sh
+
+quotes_file="$HOME/.local/share/quotes.json"
+cowsay "$(jq -r '.[] | .author + ": " + .text' "$quotes_file" | shuf | head -n1)"

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+files="$@"
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	menu() {
+		tofi --placeholder-text "$@"
+	}
+else
+	menu() {
+		menu-wrapper -p "$@"
+	}
+fi
+
+ans="$(printf "Yes\\nNo" | menu "Want to delete "$files"")"
+
+[ "$ans" = "Yes" ] && notify-send "$files"

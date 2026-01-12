@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# a youtube-dl wrapper script
+
+/usr/bin/yt-dlp --compat-options youtube-dl "$@"

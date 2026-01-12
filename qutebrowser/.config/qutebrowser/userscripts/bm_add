@@ -1,0 +1,22 @@
+#!/bin/sh
+
+url="$1"
+tags="$2"
+tags_file="$QUTE_CONFIG_DIR/bookmarks_tags"
+
+isthere="$(shiori list | grep "\b$url\b")"
+
+[ -n "$isthere" ] && echo "message-warning \"already bookmarked $url\"" >>"$QUTE_FIFO" && exit 0
+
+[ -z "$tags" ] && tags="$(menu-wrapper -p 'Tags (split with a ,)' <"$tags_file")"
+
+[ -z "$tags" ] && exit 0
+
+shiori add -a "$url" -i "$QUTE_TITLE" -t "$tags" && echo "message-info \"Added to $tags $url\"" >>"$QUTE_FIFO"
+
+# update home page to contain goinon tagged bookmarks
+# [ "$tag" = "goingon" ] && shiori list -j -t goingon | jq -r '.[] | "<h3><a href=\(.url)>\(.title)</a></h3>"' > startpage.html
+
+if ! grep ^$tag\$ "$tags_file"; then
+	shiori list -j | jq -r '.[].tags.[].name' | sort | uniq >"$tags_file"
+fi

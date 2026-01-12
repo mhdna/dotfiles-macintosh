@@ -1,0 +1,10 @@
+#!/bin/sh
+
+dir="$(mktemp -d)"
+git clone "$1" --depth 1 "$dir" >/dev/null 2>&1
+cd "$dir" || { echo "Cannot cd into directory" && exit 1; }
+if [ "$2" == "f" ]; then
+	git ls-files | wc -l
+	exit 0
+fi
+git ls-files | grep "\.py" | xargs cat | wc -l

@@ -1,0 +1,73 @@
+reload-threads 50 # Parallel reloading
+auto-reload yes
+max-items 40
+# automatically populate queries at startup, rather than showing 0/0 and populating on reload
+prepopulate-query-feeds yes
+feed-sort-order firsttag
+
+external-url-viewer "urlview"
+
+bind-key j down
+bind-key k up
+bind-key J next-feed articlelist
+bind-key K prev-feed articlelist
+bind-key G end
+bind-key g home
+bind-key d pagedown
+bind-key u pageup
+bind-key l open
+bind-key h quit
+bind-key a toggle-article-read
+bind-key n next-unread
+bind-key N prev-unread
+bind-key D pb-download
+bind-key ^U show-urls
+bind-key b bookmark
+bind-key x pb-delete
+
+browser $BROWSER
+macro , open-in-browser
+macro v set browser "setsid -f mpv" ; open-in-browser ; set browser linkhandler
+macro w set browser "lynx" ; open-in-browser ; set browser linkhandler
+macro d set browser "handler-menu" ; open-in-browser ; set browser linkhandler
+macro c set browser "echo %u | xclip -r -sel c" ; open-in-browser ; set browser linkhandler
+macro p set browser "peertubetorrent %u 480" ; open-in-browser ; set browser linkhandler
+macro P set browser "peertubetorrent %u 1080" ; open-in-browser ; set browser linkhandler
+
+# color listnormal cyan default
+# color listfocus black yellow standout bold
+# color listnormal_unread blue default
+# color listfocus_unread yellow default bold
+# color info red black bold
+# color article white default bold
+
+color listnormal cyan default
+color listfocus black yellow standout bold
+color listnormal_unread white default
+color listfocus_unread yellow default bold
+color info red black bold
+color article white default bold
+
+# Colors
+# Keep an eye on this issue, because currently there is no way to
+# inherit a color, which makes many things awkward:
+# https://github.com/newsboat/newsboat/issues/2054
+# color  info               default  default  reverse
+# color  listfocus          yellow   default  reverse
+# color  listfocus_unread   yellow   default  reverse
+# color  listnormal_unread  green    default
+
+# Highlights
+# highlight article "^(Title):.*$"         green default
+# highlight article "https?://[^ ]+"       red   default
+# highlight article "\\[image\\ [0-9]+\\]" green default
+# highlight feedlist "(0/0)" red default
+# highlight-article "age > 90" default default dim
+# Subheadings hack (there are nbsps in there)
+# highlight feedlist ".*0/0.*< " blue default invis
+# highlight feedlist " >.*"      blue default invis
+# highlight feedlist "< .* >"    blue default bold
+
+
+# bookmark-autopilot yes # do not use interactive mode when bookmarking
+bookmark-cmd "~/.config/newsboat/bookmark.sh"

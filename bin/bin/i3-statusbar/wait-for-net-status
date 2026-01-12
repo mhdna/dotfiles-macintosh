@@ -1,0 +1,4 @@
+#!/bin/sh
+
+file="/tmp/wait-for-net-status"
+cat "$file" 2> /dev/null

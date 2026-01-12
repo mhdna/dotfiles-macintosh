@@ -1,0 +1,3 @@
+#!/bin/sh
+
+export OPENAI_API_KEY="$(pass gpt)" && sgpt "$@"

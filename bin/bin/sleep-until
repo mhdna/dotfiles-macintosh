@@ -1,0 +1,9 @@
+#!/bin/sh
+
+time="$1"
+current_time=$(date +%s)
+target_time=$(date -d "$time" +%s)
+sleep_time=$((target_time - current_time))
+if [ $sleep_time -gt 0 ]; then
+  sleep $sleep_time
+fi

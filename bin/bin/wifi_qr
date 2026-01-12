@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Get the SSID of the currently connected Wi-Fi
+SSID=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2)
+
+# Get the Wi-Fi password (assuming WPA/WPA2 security)
+PASSWORD=$(nmcli -s -g 802-11-wireless-security.psk connection show "$SSID")
+
+# Generate the Wi-Fi string for QR code
+WIFI_STRING="WIFI:S:$SSID;T:WPA;P:$PASSWORD;;"
+
+# Generate the QR code with higher resolution and save it to a file
+qrencode -o /tmp/wifi_qr.png -s 10 "$WIFI_STRING"
+
+# Open the QR code image with sxiv
+nsxiv /tmp/wifi_qr.png

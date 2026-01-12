@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# colors on/off
+# default duration
+# alarm option
+
+# Start/Stop
+
+# toggle elapsed/remaining
+
+# check if already running
+
+data="$HOME/.timer"
+
+# Set the duration in seconds
+
+# Set the duration in seconds
+duration=28800 # Change this to the desired duration in seconds
+
+# Initialize state variables
+paused=false
+start_time=0
+end_time=0
+config_file="timer_config.txt"
+
+# Function to format seconds into HH:MM:SS format
+format_time() {
+	local seconds=$1
+	local hours=$((seconds / 3600))
+	local minutes=$(((seconds % 3600) / 60))
+	local seconds=$((seconds % 60))
+	printf "%02d:%02d:%02d" $hours $minutes $seconds
+}
+
+# Function to save the timer state to a configuration file
+save_timer_state() {
+	echo "start_time=$start_time" >"$config_file"
+	echo "end_time=$end_time" >>"$config_file"
+	echo "paused=$paused" >>"$config_file"
+}
+
+# Function to load the timer state from a configuration file
+load_timer_state() {
+	if [ -f "$config_file" ]; then
+		source "$config_file"
+	else
+		start_time=$(date +%s)
+		end_time=$((start_time + duration))
+	fi
+}
+
+# Function to handle pause and resume using SIGUSR1
+pause_resume() {
+	if $paused; then
+		echo "Resuming..."
+		start_time=$((start_time + $(date +%s) - paused_time))
+		end_time=$((end_time + $(date +%s) - paused_time))
+		paused=false
+	else
+		echo "Pausing..."
+		paused_time=$(date +%s)
+		paused=true
+	fi
+	save_timer_state
+}
+
+# Trap SIGUSR1 to toggle pause/resume
+trap pause_resume SIGUSR1
+
+# Load the timer state from the configuration file
+load_timer_state
+
+while true; do
+	if $paused; then
+		echo "Paused | Elapsed time: $(format_time $elapsed_time) | Remaining time: $(format_time $remaining_time)"
+	else
+		current_time=$(date +%s)
+		elapsed_time=$((current_time - start_time))
+		remaining_time=$((end_time - current_time))
+
+		if [ $remaining_time -le 0 ]; then
+			echo "Time's up!"
+			break
+		fi
+
+		echo "Elapsed time: $(format_time $elapsed_time) | Remaining time: $(format_time $remaining_time)"
+	fi
+	sleep 1
+done
+
+# Clean up the configuration file at the end of the day
+rm -f "$config_file"

@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+# Screenshots menu for both X and Wayland (sway)
+
+main_pictures_dir="$XDG_PICTURES_DIR"
+local_scrots_dir="$XDG_PICTURES_DIR/private-scrots/"
+cloud_scrots_dir="$XDG_PICTURES_DIR/google-photos/"
+tmpdir="/tmp/screenshots"
+keepintmp="false"
+dirs="$XDG_CACHE_HOME/scrot-dirs.txt"
+
+[ ! -d "$tmpdir" ] && mkdir -p "$tmpdir"
+[ ! -d "$main_pictures_dir" ] && mkdir -p "$main_pictures_dir"
+[ ! -d "$local_scrots_dir" ] && mkdir -p "$local_scrots_dir"
+[ ! -d "$cloud_scrots_dir" ] && mkdir -p "$cloud_scrots_dir"
+
+find "$cloud_scrots_dir" "$local_scrots_dir" "$main_pictures_dir" -maxdepth 2 -type d >"$dirs" &&
+	mkdir -p "$tmpdir"
+
+output="$tmpdir/$(date '+%y-%m-%d_%H:%M:%S').jpg"
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	menu="tofi --placeholder-text"
+else
+	menu="menu-wrapper -p"
+fi
+
+scrotsel() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		grim -g "$(slurp)" "$1"
+	else
+		maim -b 2 -u -s -c "255,0,0,0.5" -l "$1" pic-selected-
+	fi
+}
+
+scrotwin() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		grim -g "$(swaymsg -t get_tree | jq -j '.. | select(.type?) | select(.focused).rect | "\(.x),\(.y) \(.width)x\(.height)"')" "$1"
+	else
+		maim -q -u -d 0.2 -i "$(xdotool getactivewindow)" "$1" pic-window-
+	fi
+}
+
+scrot_drag_and_drop() {
+	keepintmp="true"
+	scrotsel "$output"
+	dragon-drop --and-exit -a "$output"
+}
+
+scrotful() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		grim "$1"
+	else
+		maim -q -u -d 0.2 "$1" pic-full-
+	fi
+}
+
+copy() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		wl-copy
+	else
+		xclip -sel c -i
+	fi
+}
+
+copyimg() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		wl-copy
+	else
+		xclip -sel c -t image/jpg
+	fi
+}
+
+notify_success() {
+	notify-send -t 300 "✅ Screenshot has been copied successfully"
+}
+
+move_and_copy_path() {
+	newpath="$(cat "$dirs" | $menu "Quit to save to $tmpdir:")"
+	[ -z "$newpath" ] && newpath="$tmpdir"
+	mv "$output" "$newpath" >/dev/null 2>&1
+	echo $newpath/$(basename "$output")
+	echo "$newpath/$(basename "$output")" | tr -d '\n' | copy
+}
+
+[ "$1" == "-t" ] && scrotful "$output" && notify_success && exit 0
+
+c=("a selected area" "current window" "full screen" "a selected area (copy)" "current window (copy)" "full screen (copy)" "drag and drop")
+case "${1:-$(printf "%s\n" "${c[@]}" | $menu "Screenshot which area?")}" in
+"${c[0]}") scrotsel "$output" ;;
+"${c[1]}") scrotwin "$output" ;;
+"${c[2]}") scrotful "$output" ;;
+"${c[3]}")
+	scrotsel - | copyimg
+	clip="true"
+	;;
+"${c[4]}")
+	scrotwin - | copyimg
+	clip="true"
+	;;
+"${c[5]}" | "-c")
+	scrotful "$output" | copyimg
+	clip="true"
+	;;
+"${c[6]}" | "-d")
+	scrot_drag_and_drop
+	;;
+*) exit 1 ;;
+esac || exit 1
+
+if [ "$clip" = "true" ]; then
+	notify-success
+elif [ "$keepintmp" != "true" ]; then
+	move_and_copy_path
+fi

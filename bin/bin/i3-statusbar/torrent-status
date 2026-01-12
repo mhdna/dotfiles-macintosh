@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+case $BLOCK_BUTTON in
+1) setsid -f $TERMINAL -e torwrap ;;
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+# if [ "$STATUSBAR" = "i3blocks" ]; then
+#   g="\"#00ff00\">"
+#   r="\"#ff0000\">"
+#   w="\"#ffffff\">"
+#   status="$(transmission-remote -l | grep % |
+# 	sed " # The letters are for sorting and will not appear.
+#     s/.*Stopped.*/A ${r}S:/;
+#     s/.*Seeding.*/Z ${g}ss:/;
+#     s/.*100%.*/N ${g}D:/;
+#     s/.*Idle.*/B ${r}I:/;
+#     s/.*Uploading.*/L ${g}uu:/;
+#     s/.*%.*/M ${w}dd:/" | sort -h | uniq -c | awk '{print $3 $1}' | paste -sd ' ' -)"
+#   echo "<span color=${status}</span>"
+# else
+transmission-remote -l | grep % |
+	sed " # The letters are for sorting and will not appear.
+    s/.*Stopped.*/A S:/;
+    s/.*Seeding.*/Z ss:/;
+    s/.*100%.*/N D:/;
+    s/.*Idle.*/B I:/;
+    s/.*Uploading.*/L uu:/;
+    s/.*%.*/M dd:/" |
+	sort -h | uniq -c | awk '{print $3 $1}' | paste -sd ' ' -
+# fi

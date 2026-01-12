@@ -1,0 +1,43 @@
+{
+  "timeStamp": 1703423899675,
+  "version": "1.54.0",
+  "userSettings": {
+    "advancedUserEnabled": true,
+    "externalLists": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt",
+    "importedLists": [
+      "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt"
+    ],
+    "popupPanelSections": 31
+  },
+  "selectedFilterLists": [
+    "user-filters",
+    "ublock-filters",
+    "ublock-badware",
+    "ublock-privacy",
+    "ublock-quick-fixes",
+    "ublock-unbreak",
+    "easylist",
+    "adguard-spyware-url",
+    "easyprivacy",
+    "urlhaus-1",
+    "plowe-0",
+    "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/LegitimateURLShortener.txt"
+  ],
+  "hiddenSettings": {},
+  "whitelist": [
+    "*youtube.com/*&disableadblock=1",
+    "127.0.0.1",
+    "about-scheme",
+    "chrome-extension-scheme",
+    "chrome-scheme",
+    "edge-scheme",
+    "moz-extension-scheme",
+    "opera-scheme",
+    "vivaldi-scheme",
+    "wyciwyg-scheme"
+  ],
+  "dynamicFilteringString": "* * image block",
+  "urlFilteringString": "",
+  "hostnameSwitchesString": "no-scripting: www.youtube.com false\nno-scripting: twitter.com false\nno-scripting: web.whatsapp.com false\nno-scripting: help.libreoffice.org false\nno-scripting: app.element.io false\nno-scripting: www.gnome-look.org false\nno-scripting: chat.openai.com false\nno-scripting: html.duckduckgo.com false\nno-remote-fonts: play.typeracer.com true",
+  "userFilters": "! 2023-11-14 https://javascript.info\njavascript.info##.sitetoolbar-right-button_courses.sitetoolbar-right-button\n"
+}

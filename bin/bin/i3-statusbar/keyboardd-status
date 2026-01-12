@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [[ -n $WAYLAND_DISPLAY ]]; then
+	keyboard="$1"
+	[ -z "$1" ] && {
+		echo "Please provide keyboard device"
+		exit 1
+	}
+
+	swaylayout --listen "$keyboard" |
+		while read -r line; do
+			pkill -RTMIN+7 "${STATUSBAR:-dwmblocks}"
+		done
+else
+	xkbmon |
+		while read -r line; do
+			pkill -RTMIN+7 "${STATUSBAR:-dwmblocks}"
+		done
+fi

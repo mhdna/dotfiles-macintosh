@@ -1,0 +1,29 @@
+{
+  "whitelisted": [
+    {
+      "id": "UCLIvNqBJtlcw9ymmRhyAacw",
+      "display": "anaHr",
+      "username": ""
+    },
+    {
+      "id": "UCEHvaZ336u7TIsUQ2c6SAeQ",
+      "display": "دروس أونلاين",
+      "username": ""
+    }
+  ],
+  "blacklisted": [],
+  "muted": [],
+  "exclude": [],
+  "muteAll": false,
+  "skipOverlays": true,
+  "skipAdErrors": true,
+  "pauseAfterAd": false,
+  "autoWhite": false,
+  "autoSkip": false,
+  "autoSkipSeconds": 30,
+  "keyboardSkip": true,
+  "verifyWl": true,
+  "limitAds": false,
+  "limitAdsQty": 2,
+  "forceWhite": false
+}

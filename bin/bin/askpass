@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# This script is the SUDO_ASKPASS variable, meaning that it will be used as a
+# password prompt if needed.
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	tofi --placeholder-text "Password:" --hidden-character="*" --hide-input true --require-match false </dev/null
+else
+	menu-wrapper -x -p "$1" <&- && echo
+fi

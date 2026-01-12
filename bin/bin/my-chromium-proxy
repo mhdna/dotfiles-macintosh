@@ -1,0 +1,3 @@
+#!/bin/sh
+
+http_proxy="http://127.0.0.1:8041" https_proxy="http://127.0.0.1:8041" chromium

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+yt-dlp -o "%(title)s.%(ext)s" --trim-filenames 100 --external-downloader aria2c $@
+# --no-playlist
+

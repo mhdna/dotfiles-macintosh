@@ -1,0 +1,28 @@
+#!/bin/sh
+
+menu() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		tofi --placeholder-text "$@"
+	else
+		menu-wrapper -p "$@"
+	fi
+}
+
+orig_file="$HOME/.browser-search"
+# get the name of the search engine
+engines="$(cut -d ';' -f 1 <"$orig_file")"
+search_engine="$(echo "$engines" | menu 'Search in:')"
+
+if [ -z "$search_engine" ] || ! { echo "$engines" | grep -q "$search_engine"; }; then
+	exit 1
+fi
+
+web_search="$(menu 'Web Search:' </dev/null)"
+[ -z "$web_search" ] && exit
+
+# get the url of the search engine
+search_engine="$(grep "$search_engine" "$orig_file" | head -n 1 | cut -d ';' -f 2)"
+
+web_search_url="$(echo "$search_engine" | awk -v web_search="$web_search" '{print $1 web_search $2}')"
+
+$BROWSER "$web_search_url" &

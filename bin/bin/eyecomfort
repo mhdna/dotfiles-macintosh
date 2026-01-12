@@ -1,0 +1,3 @@
+#!/bin/sh
+
+notify-send "It's time to give your eyes a little break" "Look at something 20 feets far away, for 20 secconds"

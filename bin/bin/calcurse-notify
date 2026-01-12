@@ -1,0 +1,3 @@
+#!/bin/sh
+
+CONT="$(calcurse -n | tail -1 | cut -d ' ' -f 5-)" && notify-send -i /usr/share/icons/Adwaita/32x32/mimetypes/x-office-calendar-symbolic.symbolic.png  "Calcurse Event" "$CONT"

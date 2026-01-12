@@ -1,0 +1,19 @@
+#!/bin/sh
+
+usage() {
+    # xdotool uses regular expressions
+    echo "Usage: $(basename "$0") firefox [Brave Chromium ...]"
+    exit 1
+}
+[ $# -lt 1 ] && usage
+
+for app in "$@"
+do
+    w=$(xdotool getwindowfocus)
+    browserid=$(xdotool search --onlyvisible --class "$app" | tail -n 1)
+    [ -z "$browserid" ] && usage
+    xdotool windowfocus "$browserid" key 'ctrl+r' || {
+        1>&2 echo "unable to signal \"$app\""
+    }
+    xdotool windowfocus "$w"
+done

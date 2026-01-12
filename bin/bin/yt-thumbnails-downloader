@@ -1,0 +1,38 @@
+#!/bin/sh
+
+main() {
+    file="$1"
+    title="${file%.*}"
+    path="$HOME/.cache/yt-audio-thumbnails/"
+    thumb="$path/$title.jpg"
+
+    get_thumb() {
+        search_term="$1"
+        # decrement the number of words to search until you find a thumbnail
+        while [ ! -f "$thumb" ]; do
+            [ -z "$search_term" ] && return 1
+            yt-dlp --write-thumbnail -o "%(title)s.%(ext)s" --convert-thumbnail jpg --skip-download ytsearch:"$search_term" -P "$path" -o "$title" > /dev/null 2>&1
+            search_term="$(echo "$search_term" | awk '{NF--; print}')"
+        done
+    }
+
+    # search using title
+    search_term="$title"
+    get_thumb "$search_term" || {
+        printf "ℹ️  Seaching using metadata...\\n"
+            search_term="$(mediainfo --Output=JSON "$file" | jq '.media.track[0].Title')"
+            [ "$search_term" = "null" ] && search_term="$title" exit 1
+            get_thumb "$search_term"
+        }
+
+        if [ -f "$thumb" ]; then
+            # make it smaller
+            convert -resize '250x250>' "$thumb" "$thumb"
+            echo "✅ $search_term"
+        else
+            echo "❌ Couldn't find "$title""
+        fi
+    }
+
+    export -f main
+    parallel -j 10 main ::: "$@"

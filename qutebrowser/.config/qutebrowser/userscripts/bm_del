@@ -1,0 +1,19 @@
+#!/bin/sh
+
+url="$1"
+tags_file="$QUTE_CONFIG_DIR/bookmarks_tags"
+info="$(shiori list | grep -B 1 "\b$url\b")"
+
+[ -z "$info" ] && echo ":message-warning '$QUTE_URL is not bookmarked'" >>"$QUTE_FIFO" && exit 0
+
+! menu-wrapper -isyes "Delete?" && exit 0
+
+id="$( echo "$info" | head -n 1 | cut -d '.' -f 1)"
+
+shiori delete "$id" -y && echo ":message-info 'Deleted $QUTE_URL'" >>"$QUTE_FIFO"
+
+# update home page to contain goinon tagged bookmarks
+# [ "$tag" = "goingon" ] && shiori list -j -t goingon | jq -r '.[] | "<h3><a href=\(.url)>\(.title)</a></h3>"' > startpage.html
+
+# update tags list
+shiori list -j | jq -r '.[].tags.[].name' | sort | uniq >"$tags_file"

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+file="$1"
+command="$2"
+[ -d "$file" ] && dir="$file" || dir="$(dirname "$file")"
+
+sleep 0.1
+
+if [ ! -z "$command" ]; then
+    $EDITOR -c "cd $dir" -c "$command" "$file"
+else
+    $EDITOR -c "cd $dir" "$file"
+fi

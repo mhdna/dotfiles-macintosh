@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# ! pidof dwmblocks >/dev/null 2>&1 && setsid -f dwmblocks >/dev/null 2>&1
+
+case $BLOCK_BUTTON in
+1) nmcli device wifi rescan && notify-send -u low -t 500 "Network Manager" "Refreshed WIFI" ;;
+3) setsid -f $TERMINAL -e nmtui ;;
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+if [ -f "/tmp/wait-for-net-status" ]; then
+    limited=true
+else
+    nmcli networking connectivity | grep -Eq "(limited|portal)" && limited=true
+fi
+
+if grep -xq 'up' /sys/class/net/w*/operstate 2>/dev/null; then
+    wstatus="$(awk '/^\s*w/ { print int($3 * 100 / 70) "%" }' /proc/net/wireless)"
+    # device_name="$(ls /sys/class/net/ | grep "^w")"
+    # ssid="$(iw $device_name link | grep SSID | cut -d ':' -f 2 | tr -d ' ')"
+    # check if connected but has no internet access
+    # ip_address="$(ip -j route get 8.8.8.8 | jq -r ".[0].prefsrc")"
+    # wstatus="${wstatus} ${ip_address}"
+    if [ "$limited" = true ]; then
+        wstatus="<span color=\"#ff0000\">W: $wstatus</span>"
+    else
+        # wstatus="<span color=\"#00ff00\">W: $wstatus</span>"
+        wstatus="W: $wstatus"
+    fi
+elif grep -xq 'down' /sys/class/net/w*/operstate 2>/dev/null; then
+    grep -xq '0x1003' /sys/class/net/w*/flags && wstatus="NC" || wstatus="down"
+    wstatus="<span color=\"#ff0000\">W: $wstatus</span>"
+fi
+
+ethstatus="$(cat /sys/class/net/e*/operstate 2>/dev/null)"
+# only show ethstatus if up
+if [ "$ethstatus" = "up" ]; then
+    if [ "$limited" = true ]; then
+        ethstatus="<span color=\"#ff0000\"> E: $ethstatus</span>"
+    else
+        # ethstatus="<span color=\"#00ff00\"> E: $ethstatus</span>"
+        ethstatus=" E: $ethstatus"
+    fi
+else
+    ethstatus=""
+fi
+
+vpnstatus="$(sed "s/.*/🔒/" /sys/class/net/tun*/operstate 2>/dev/null)"
+
+printf "%s%s%s\n" "$wstatus" "$ethstatus" "$vpnstatus"

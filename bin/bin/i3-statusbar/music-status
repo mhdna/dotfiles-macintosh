@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# print() {
+# 	status=$(mpc status %state%)
+# 	if [ "$STATUSBAR" = "i3blocks" ]; then
+# 		if [ "$status" = "playing" ]; then
+# 			color="#00ff00"
+# 		else
+# 			color="#ff0000"
+# 		fi
+# 		status="<span color=\"$color\">MPD: $status</span>"
+# 	else
+# 		status="MPD: $status"
+# 	fi
+# 	echo "$status"
+# }
+
+# print
+
+while :; do
+	mpc idle >/dev/null && mpd-notify # && print
+done

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# wpctl could cause dwmblocks to block updating
+
+case "$1" in
+"-t") wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
+"-i") wpctl set-volume @DEFAULT_AUDIO_SINK@ "$2"%+ ;;
+"-d") wpctl set-volume @DEFAULT_AUDIO_SINK@ "$2"%- ;;
+# "-t") pamixer -t ;;
+# "-i") pamixer --allow-boost -i 5 ;;
+# "-d") pamixer --allow-boost -d 5 ;;
+"-m") pactl set-source-mute @DEFAULT_SOURCE@ toggle ;;
+*) help ;;
+esac
+
+pkill -RTMIN+1 ${STATUSBAR:-i3blocks}
+# pkill -RTMIN+1 ${STATUSBAR:-dwmblocks}

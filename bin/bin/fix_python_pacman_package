@@ -1,0 +1,4 @@
+#!/bin/sh
+
+sudo pacman -S --noconfirm --overwrite '*' $@
+sudo pacman -Rdd --noconfirm $@

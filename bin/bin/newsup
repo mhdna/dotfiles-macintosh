@@ -1,0 +1,15 @@
+#/bin/sh
+
+ping -q -c 1 8.8.8.8 > /dev/null || exit
+
+pgrep -f newsboat$ && exit 1
+
+dst="/tmp/newsupdate"
+
+trap "rm -fr $dst" HUP INT QUIT TERM PWR EXIT
+
+echo "RSS" > "$dst"
+pkill -RTMIN+3 ${STATUSBAR:-dwmblocks}
+/usr/bin/newsboat -x reload
+rm -f "$dst"
+pkill -RTMIN+3 ${STATUSBAR:-dwmblocks}

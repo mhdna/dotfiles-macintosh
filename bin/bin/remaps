@@ -1,0 +1,70 @@
+#!/bin/sh
+
+mine() {
+    # xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Enabled" 1
+
+    # Decrease key repeat delay to 300ms and increase key repeat rate to 50 per second.
+    xset r rate 250 60
+
+    # to see available options, run
+    # grep -E "(ctrl|caps):" /usr/share/X11/xkb/rules/base.lst
+    # setxkbmap -model pc105 -layout us,ara -option grp:alt_space_toggle -option caps:swapescape,altwin:menu_win
+
+    # setxkbmap -model pc104 -layout us,ara -option grp:alt_space_toggle # -option ctrl:swapcaps # -option caps:swapescape
+    setxkbmap -layout us,ara -option grp:alt_space_toggle -option altwin:menu_win # -option ctrl:swapcaps # -option caps:swapescape
+
+    # when it is pressed only once, treat it as escape.
+    # killall xcape 2>/dev/null
+    # xcape -e 'Caps_Lock=Escape' -e 'Control_L=Control_L'
+
+}
+
+reset() {
+    setxkbmap -model pc104 -layout us -option ''
+}
+
+case "$1" in
+"-r") reset ;;
+*) mine ;;
+esac
+
+# #!/bin/sh
+
+# mine() {
+# # Decrease key repeat delay to 300ms and increase key repeat rate to 50 per second.
+# xset r rate 300 50
+
+# # to see available options, run
+# # grep -E "(ctrl|caps):" /usr/share/X11/xkb/rules/base.lst
+# setxkbmap -model pc105 -layout us,ara -option grp:alt_space_toggle -option caps:swapescape,altwin:menu_win
+
+# # when it is pressed only once, treat it as escape.
+# # killall xcape 2>/dev/null ; xcape -e 'Caps_Lock=Escape'
+# }
+
+# touchpad_on() {
+#     ID=""
+#     ID=$(xinput list | grep -Eio '(touchpad|glidepoint)\s*id=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}')
+
+#     xinput enable "$ID"
+# }
+
+# touchpad_off() {
+#     ID=""
+#     ID=$(xinput list | grep -Eio '(touchpad|glidepoint)\s*id=[0-9]{1,2}' | grep -Eo '[0-9]{1,2}')
+
+#     xinput disable "$ID"
+# }
+
+# reset() {
+#				setxkbmap -model pc105 -layout us -option ''
+# }
+
+# while getopts 'rtT' opt; do
+#     case "$opt" in
+#         r) reset;;
+#         t) touchpad_on;;
+#         T) touchpad_off;;
+#         \?) mine;;
+#     esac
+# done

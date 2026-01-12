@@ -1,0 +1,14 @@
+#!/bin/sh
+
+! command -v clipnotify >/dev/null 2>&1 && {
+    echo "clipnotify needs to be installed"
+    exit 1
+}
+
+echo "Listening to clipboard events in order to translate.."
+
+while clipnotify; do
+    new="$(xclip -sel c -o)"
+
+    transs -c
+done

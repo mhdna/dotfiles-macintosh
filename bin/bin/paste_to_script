@@ -1,0 +1,5 @@
+#!/bin/bash
+
+xclip -o -selection clipboard > "$1"
+chmod a+x "$1"
+${EDITOR:-vim} "$1"

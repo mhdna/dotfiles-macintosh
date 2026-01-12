@@ -1,0 +1,3 @@
+#!/bin/sh
+
+zellij attach || zellij

@@ -1,0 +1,638 @@
+# vim:ft=conf
+set shellopts '-eu'
+set ifs "\n"
+set scrolloff 10
+# set icons
+set period 1
+# set previewer 'pistol'
+set previewer '~/.config/lf/preview'
+# set cleaner '~/.config/lf/cleaner'
+set sixel
+set ratios 1:2:2
+set reverse true
+set globsearch true
+set incsearch true
+set sortby ctime
+set info size
+# set drawbox
+
+# set title to current cd
+# cmd on-cd &{{
+# 	    printf "\033]0; $PWD\007" > /dev/tty
+# }}
+
+# Dynamically set number of columns
+# cmd on-redraw %{{
+#     if [ $lf_width -le 40 ]; then
+#         lf -remote "send $id set ratios 1"
+#         lf -remote "send $id set nopreview"
+#     elif [ $lf_width -le 80 ]; then
+#         lf -remote "send $id set ratios 1:1"
+#         lf -remote "send $id set preview"
+#     elif [ $lf_width -le 160 ]; then
+#         lf -remote "send $id set ratios 1:2:3"
+#         lf -remote "send $id set preview"
+#     fi
+# }}
+
+# # no colors
+# set promptfmt "%u@%h:%d%f"
+# set statfmt "%p| %c| %u| %g| %S| %t| -> %l"
+# set borderfmt        "\033[0m"
+# set cursoractivefmt  "\033[7m"
+# set cursorparentfmt  "\033[7m"
+# set cursorpreviewfmt "\033[4m"
+# set errorfmt         "\033[7;31;47m"
+# set numberfmt        ""
+# set rulerfmt         "%a  |%p  | %m | %c | %s | %f   |%i/%t"
+# set tagfmt           ""
+
+# WARNING (don't do): setting more info hides them all on relatively small windows
+# set info size:time
+set mouse true
+set autoquit true
+
+cmd e ${{ $EDITOR "$1" }}
+
+cmd chmod ${{
+
+clear; printf "mode Bits: "
+read ans
+
+for file in "$fx"
+do
+		chmod $ans $file
+done
+
+lf -remote 'send reload'
+}}
+
+# Archive
+cmd zip $zip -r "$f.zip" "$f"
+cmd tar $tar cvf "$f.tar" "$f"
+cmd targz $tar cvzf "$f.tar.gz" "$f"
+cmd tarbz2 $tar cjvf "$f.tar.bz2" "$f"
+
+# # Creates problems that I don't want to waste my time debugging
+# cmd extract_sub &{{
+# # :extract_sub
+# # -- Extract an archive in subdirectory
+# lf -remote "send extract '$(basename -- "${f%.*}" .tar)'"
+# }}
+
+cmd extract &{{
+# :extract [out_dir]
+out_dir="$*"
+
+if [ -n "$out_dir" ]; then
+		mkdir -p "$out_dir"
+		cd "$out_dir" || {
+				lf -remote "send echoerr unable to create dir"
+						exit 1
+				}
+fi
+
+[ -w . ] || {
+		lf -remote "send echoerr unable to extract to \
+		\'${out_dir:-.}\'. No write permissions"
+		exit 1
+}
+
+lf -remote "send echomsg ${f##*/} extracting ..."
+
+case "$f" in
+*.tar) cmd="tar -xf $f" ;;
+*.tar.bz|*.tbz| \
+*.tar.bz2|*.tbz2) cmd="tar -xjf $f" ;;
+*.tar.gz|*.tgz) cmd="tar -xzf $f" ;;
+*.tar.xz|*.txz) cmd="tar -xJf $f" ;;
+*.tar.[zZ]|*.t[zZ]) cmd="tar -xZf $f" ;;
+*.tar.lz|*.tlz| \
+*.tar.lzma|*.tlzma| \
+*.tar.lzo|*.tzo| \
+*.tar.zst|*.tzst) cmd="tar -xaf $f" ;;
+*.7z) cmd="7za x -- $f" ;;
+*.a|*.ar) cmd="ar x -- $f" ;;
+*.ace) cmd="unace e -- $f" ;;
+*.alz) cmd="unalz -- $f" ;;
+*.arc|*.ark|*.ARC|*.ARK) cmd="nomarch -- $f" ;;
+*.arj|*.ARJ) cmd="arj e -r -- $f" ;;
+*.bz|*.bz2) cmd="bunzip2 -k -- $f" ;;
+*.cab|*.CAB|*.exe|*.EXE) cmd="cabextract $f" ;;
+*.cpio) cmd="cpio -id -F $f"   ;;
+*.deb) cmd="dpkg -x -- $f ." ;;
+*.gz) cmd="gunzip -k $f" ;;
+*.lha|*.lzh) cmd="lha x $f" ;;
+*.lrz|*.lrzip|*.rz) cmd="lrunzip -- $f" ;;
+*.lz) cmd="lzip -d -k -- $f" ;;
+*.lz4) cmd="unlz4 -- $f" ;;
+*.lzma) cmd="xz -d -k $f" ;;
+*.lzo) cmd="lzop -x $f" ;;
+*.rar) cmd="unrar x -- $f" ;;
+*.src.rpm|*.rpm|*.spm) cmd="rpm2cpio $f | cpio -dium" ;;
+*.xz) cmd="unxz -k -- $f" ;;
+*.[zZ]) cmd="uncompress -- $f" ;;
+*.zip|*.osz) cmd="unzip -- $f" ;;
+*.zst) cmd="unzstd -- $f" ;;
+*.AppImage) cmd ="./$f --appimage-extract" ;;
+*) lf -remote "send echoerr ${f##*/} unknown archive format"
+exit 0;;
+esac
+
+[ -n "$cmd" ] && $TERMINAL -e $cmd
+
+if [ -n "$out_dir" ]; then
+lf -remote "send select '$out_dir'"
+fi
+
+lf -remote "send reload"
+lf -remote "send echomsg ${f##*/} extracted."
+}}
+
+# cmd bulkrename ${{
+# tmpfile_old="$(mktemp)"
+# tmpfile_new="$(mktemp)"
+
+# [ -n "$fs" ] && fs=$(basename -a $fs) || fs=$(ls)
+
+# echo "$fs" > "$tmpfile_old"
+# echo "$fs" > "$tmpfile_new"
+# $EDITOR "$tmpfile_new"
+
+# [ "$(wc -l < "$tmpfile_old")" -eq "$(wc -l < "$tmpfile_new")" ] || { rm -f "$tmpfile_old" "$tmpfile_new"; exit 1; }
+
+# paste "$tmpfile_old" "$tmpfile_new" | while IFS="$(printf '\t')" read -r src dst
+# do
+# [ "$src" = "$dst" ] || [ -e "$dst" ] || mv -- "$src" "$dst"
+# done
+
+# rm -f "$tmpfile_old" "$tmpfile_new"
+# lf -remote "send $id unselect"
+# }}
+cmd bulkrename $vimv
+
+# Select files recursively
+cmd select-files ${{
+    pattern="$1"
+    files=$(
+        if [ "$lf_hidden" = 'false' ]; then
+            # select all files except idden files and files in hidden directories
+            find "$PWD" -mindepth 1 -type f -not -name '.*' -not -path '*/.*' -name "$pattern" -print0
+        else
+            find "$PWD" -mindepth 1 -type f -name "$pattern" -print0
+        fi |
+        xargs -0 printf ' %q'
+        )
+    if [ -n "$(echo "$files" | tr -d ' ')" ]; then
+        lf -remote "send :toggle $files"
+    else
+        lf -remote "send echoerr No matches found"
+    fi
+}}
+
+# Select directories recursively
+cmd select-dirs &{{
+    dirs=$(
+        if [ "$lf_hidden" = 'false' ]; then
+            find "$PWD" -mindepth 1 -type d -not -name '.*' -print0
+        else
+            find "$PWD" -mindepth 1 -type d -print0
+        fi |
+        xargs -0 printf ' %q'
+    )
+    if [ -n "$(echo "$dirs" | tr -d ' ')" ]; then
+        lf -remote "send :unselect; toggle $(get_dirs)"
+    else
+        lf -remote "send echoerr No matches found"
+    fi
+}}
+
+cmd selectnsxivthumb %{{
+    OPENER='printf "%s\0"' SIZE=768 nsxiv-thumb -e "$TABBED_XID" | xargs -r0 realpath -sm -- | while IFS= read -r i; do
+        lf -remote "send $id select '$i'" && lf -remote "send $id toggle"
+    done
+    lf -remote "send $id select '$f'"
+}}
+
+# compress current file or selected files with tar and gunzip
+cmd tar ${{
+set -f
+mkdir $1
+cp -r $fx $1
+tar czf $1.tar.gz $1
+rm -rf $1
+}}
+
+# compress current file or selected files with zip
+cmd zip ${{
+set -f
+mkdir $1
+cp -r $fx $1
+zip -r $1.zip $1
+rm -rf $1
+}}
+
+#fzf
+cmd fzf_jump ${{
+res="$(find . -maxdepth 15 -not -path '*/[@.]*' | fzf --prompt='Jump to: ')" && {
+if [ -f "$res" ]; then
+		cmd="select"
+elif [ -d "$res" ]; then
+		cmd="cd"
+fi
+lf -remote "send $id $cmd \"$res\""
+} || exit 0
+}}
+
+# y (select for copy) and P to paste soft-link
+# d (select for cut) and P to paste hard-link
+cmd link %{{
+set -- $(cat ~/.local/share/lf/files)
+mode="$1"
+shift
+if [ "$#" -lt 1 ]; then
+		lf -remote "send echoerr no files to link"
+		exit 0
+fi
+case "$mode" in
+		# symbolically copy mode is indicating a soft link
+		copy) ln -sr -t . -- "$@";;
+		# while a move mode is indicating a hard link
+		move) ln -t . -- "$@";;
+esac
+rm ~/.local/share/lf/files
+lf -remote "send clear"
+}}
+
+# cmd open $set -f; rifle -p 0 "$fx"
+
+# cmds/functions
+
+cmd q :quit
+
+cmd open &{{
+# xdg-mime seems to be smarter but slower than file
+# case $(xdg-mime query filetype "$f") in
+# if [ -n "${NVIM-}" ]; then
+# else
+	case $(file --dereference --brief --mime-type -- "$f") in
+			# text/html) setsid -f surf -z 1.5 $fx >/dev/null 2>&1;;
+			text/html|application/x-bittorrent) rifle "$fx";;
+			# text/org) setsid -f myemacsclient $f >/dev/null 2>&1 ;;
+			# NOTE: the above is the old none application/* implementation
+			image/x-xcf) setsid -f gimp $fx >/dev/null 2>&1 ;;
+			image/*)
+			# setsid -f pqiv --thumbnail-persistence=$HOME/.cache/pqiv/ --max-depth 1 "$PWD" 2>/dev/null
+			# nsxiv-refile "$fx"
+			rotdir $f | grep -i "\.\(svg\|png\|jpg\|jpeg\|gif\|webp\|tif\|ico\)\(_large\)*$" |
+					setsid -f nsxiv-wrapper -aio 2>/dev/null | while read -r file; do
+							[ -z "$file" ] && continue
+							lf -remote "send select \"$file\""
+							lf -remote "send toggle"
+					done
+					;;
+			image/vnd.djvu|application/pdf|application/octet-stream|application/postscript|application/epub*)  setsid -f xdg-open $fx ;; # zathura-fit-width
+			# video/x-ms-asf) setsid -f mpv --profile=fast $f -quiet >/dev/null 2>&1;;
+			audio/*|video/x-ms-asf) setsid -f mpv --script-opts=layout=topbar,osc-visibility=always --profile=audio $f > /dev/null 2>&1 ;;
+			# audio/*|video/x-ms-asf) setsid -f $TERMINAL -e mpv $f >/dev/null 2>&1  ;;
+			video/*) setsid -f mpv $f -quiet >/dev/null 2>&1 ;;
+			# libreoffice filetypes
+			application/vnd.openxmlformats-officedocument.wordprocessingml.document|application/vnd.oasis.opendocument.text|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|application/octet-stream|application/vnd.oasis.opendocument.spreadsheet|application/vnd.oasis.opendocument.spreadsheet-template|application/vnd.openxmlformats-officedocument.presentationml.presentation|application/vnd.oasis.opendocument.presentation-template|application/vnd.oasis.opendocument.presentation|application/vnd.ms-powerpoint|application/vnd.oasis.opendocument.graphics|application/vnd.oasis.opendocument.graphics-template|application/vnd.oasis.opendocument.formula|application/vnd.oasis.opendocument.database|application/msword) setsid -f libreoffice $fx >/dev/null 2>&1 ;;
+			application/pgp-encrypted|application/*|text/*|application/x-trash|application/x-shellscript|application/json|inode/x-empty|application/x-subrip) setsid -f $TERMINAL -e $EDITOR "$f">/dev/null 2>&1;;
+			*) for f in $fx; do setsid -f rifle $f >/dev/null 2>&1; done;;
+	esac
+# fi
+}}
+
+cmd resize ${{
+	# e.g. :resize 400 400 converts all selected files to that size
+	x="$1"
+	y="$2"
+	for f in $fx; do
+		magick "$f" -resize "${x}x${y}" "${f%.*}-resized.png"
+	done
+}}
+
+cmd convert_image ${{
+	ext="$1"
+	for f in $fx; do
+		magick "$f" "${f%.*}-converted.$ext"
+	done
+}}
+
+cmd mkdir $mkdir -p "$(echo $* | tr ' ' '\ ')"
+cmd mkfile $touch "$(echo $* | tr ' ' '\ ')"
+
+cmd yank ${{
+    case "$1" in
+        p) # path
+        readlink -f $PWD | tr -d '\n' | xclip-or-wl-copy ;;
+        n) # name
+        basename -a -- $fx | head -c-1 | xclip-or-wl-copy ;;
+        P) # name+path
+        echo -n $fx | xclip-or-wl-copy ;;
+    esac
+}}
+
+cmd upload0x0 ${{
+    clear; tput cup $(($(tput lines)/3)); tput bold
+    set -f
+    printf "%s\n\t" "$f"
+    printf "upload to 0x0.st?[y/n] "
+    read ans
+    [ $ans = "y" ] && curl -F "file=@$f" 0x0.st | xclip-or-wl-copy && lf -remote "send echo  Uploaded to 0x0.st"
+}}
+
+cmd pdfConvert ${{
+clear; tput cup $(($(tput lines)/3)); tput bold
+set -f
+printf "%s\n\t" "$fx"
+printf "convert to pdf?[y/N] "
+read ans
+[ $ans = "y" ] && libreoffice --convert-to pdf $fx --headless
+}}
+
+cmd trash-put ${{
+clear; tput cup $(($(tput lines)/3)); tput bold
+set -f
+printf "%s\n\t" "$fx"
+printf "move to trash?[y/N] "
+read ans
+[ $ans = "y" ] && trash-put -- $fx
+}}
+
+cmd delete ${{
+clear; tput cup $(($(tput lines)/3)); tput bold
+set -f
+printf "%s\n\t" "$fx"
+printf "delete?[y/N] "
+read ans
+[ $ans = "y" ] && rm -rf -- $fx
+}}
+
+cmd shred ${{
+clear; tput cup $(($(tput lines)/3)); tput bold
+set -f
+printf "%s\n\t" "$fx"
+printf "shred?[y/N] "
+read ans
+[ $ans = "y" ] && shred -uvzn3 -- $fx
+}}
+
+cmd moveto ${{
+clear; tput cup $(($(tput lines)/3)); tput bold
+set -f
+clear; echo "Move to where?"
+dest="$(cat ${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs | fzf)" &&
+		for x in $fx; do
+				mv -iv "$x" "$dest"
+		done &&
+                lf -remote "send echo 🚚 File(s) moved. File(s) moved to $dest."
+		}}
+
+# move to current subdirectories
+cmd movecto ${{
+clear; tput cup $(($(tput lines)/3)); tput bold
+set -f
+clear; echo "Move to where?"
+dest="$(find . -maxdepth 2 -type d | fzf)" &&
+		for x in $fx; do
+				mv -iv "$x" "$dest"
+		done &&
+                lf -remote "send echo 🚚 File(s) moved. File(s) moved to $dest."
+		}}
+
+		cmd copyto ${{
+		clear; tput cup $(($(tput lines)/3)); tput bold
+		set -f
+		clear; echo "Copy to where?"
+		dest="$(cat ${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs | fzf)" &&
+				for x in $fx; do
+						cp -ivr "$x" "$dest"
+				done &&
+                        lf -remote "send echo 📋 File(s) copied. File(s) copied to $dest."
+
+				}}
+
+				cmd jumpTo ${{
+				res="$(cat ${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs | fzf  --prompt='Jump to: ')" && {
+						if [ -f "$res" ]; then
+								cmd="select"
+						elif [ -d "$res" ]; then
+								cmd="cd"
+						fi
+						lf -remote "send $id $cmd \"$res\""
+					} || exit 0
+				}}
+
+				cmd Search :{{
+				search
+				push **<c-b>
+		}}
+
+		cmd Search-back :{{
+		search-back
+		push **<c-b>
+}}
+
+cmd fzf_search ${{
+    RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+    res="$(
+        FZF_DEFAULT_COMMAND="$RG_PREFIX ''" \
+		fzf --ansi --disabled \
+			--bind "start:reload:$RG_PREFIX {q}" \
+			--bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
+			--delimiter : \
+			--preview 'bat --color=always {1} --highlight-line {2}' \
+			--preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
+            | cut -d':' -f1 | sed 's/\\/\\\\/g;s/"/\\"/g'
+    )"
+    [ -n "$res" ] && lf -remote "send $id select \"$res\""
+}}
+
+cmd reloadConfig :{{
+      source ~/.config/lf/lfrc
+      echo "Config reloaded"
+}}
+
+cmd so &{{
+# Source config files without restarting
+    {
+        lf -remote "send source ~/.config/lf/lfrc"&
+        shortcuts && lf -remote "send source ~/.config/lf/shortcutrc"
+    } &&
+    lf -remote "send echo Shortcuts and config got reloded"
+}}
+# cmd paste $cp-p --lf-paste "$id"
+
+cmd echo_filename &{{
+	fname="$f"
+	notify-send -u low "$fname"
+}}
+
+# zoxide
+
+cmd z %{{
+    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
+
+cmd zi ${{
+    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
+
+cmd on-cd &{{
+    zoxide add "$PWD"
+}}
+
+cmd compressvideo ${{
+    clear
+    set -f
+
+    converted_filenames="" # notify-send variable
+    converted_files_count=0 # notify-send variable
+
+    echo "Compression Rate? (default: 31, maximum: 50)"
+    read compressionRate
+
+    # If not a number (e.g. empty), give default 31 value
+    if ! [[ $compressionRate =~ ^[0-5][0-9]$ ]]; then
+        compressionRate="31"
+    fi
+
+    for pickedFilepath in $fx; do
+        # could instead use ffprobe but would get more complicated as the filetype suffix becomes unknown
+        case "$pickedFilepath" in
+            *.mp4)
+                tempFilepath="$(printf '%s' "$pickedFilepath" | sed 's|.mp4|(CONVERTING).mp4|')"
+                mv -f "$pickedFilepath" "$tempFilepath"
+
+                ffmpeg -i "$tempFilepath" -vcodec libx265 -crf "$compressionRate" "$pickedFilepath"
+                rm -f -- "$tempFilepath"
+                ;;
+            *.webm | *.mkv)
+                newFilepath="$(printf '%s' "$pickedFilepath" | sed 's/\(.webm\|.mkv\)/.mp4/')"
+                ffmpeg -i "$pickedFilepath" -vcodec libx265 -crf "$compressionRate" "$newFilepath"
+                rm -f -- "$pickedFilepath"
+                ;;
+            *) continue 1;;
+        esac
+
+        ((converted_files_count=converted_files_count+1))
+        converted_filenames="$converted_filenames"$'\n'"$pickedFilepath"
+
+    done
+
+    # Notify the user of the results
+    if [[ $converted_files_count -gt 0 ]]; then
+        converted_filenames="$(printf '%s' "$converted_filenames" | sed 's|.*\/||')"
+        notify-send "Compressed Videos($converted_files_count):" "$converted_filenames"
+    fi
+}}
+
+map DD trash-put
+map DL delete
+map TT cd ~/.local/share/Trash/
+map TR $clear; trash-restore
+map TE $clear; trash-empty
+map DS shred
+map Y copyto
+map M moveto
+map <a-m> movecto
+map Z pdfConvert
+
+map / Search
+map ? Search-back
+map <a-/> search
+map <a-?> search-back
+
+# map <enter> shell
+map x !clear; $f
+map X chmod
+
+map w $setsid -f $TERMINAL >/dev/null 2>&1
+
+map U !clear; du -sh
+map u :clear; unselect
+
+map <a-r> so
+map <c-r> :reload; redraw
+
+map gh
+
+map <c-g> push :glob-select<space>*.
+# map J jumpTo
+map <c-j> zi
+map <c-f> :fzf_jump
+map gs :fzf_search
+map <c-space> :toggle; up
+
+map o &mimeopen "$f"
+map O &mimeopen-menu "$f"
+map <c-o> $clear; mimeopen --ask-default "$f"
+
+map K $kdcfiles-menu $fx
+map P $myscp $fx
+map ) upload0x0
+
+# map <c-n>  :updir; set dironly true; down; set dironly false; open
+# map <c-p>  :updir; set dironly true; up; set dironly false; open
+
+map c
+
+map A :rename; cmd-end # at the very end
+map r push A<c-u>
+map a :rename; cmd-right # after extention
+map I :rename; cmd-home # at the very beginning
+map i rename # before extention
+map B bulkrename
+map b $setbg "$fx"
+map <a-e> echo_filename
+map L :link
+map V invert-below
+
+# yank
+map y
+map yy copy
+map yp yank p
+map yn yank n
+map yP yank P
+
+# archive mappings
+map <c-a>z $zip -r "$f.zip" "$f" # zip
+map <c-a>t $tar cvf "$f.tar" "$f" # tar
+map <c-a>g $tar cvzf "$f.tar.gz" "$f" # targz
+map <c-a>b $tar cjvf "$f.tar.bz2" "$f" # tarbz2
+# map <c-e> extract_sub
+map E extract
+
+map m push :mkdir<space>
+map f push :mkfile<space>
+map S push :select-files<space>*
+map R push :resize<space>200<space>200<a-b><a-b>
+map Cr push :convert_image<space>jpg<a-b>
+map Co compressvideo
+
+map P &pcmanfm .
+
+# stipspace
+map sS %stripspace "$f"
+
+cmd replace ${{
+	newline="$1"
+	sed -i "1s/^/$newline\n\n/" "$fx"
+}}
+
+map <tab> push :replace<space>
+
+#dragon
+map d
+map dd cut
+map dr &dragon-drop -k --and-exit -a $fx
+map dm %mvdragon
+map dc %cpdragon
+map dl %dlfile
+
+# Source Bookmarks
+source "~/.config/lf/shortcutrc"

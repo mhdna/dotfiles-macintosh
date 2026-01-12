@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [[ "$EUID" != 0 ]]
+then
+    exec sudo "$0" "$@"
+fi
+
+[[ ! -d /sys/class/backlight/intel_backlight ]] && exit
+
+current=$(< /sys/class/backlight/intel_backlight/brightness)
+max=$(< /sys/class/backlight/intel_backlight/max_brightness)
+min=$((max / max))
+step=$((max / 20))
+
+case $1 in
+    up)    ((current+=step))     ;;
+    down)  ((current-=step))     ;;
+    min)   current=$min          ;;
+    max)   current=$max          ;;
+    off)   current=0             ;;
+    print) echo "$current"; exit ;;
+    *)     current=$1            ;;
+esac
+
+if (( current < min )) && [[ $1 != off ]]
+then
+    current=$min
+elif (( current > max ))
+then
+    current=$max
+fi
+
+echo $current >/sys/class/backlight/intel_backlight/brightness

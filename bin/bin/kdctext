@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# kde-connect send URL or clipboard to some device via menu
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    menu () {
+        tofi --placeholder-text "$@"
+    }
+else
+    menu () {
+        menu-wrapper -l 10 -p "$@"
+    }
+fi
+
+# Description:
+# Send files to a connected kdeconnect device
+
+! pidof kdeconnectd  >/dev/null 2>&1 && { setsid -f /usr/lib/kdeconnectd >/dev/null 2>&1 && sleep 2; }
+
+kdeconnect-cli --refresh
+
+chosen="$(kdeconnect-cli -a | menu "Device")"
+[ -z "$chosen" ] && exit 1 # exit if empty (you can't do *| fzf || exit 1* in the previous row)
+
+id="$(echo "$chosen" | cut -d ":" -f 2 | cut -d " " -f 2)"
+
+isSuccessful() {
+	$@ || notify-send '📱 Kdeconnect' 'Sending has failed'
+}
+if [ -n "$1" ]; then
+	isSuccessful kdeconnect-cli --share --device "$id" "$1"
+else
+	isSuccessful kdeconnect-cli --send-clipboard  --device "$id"
+fi

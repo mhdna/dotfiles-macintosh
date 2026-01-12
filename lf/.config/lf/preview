@@ -1,0 +1,77 @@
+#!/bin/sh
+
+filesize=$(stat -c %s "$1")
+[ "$filesize" -gt 10737418240 ] && exit 0
+
+image() {
+	# if [ $TERM = "tmux-256color" ]; then
+	# 	exit 0
+	# else
+	geometry="$(($2 - 2))x$(($3 - 10))"
+	chafa -f sixel -s "$geometry" --animate off --polite on "$1"
+	exit 1
+	# fi
+}
+
+# set -C -f
+# IFS="$(printf '%b_' '\n')"
+# IFS="${IFS%_}"
+
+# image() {
+# 	if [ -f "$1" ] && [ -n "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && command -V ueberzug >/dev/null 2>&1; then
+# 		printf '{"action": "add", "identifier": "PREVIEW", "x": "%s", "y": "%s", "width": "%s", "height": "%s", "scaler": "contain", "path": "%s"}\n' "$4" "$5" "$(($2 - 1))" "$(($3 - 1))" "$1" >"$FIFO_UEBERZUG"
+# 	else
+# 		mediainfo "$6"
+# 	fi
+# }
+
+batorcat() {
+	file="$1"
+	shift
+	if command -v bat >/dev/null 2>&1; then
+		bat --color=always --terminal-width "$(($4 - 2))" --style=plain --pager=never "$file" "$@"
+	else
+		cat "$file"
+	fi
+}
+
+case "$(mimetype -b -- "$(readlink -f "$1")")" in
+application/x-executable) xxd -b -l 200 "$1" ;;
+*/epub+zip | */mobi*)
+	CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/lf/thumb.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$1")" | sha256sum | cut -d' ' -f1)"
+	[ ! -f "$CACHE.jpg" ] && gnome-epub-thumbnailer "$1" "$CACHE.jpg"
+	image "$CACHE.jpg" "$2" "$3" "$4" "$5" "$1"
+	;;
+image/avif)
+	CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/lf/thumb.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$1")" | sha256sum | cut -d' ' -f1)"
+	[ ! -f "$CACHE" ] && convert "$1" "$CACHE.jpg"
+	image "$CACHE.jpg" "$2" "$3" "$4" "$5" "$1"
+	;;
+image/*) image "$1" "$2" "$3" "$4" "$5" "$1" ;;
+# text/html) lynx -width="$4" -display_charset=utf-8 -dump "$1" ;;
+text/troff) man ./ "$1" | col -b ;;
+application/x-object) objdump -h "$1" ;; # -x for a little more details
+application/x-bittorrent) transmission-show "$1" ;;
+application/*zip | *-tar | *-7z-*) atool --list -- "$1" ;;
+text/* | application/x-* | application/x-desktop | application/x-shellscript | application/toml | application/x-trash | */xml | application/json | application/yaml | application/javascript) batorcat "$1" ;;
+video/* | audio/ogg)
+	CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/lf/thumb.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$1")" | sha256sum | cut -d' ' -f1)"
+	[ ! -f "$CACHE" ] && ffmpegthumbnailer -i "$1" -o "$CACHE" -s 0
+	image "$CACHE" "$2" "$3" "$4" "$5" "$1"
+	;;
+*/pdf)
+	CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/lf/thumb.$(stat --printf '%n\0%i\0%F\0%s\0%W\0%Y' -- "$(readlink -f "$1")" | sha256sum | cut -d' ' -f1)"
+	[ ! -f "$CACHE.jpg" ] && pdftoppm -jpeg -f 1 -singlefile "$1" "$CACHE"
+	image "$CACHE.jpg" "$2" "$3" "$4" "$5" "$1"
+	;;
+audio/* | application/octet-stream) mediainfo --Output=HTML "$1" | lynx -width="$4" -display_charset=utf-8 -dump -stdin || exit 1 ;;
+*opendocument*) odt2txt "$1" ;;
+application/pgp-encrypted) gpg -d -- "$1" ;;
+application/*iso*-image) iso-info --no-header -l "$1" ;;
+application/*officedocument.wordprocessingml* | application/msword) docx2txt "$1" - ;;
+application/*officedocument.spreadsheetml*)
+	ssconvert --export-type=Gnumeric_stf:stf_csv "$1" "fd://1" | batorcat --language=csv
+	;;
+*) echo -e "\e[47;30mNo preview\e[0m" ;;
+esac
+exit 1

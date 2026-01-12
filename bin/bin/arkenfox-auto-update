@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# A wrapper for the arkenfox-updater that runs it on all pre-existing Arkenfox
+# user.js files on the machine.
+
+# On installation of LARBS, this file is copied to /usr/local/lib/ where it is
+# run by a pacman hook set up. The user should not have to run this manually.
+
+# Search for all Firefox and Librewolf profiles using Arkenfox.
+userjss="$(grep -sH "arkenfox user.js" \
+	/home/*/.mozilla/firefox/*/user.js \
+	/home/*/.librewolf/*/user.js | cut -d ':' -f 1)"
+
+IFS='
+'
+
+# Update each found profile.
+for u in ${userjss[@]}; do
+	profile="$(dirname $u)"
+	sudo chown "$user:$user" -R $profile # otherwise it won't work
+	arkenfox-updater -o "$HOME"/.config/firefox/overrides.js -s -p $profile
+done

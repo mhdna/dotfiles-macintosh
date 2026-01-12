@@ -1,0 +1,3 @@
+-- vim.keymap.set("n", "<M-b>", "ysiWtb<CR>", {buffer = 0})
+-- vim.keymap.set("n", "<M-i>", "ysiWte<CR>", {buffer = 0})
+-- vim.keymap.set("n", "<M-y>", "ysiWt<span style:'background-color: yellow; color: black;'<CR>", {buffer = 0})

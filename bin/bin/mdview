@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+
+
+from markdown import markdown
+from os import getenv
+from subprocess import call
+from tempfile import NamedTemporaryFile
+
+import argparse
+import sys
+
+
+HEADER_HTML5 = """<!DOCTYPE html>
+<html{lang}>
+    <head>
+        <meta charset="UTF-8">
+        {viewport}
+        {raw_headers}
+        {css}
+        {title}
+    </head>
+    <body>
+        <div id="{wrapdiv}">
+"""
+
+HEADER_XHTML11 = """<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"{lang}>
+    <head>
+        {viewport}
+        {raw_headers}
+        {css}
+        {title}
+    </head>
+    <body>
+        <div id="{wrapdiv}">
+"""
+
+FOOTER = """
+        </div>
+    </body>
+</html>
+"""
+
+
+def output_wrapper(
+    css_path,
+    title,
+    raw_headers,
+    raw,
+    wrapdiv,
+    xhtml,
+    language,
+    content,
+    use_browser,
+    use_viewport,
+):
+    if xhtml:
+        output_format = 'XHTML'
+        header = HEADER_XHTML11
+        lang_prefix = 'xml:'
+    else:
+        output_format = 'HTML5'
+        header = HEADER_HTML5
+        lang_prefix = ''
+
+    if language is not None:
+        lang = ' ' + lang_prefix + 'lang="' + language + '"'
+    else:
+        lang = ''
+
+    if use_viewport:
+        viewport = '<meta name="viewport" content="width=device-width, initial-scale=1">'
+    else:
+        viewport = ''
+
+    if use_browser:
+        with NamedTemporaryFile(delete=False, suffix='.html') as fp:
+            if not raw:
+                fp.write(header.format(
+                    css=css_path,
+                    lang=lang,
+                    viewport=viewport,
+                    raw_headers=raw_headers,
+                    title=title,
+                    wrapdiv=wrapdiv,
+                ).encode('UTF-8'))
+            fp.write(markdown(content, output_format=output_format).encode('UTF-8'))
+            if not raw:
+                fp.write(FOOTER.encode('UTF-8'))
+        call([getenv('BROWSER'), 'file://' + fp.name])
+    else:
+        if not raw:
+            print(header.format(
+                css=css_path,
+                lang=lang,
+                viewport=viewport,
+                title=title,
+                raw_headers=raw_headers,
+                wrapdiv=wrapdiv,
+            ))
+        print(markdown(content, output_format=output_format))
+        if not raw:
+            print(FOOTER)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-b', '--force-browser', action='store_true')
+    parser.add_argument('-c', '--css')
+    parser.add_argument('-H', '--raw-headers')
+    parser.add_argument('-l', '--language', default=None)
+    parser.add_argument('-r', '--raw', action='store_true')
+    parser.add_argument('-t', '--title', default='Page')
+    parser.add_argument('-V', '--no-viewport', action='store_true')
+    parser.add_argument('-w', '--wrapdiv')
+    parser.add_argument('-x', '--xhtml', action='store_true')
+    parser.add_argument('files', nargs='*')
+    args = parser.parse_args()
+
+    if args.css:
+        if args.xhtml:
+            x = '/'
+        else:
+            x = ''
+        css_path = '<link rel="stylesheet" href="{}"{}>'.format(args.css, x)
+    else:
+        css_path = ''
+
+    if args.raw_headers:
+        raw_headers = args.raw_headers
+    else:
+        raw_headers = ''
+
+    use_browser = args.force_browser or sys.stdout.isatty()
+    use_viewport = not args.no_viewport
+
+    title = '<title>{}</title>'.format(args.title)
+
+    wrapdiv = args.wrapdiv or 'markdown'
+
+    if len(args.files) == 0:
+        output_wrapper(
+            css_path,
+            title,
+            raw_headers,
+            args.raw,
+            wrapdiv,
+            args.xhtml,
+            args.language,
+            sys.stdin.read(),
+            use_browser,
+            use_viewport,
+        )
+    else:
+        for i in args.files:
+            with open(i, 'r') as fp:
+                output_wrapper(
+                    css_path,
+                    title,
+                    raw_headers,
+                    args.raw,
+                    wrapdiv,
+                    args.xhtml,
+                    args.language,
+                    fp.read(),
+                    use_browser,
+                    use_viewport,
+                )

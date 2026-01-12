@@ -1,0 +1,16 @@
+#!/bin/sh
+
+notify() {
+    notify-send -u critical -t 1000 "Internet is Back"
+    # kdeconnect-cli --device "60e1403c_206f_4107_8c64_d4b6aa04223b" --ring
+}
+
+while true; do
+    # TODO: check if the nmcli is enough so I remove the ping command
+    if ping -q -c 1 8.8.8.8 >/dev/null 2>&1; then # && { nmcli networking connectivity | grep -q full; }; then
+        # if nmcli networking connectivity | grep -q full; then
+        notify
+        break
+    fi
+    sleep 2
+done

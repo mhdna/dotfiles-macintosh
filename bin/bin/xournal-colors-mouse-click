@@ -1,0 +1,16 @@
+#!/bin/sh
+
+click() {
+	wlrctl pointer move -3000 -3000
+	wlrctl pointer move $1
+	sleep 0.5
+	wlrctl pointer click
+}
+
+case "$1" in
+"yellow") click "1572 358" ;;
+"green") click "1572 190" ;;
+"red") click "1572 273" ;;
+"pink") click "1572 303" ;;
+*) exit 1 ;;
+esac

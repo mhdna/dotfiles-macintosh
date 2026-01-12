@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+case "$1" in
+"-d")
+	daemon="mpd-notifyd"
+	if pidof -xs "$daemon"; then
+		echo "$0: Already running"
+		exit 1
+	else
+		"$daemon"
+	fi
+	;;
+*)
+	path="$(mpc --format '%file%' current)"
+	filename="$(basename "${path%.*}")" # name without path and extension
+
+	status="$(mpc status '%state%')" # NOTE: needs to be a separate command
+	# only send notification when playing and file name isn't the smae
+	status_file="/tmp/$(basename "$0")_status"
+	[ ! -f "$status_file" ] && touch "$status_file"
+
+	[ "$status" = "paused" ] || grep -Fq "$path" "$status_file" && exit 0
+
+	echo "$path" >"$status_file"
+
+	# Do not send a notification of non-local files
+	echo "$path" | grep -q '^http' && exit 0
+
+	clean_path="$(basename "${path%.*}")"
+
+	thumb="$XDG_CACHE_HOME/yt-audio-thumbnails/$clean_path.jpg"
+	if [ -f "$thumb" ]; then
+		notify-send -i "$thumb" -t 4000 "$filename"
+	else
+		notify-send -t 4000 "Playing" "$filename"
+	fi
+	;;
+esac

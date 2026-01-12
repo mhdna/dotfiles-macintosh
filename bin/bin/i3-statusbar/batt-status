@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+case $BLOCK_BUTTON in
+# 2) brightnessctl set 1% >/dev/null 2>&1 ;;
+4) intel-backlight up >/dev/null 2>&1 ;;   #brightnessctl set 5%+
+5) intel-backlight down >/dev/null 2>&1 ;; #brightnessctl set 5%-
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+# Loop through all attached batteries and format the info
+for battery in /sys/class/power_supply/BAT?*; do
+	# If non-first battery, print a space separator.
+	[ -n "${capacity+x}" ] && printf " "
+	# Sets up the status and capacity
+	status="$(cat "$battery/status") "
+	capacity="$(cat "$battery/capacity" 2>&1)"
+	# Will make a warn variable if discharging and low
+	if [[ "$status" =~ .*Discharging.* ]]; then
+		printf "<span color=\"#ff0000\">B: %s%d%%</span>" "$warn" "$capacity"
+	else
+		printf "B: %s%d%%" "$warn" "$capacity"
+	fi
+
+	unset warn
+
+done && printf "\\n"

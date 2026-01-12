@@ -1,0 +1,226 @@
+Xft.dpi: 96
+Emacs.alpha: 100
+Emacs*geometry: 70x30
+*.font: Mono:pixelsize=19
+*.alpha: 1
+
+Xclock.Width: 300px
+Xclock.font: "Serif 20"
+
+*.background: #000000
+*.foreground: #ffffff
+*.cursorColor: #ffffff
+*.color4: #0d73cc
+! *.cursorColor: #fbdc31
+
+! ! light
+! *.color0: #000000
+! *.color1: #000000
+! *.color2: #000000
+! *.color3: #000000
+! *.color4: #000000
+! *.color5: #000000
+! *.color6: #000000
+! *.color7: #ffffff
+! *.color8: #000000
+! *.color9: #000000
+! *.color10: #000000
+! *.color11: #000000
+! *.color12: #000000
+! *.color13: #000000
+! *.color14: #000000
+! *.color15: #ffffff
+! *.color256: #000000
+! *.color257: #000000
+! *.background: #ffffff
+! *.foreground: #000000
+! *.cursorColor: #000000
+! ! Nsxiv
+! Nsxiv.window.background: #666666
+! Nsxiv.window.foreground: #000000
+! Nsxiv.mark.foreground: #ffffff
+! Nsxiv.bar.background: #ffffff
+! Nsxiv.bar.foreground: #000000
+
+! ! dark
+! *.color0: #ffffff
+! *.color1: #ffffff
+! *.color2: #ffffff
+! *.color3: #ffffff
+! *.color4: #ffffff
+! *.color5: #ffffff
+! *.color6: #ffffff
+! *.color7: #000000
+! *.color8: #ffffff
+! *.color9: #ffffff
+! *.color10: #ffffff
+! *.color11: #ffffff
+! *.color12: #ffffff
+! *.color13: #ffffff
+! *.color14: #ffffff
+! *.color15: #000000
+! *.color256: #ffffff
+! *.color257: #ffffff
+! *.background: #000000
+! *.foreground: #eeeeee
+! *.cursorColor: #eeeeee
+! Nsxiv
+! Nsxiv.window.background: #000000
+! Nsxiv.window.foreground: #ffffff
+! Nsxiv.bar.background: #000000
+! Nsxiv.bar.foreground: #ffffff
+
+! zenburn
+! *.background: #222222 ! brown = 301f00
+! *foreground: #dcdccc
+! *cursorColor: #aaaaaa
+! *colorUL: #366060
+! *underlineColor: #dfaf8f
+! *color0: #3f3f3f
+! *color1: #cc9393
+! *color2: #7f9f7f
+! *color3: #d0bf8f
+! *color4: #6ca0a3
+! *color5: #dc8cc3
+! *color6: #93e0e3
+! *color7: #dcdccc
+! *color8: #888888
+! *color9: #dca3a3
+! *color10: #bfebbf
+! *color11: #f0dfaf
+! *color12: #8cd0d3
+! *color13: #dc8cc3
+! *color14: #93e0e3
+! *color15: #ffffff
+
+! Nsxiv.bar.font: Mono:size=16
+
+! ! *.background: #111111
+! ! *.foreground: #ebdbb2
+! ! *.cursorColor: #ebdbb2
+! ! gruvbox:
+! *.color0: #1d2021
+! *.color1: #cc241d
+! *.color2: #98971a
+! *.color3: #d79921
+! *.color4: #458588
+! *.color5: #b16286
+! *.color6: #689d6a
+! *.color7: #a89984
+! *.color8: #928374
+! *.color9: #fb4934
+! *.color10: #b8bb26
+! *.color11: #fabd2f
+! *.color12: #83a598
+! *.color13: #d3869b
+! *.color14: #8ec07c
+! *.color15: #ebdbb2
+! *.color256: #1d2021
+! *.color257: #ebdbb2
+
+! ! Zenburn
+! *color0:  #1E2320
+! *color1:  #705050
+! *color2:  #60b48a
+! *color3:  #dfaf8f
+! *color4:  #506070
+! *color5:  #dc8cc3
+! *color6:  #8cd0d3
+! *color7:  #dcdccc
+! *color8:  #709080
+! *color9:  #dca3a3
+! *color10: #c3bf9f
+! *color11: #f0dfaf
+! *color12: #94bff3
+! *color13: #ec93d3
+! *color14: #93e0e3
+! *color15: #ffffff
+
+! Xcursor.theme: Adwaita
+! Xcursor.size: 28
+
+
+! ! Allow sixel graphics. (Try: "convert -colors 16 foo.jpg sixel:-").
+! xterm*decTerminalID	:	vt340
+
+
+! !! Keybinding ========================================================
+! ! http://blog.rot13.org/2010/03/change-font-size-in-xterm-using-keyboard.html
+! XTerm.vt100.translations: #override \n\
+! 	Ctrl <Key> minus: smaller-vt-font() \n\
+! 	Ctrl <Key> plus: larger-vt-font() \n\
+! 	Ctrl <Key> 0: set-vt-font(d) \n\
+! 	Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
+! 	Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\
+! 	Shift <Btn1Up>: exec-formatted("xdg-open '%t'", PRIMARY) \n\
+! 	<Btn1Up>: select-end(PRIMARY, CLIPBOARD, CUT_BUFFER0) \n\
+! 	<Btn2Up>: insert-selection(PRIMARY)
+
+! ! Misc. Settings
+! Xft.rgba: rgb
+! XTerm*termName: xterm-256color
+! XTerm*visualBell: false
+! XTerm*faceName: monospace-16
+! Xft.autohint: 1
+! Xft.lcdfilter:  lcddefault
+! Xft.hintstyle:  hintfull
+! Xft.hinting: 1
+! Xft.antialias: 1
+! XTerm*faceSize: 11
+! XTerm*transparent: true
+! XTerm*saveLines: 10000
+! XTerm*scrollBar: false
+! XTerm*geometry: 65x25
+! XTerm*cursorBlink: true
+! XTerm*eightBitInput: false
+! XTerm*scrollTtyOutput: false
+! XTerm*jumpScroll:         true
+! XTerm*multiScroll:        true
+! ! scroll input
+! XTerm*scrollKey:          true
+! XTerm*loginShell:         true
+! XTerm*backarrowKey: false
+! ! enable copy/paste hotkey to work (shift+insert = paste ; mouse highlight = copy)
+! XTerm*selectToClipboard: true
+! ! disable fullscreen hotkey alt+enter (hotkey conflicts with weechat, midnight commander ...etc)
+! XTerm*fullscreen: never
+! ! enable alt key to work
+! XTerm*metaSendsEscape: true
+! ! Fix the backspace key (for Emacs)
+! XTerm.vt100.backarrowKey: false
+! XTerm.ttyModes: erase ^?
+! XTerm.metaSendsEscape: true
+! ! Display newlines when highlighting text
+! XTerm*highlightSelection: true
+
+URxvt.background:	#1F1D19
+URxvt.foreground:	#DEDEDE
+URxvt.font:			xft:DejaVu Sans Mono:pixelsize=17:antialias=true:hinting=true
+URxvt.boldFont:		xft:DejaVu Sans Mono:bold:pixelsize=17:antialias=true:hinting=true
+URxvt.scrollBar:	false
+URxvt.saveLines:	65535
+URxvt.perl-ext-common: keyboard-select,url-select,clipboard
+URxvt.keysym.M-Escape: perl:keyboard-select:activate
+URxvt.keysym.M-s: perl:keyboard-select:search
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.keysym.M-c:   perl:clipboard:copy
+URxvt.keysym.M-v:   perl:clipboard:paste
+URxvt.keysym.M-C-v: perl:clipboard:paste_escaped
+Xft*antialias: True
+Xft*hinting:   Full
+URxvt.keysym.KP_Add:    +
+URxvt.keysym.KP_Subtract: -
+URxvt.keysym.KP_Multiply: *
+URxvt.keysym.KP_Divide  : /
+URxvt.keysym.KP_Decimal : .
+URxvt.keysym.KP_Separator : ,
+URxvt.keysym.KP_1:      1
+URxvt.keysym.KP_2:      2
+URxvt.keysym.KP_3:      3
+URxvt.keysym.KP_4:      4
+URxvt.keysym.KP_5:      5
+URxvt.keysym.KP_6:      6
+URxvt.keysym.KP_7:      7
+URxvt.keysym.KP_8:      8
+URxvt.keysym.KP_9:      9
+URxvt.keysym.KP_0:      0

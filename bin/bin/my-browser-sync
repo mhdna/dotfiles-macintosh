@@ -1,0 +1,3 @@
+#!/bin/sh
+
+browser-sync --file="*" -w --no-notify # "$@"

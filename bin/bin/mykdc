@@ -1,0 +1,18 @@
+#!/bin/sh
+
+start() {
+	# kdeconnect-indicator
+	! pidof kdeconnectd && kdeconnectd # /usr/lib/kdeconnectd on arch?
+	kdeconnect-cli --refresh
+}
+
+stop() {
+	# killall kdeconnect-indicator
+	sleep 1
+	killall kdeconnectd
+}
+
+case "$1" in
+"-s") stop & ;;
+*) start & ;;
+esac

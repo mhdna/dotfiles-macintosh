@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# download youtube videos with their thumbnails in a custom format
+# TODO get title from the logs instead of having a second command (since we disabled the thumbnails thing)
+
+urls=("$@")
+
+if [ "$1" = "-f" ]; then
+	menu="fzf --prompt="
+	menuf="${menu}Format"
+	menup="${menu}Path"
+	urls=("${urls[@]:1}") # remove first element
+else
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		menu="tofi --placeholder-text"
+		menuf="$menu Format"
+		menup="$menu Path"
+	else
+		menu="menu-wrapper -p"
+		menuf="$menu Format"
+		menup="$menu Path"
+	fi
+fi
+
+bmdirs="${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs"
+
+f=("Video MAX-RES=1080" "Audio")
+case "$(printf "%s\n" "${f[@]}" | $menuf)" in
+"${f[0]}")
+	prg="yt"
+	dst="$(grep -Ei '(/tmp/|vid)' "$bmdirs" | $menup)"
+	;;
+"${f[1]}")
+	# audio=1
+	prg="yta"
+	dst="$(grep -Ei '(/tmp/|music)' "$bmdirs" | $menup)"
+	;;
+*) exit 1 ;;
+esac
+
+[ -z "$dst" ] && {
+	echo "No destination was specified"
+	exit 1
+}
+
+for url in "${urls[@]}"; do
+	# do not download playlists, only video of that playlist
+	# yt-dlp $args -o "%(title)s.%(ext)s" --no-playlist --external-downloader aria2c --write-thumbnail --convert-thumbnails jpg --add-metadata -ic -P "$dst" "$url" || {
+	# for opus use instead:
+
+	$prg -P "$dst" "$url" || {
+		notify-send "$url is either already downloaded or failed to download."
+		exit 1
+	}
+	IFS=$'\n' readarray -t filename_title <<<"$(yt-dlp --skip-download --get-filename --get-title -o "%(title)s.%(ext)s" "$url")"
+	title="${filename_title[0]}"
+
+	# uncomment when using ogg and want external thumbnails
+	# if [ "$audio" = 1 ]; then
+	# 	thumb_filename="${filename%.*}.jpg"
+	# 	old_path="$dst/$thumb_filename"
+	# 	# smaller thumbnail resolution  for audio files
+	# 	convert -resize '250x250>' "$old_path" "$XDG_CACHE_HOME/yt-audio-thumbnails/$thumb_filename"
+	# 	rm "$old_path"
+	# fi
+
+	notify-send "👍 $title done." # Not working "Size: $(du -h "$dst/$filename")"
+done

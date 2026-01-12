@@ -1,0 +1,10 @@
+#!/bin/sh
+
+case $BLOCK_BUTTON in
+1) notify-send "This Month" "$(cal | sed "s/\<$(date +'%e' | tr -d ' ')\>/<b><span color='red'>&<\/span><\/b>/")" ;;
+3) sb-hijri -n ;;
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+# echo "$(date '+%a %d-%m(%b)-%Y %H:%M:%S')|$(TZ='Australia/Perth' date +'%H:%M')"
+date '+%a %d-%m(%b)-%Y %H:%M'

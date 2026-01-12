@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+choices=("eDP-1" "HDMI-1")
+
+case "${1:-$(printf "%s\n" "${choices[@]}" | menu-wrapper)}" in
+"${choices[0]}")
+	main="${choices[0]}"
+	off="${choices[1]}"
+	# dpi="96"
+	res="1280x720"
+	;;
+"${choices[1]}")
+	main="${choices[1]}"
+	off="${choices[0]}"
+	# dpi="110"
+	# dpi="120"
+	res="1280x1024"
+	;;
+esac
+
+xrandr --output "$off" --off
+xrandr --dpi "$dpi" --output "$main" --auto # dpi is needed because it sometimes bugs
+# xfconf-query -c xsettings -p /Xft/DPI -s "$dpi"
+xrandr -s "$res"
+# && i3-msg restart
+# setbg

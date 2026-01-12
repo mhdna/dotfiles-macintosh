@@ -1,0 +1,25 @@
+#!/bin/bash
+
+all(){
+    for i in {1..10}; do
+        for j in {1..10}; do
+            echo -n "$(( i * j )) "
+        done
+    echo
+    done
+}
+
+prompt(){
+    read -rp "Which number? " x
+    echo
+
+    for i in {1..20}; do
+        echo -n "$(( x * i )) "
+    done
+    echo
+}
+
+case "$1" in
+    "-p") prompt;;
+    *) all;;
+esac

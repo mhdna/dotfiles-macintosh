@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# create a list of bookmarks that work and add them to lf's shortcutrc file
+# bookmarks should be located in $XDG_CONFIG_HOME/shell/bm-dirs with this format:
+# lines that start with a number `n` (one digit) should be bookmarked with all of its subdirectories of `n` depth
+# lines that start with other characters will get bookmarked on their own where the characters is/are the shorcut
+
+alldirs="${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs"
+tmp="$(mktemp)"
+bmdirs="${XDG_CONFIG_HOME:-$HOME/.config}/bm/bm-dirs"
+
+# Output locations. Unactivated progs should go to /dev/null.
+# shell_shortcuts="$XDG_CONFIG_HOME/bm/shortcutrc"
+lf_shortcuts="${XDG_CONFIG_HOME:-$HOME/.config}/lf/shortcutrc"
+
+# Remove, prepare files
+rm -f "$lf_shortcuts" "$vim_shortcuts" 2>/dev/null
+# printf "# vim: filetype=sh\\nalias " > "$shell_shortcuts"
+
+# Format the `directories` file in the correct syntax and sent it to all three configs.
+eval "echo \"$(cat "$bmdirs")\"" |
+	awk "!/^\s*#/ && !/^\s*\$/ && !/^[0-5].*/ {gsub(\"\\\s*#.*$\",\"\");
+    printf(\"map c%s cd \42%s\42 \n\",\$1,\$2)           >> \"$lf_shortcuts\" }"
+
+# Add all bookmarks to all-dirs
+# ignore comments, blank lines, and whitespaces
+eval "echo \"$(cat "$bmdirs")\"" |
+	sed -e 's/\s*#.*//' -e '/^$/d' -e 's/^\S*\s*//' -e '/^[0-5].*/d' >"$tmp" || exit 1
+
+# search deaply in bookmarks that start with !s and add them to tmp
+while IFS= read -r dir; do
+	# ignore hidden dirs
+	if echo "$dir" | grep -Eq "^[0-5]"; then
+		depth="$(echo "$dir" | cut -d ' ' -f 1)"
+	fi
+
+	# do not treat symlinks as the dst, but the directories that they point to
+	find -H $(echo $dir | cut -d ' ' -f 2) -maxdepth "$depth" \( ! -regex '.*/\..*' \) -type d >>"$tmp"
+done < <(eval "echo \"$(grep -E '^[0-5].*' "$bmdirs" | sed -e 's/\s*#.*//')\"")
+
+# poor Gnu doesn't know how to remove duplicates without sorting
+sort -u -o "$tmp" "$tmp"
+
+mv "$tmp" "$alldirs"

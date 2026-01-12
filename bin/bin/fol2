@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+
+# Focus or Launch
+tclassopt="--class"
+
+main() {
+	# set class name if hasn't been set explicitly
+	if [ -z "$class" ]; then
+		if [ "$gui" = true ]; then
+			class="$prg"
+		else
+			# set class as the last word in -e prg (i.e. the prg name) (especially useful with things like -e bicon -e <myprogram>)
+			class="${prg##* }"
+			topts="${topts} $tclassopt ${prg##* }"
+		fi
+	fi
+	cycle_custom_class "$class" "$prg"
+}
+
+cycle_active_class() {
+	# get id of the focused window
+	active_win_id=$(xprop -root | grep '^_NET_ACTIVE_W' | awk -F'# 0x' '{print $2}')
+	if [ "$active_win_id" = "0" ]; then
+		active_win_id=""
+	fi
+
+	# get window manager class of current window
+	win_class=$(wmctrl -x -l | cut -d ' ' -f 1-4 | grep $active_win_id | cut -d ' ' -f 3)
+
+	# get list of all windows matching with the class above
+	win_list=$(wmctrl -x -l | grep $win_class | cut -d ' ' -f 1)
+
+	# get next window to focus on
+	switch_to=$(echo $win_list | sed s/.*$active_win_id// | awk '{print $1}')
+
+	# if the current window is the last in the list ... take the first one
+	if [ "$switch_to" = '' ]; then
+		switch_to=$(echo $win_list | awk '{print $1}')
+	fi
+
+	# switch to window
+	wmctrl -i $switch_to
+
+	exit 0
+}
+
+cycle_custom_class() {
+	# https://askubuntu.com/questions/269574/wmctrl-focus-most-recent-window-of-an-app
+	app_name=$1
+
+	workspace_number=$(wmctrl -d | grep '\*' | cut -d' ' -f 1)
+	win_list=$(wmctrl -lx | cut -d ' ' -f 1-4 | grep "$app_name\$" | grep " $workspace_number " | cut -d ' ' -f 1)
+	echo "$win_list"
+
+	# Get the id of the active window (i.e., window which has the focus)
+	active_win_id=$(xprop -root | grep '^_NET_ACTIVE_W' | awk -F'# 0x' '{print $2}' | awk -F', ' '{print $1}')
+	if [ "$active_win_id" == "0" ]; then
+		active_win_id=""
+	fi
+
+	# If the window currently focused matches the first argument, seek the id of the next window in win_list which matches it
+	if [[ "$win_list" == *"$active_win_id"* ]]; then
+
+		# Get next window to focus on
+		# (sed removes the focused window and the previous windows from the list)
+		switch_to=$(echo $win_list | sed s/.*$active_win_id// | awk '{print $1}')
+
+		# If the focused window is the last in the list, take the first one
+		if [ "$switch_to" == "" ]; then
+			switch_to=$(echo $win_list | awk '{print $1}')
+		fi
+
+		# If the currently focused window does not match the first argument
+	else
+
+		# Get the list of all the windows which do
+		win_list=$(wmctrl -lx | cut -d ' ' -f 1-4 | grep $app_name | awk '{print $1}')
+
+		IDs=$(xprop -root | grep "^_NET_CLIENT_LIST_STACKING" | tr "," " ")
+		IDs=(${IDs##*#})
+
+		# For each window in focus order
+		for ((idx = ${#IDs[@]} - 1; idx >= 0; idx--)); do
+			for i in $win_list; do
+
+				# If the window matches the first argument, focus on it
+				if [ $((i)) = $((IDs[idx])) ]; then
+					wmctrl -ia $i
+					exit 0
+				fi
+			done
+		done
+	fi
+
+	# If a window to focus on has been found, focus on it
+	if [[ -n "${switch_to}" ]]; then
+		(wmctrl -ia "$switch_to") &
+
+		# If there is no window which matches the first argument
+	else
+		if [[ $gui = true ]]; then
+			($2) &
+		else
+			$TERMINAL $topts $2 &
+		fi
+	fi
+}
+
+usage() {
+	# TODO: not correct
+	echo "Usage:
+                     -a cycle active class windows
+                     -g Open as a gui window
+                     -G Set custom geometry (tui only)
+                     -c Set custom class name (tui only)
+                     -h Show this help prompt"
+	-e run the program
+}
+
+while getopts 'agdG:c:e:h' opt; do
+	case "$opt" in
+	a) cycle_active_class ;;
+	d) ;;
+	g) gui=true ;;
+	G) [ "$gui" != true ] && topts="${topts} $OPTARG" ;;
+	c)
+		[ "$gui" != true ] && topts="${topts} $tclassopt $OPTARG"
+		class="$OPTARG"
+		;;
+	e) [ "$gui" != true ] && prg="${prg} -e $OPTARG" || prg=$OPTARG ;;
+	h) usage ;;
+	\?)
+		usage
+		exit 1
+		;;
+	esac
+done
+
+main

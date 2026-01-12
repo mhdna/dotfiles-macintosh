@@ -1,0 +1,3 @@
+#!/bin/sh
+
+img2pdf  --pagesize A4 $@

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+case "$1" in
+"-t") mpc toggle ;;
+"-n") mpc seek +1% ;;
+"-N") mpc next ;;
+"-p") mpc seek -1% ;;
+"-P") mpc prev ;;
+"-r") mpc repeat && mpc single && notify-send -u low -t 2000 "MPD" "$(mpc status 'Single Repeat: %repeat%')" ;;
+esac

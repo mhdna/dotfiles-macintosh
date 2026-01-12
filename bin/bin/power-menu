@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	wm="sway"
+	menu() {
+		tofi --placeholder-text "$@"
+	}
+else
+	wm="Xorg"
+	menu() {
+		menu-wrapper -p "$@"
+	}
+fi
+
+case "$(readlink -f /sbin/init)" in
+*systemd*) ctl='systemctl' ;;
+*) ctl='loginctl' ;;
+esac
+
+c=("lock" "leave" "hibernate" "suspend" "reboot" "poweroff")
+case "${1:-$(printf "%s\n" "${c[@]}" | menu 'Action: ')}" in
+"${c[0]}") lock ;;
+"${c[1]}") pkill -15 -t tty"$XDG_VTNR" "$wm" ;;
+"${c[2]}") $ctl hibernate -i ;;
+"${c[3]}") $ctl suspend -i ;;
+"${c[4]}") $ctl reboot -i ;;
+"${c[5]}") $ctl poweroff -i ;;
+"display off") xset dpms force off ;;
+*) exit 1 ;;
+esac

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Status bar module for disk space
+# $1 should be drive mountpoint, otherwise assumed /.
+
+case $BLOCK_BUTTON in
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+location=${1:-/}
+location2=${2:-/home}
+location3="$MEDIA"
+
+[ -d "$location" ] || exit
+
+case "$location" in
+"/home"*) icon="🏠" ;;
+"/mnt"*) icon="💾" ;;
+*) icon="🖥" ;;
+esac
+
+compute() {
+    df -h "$1" | awk ' /[0-9]/ {print $3 "/" $2 "(" $5 ")"}'
+}
+
+printf "%s %s %s\n" $(compute "$location") $(compute "$location2") $(compute "$location3")

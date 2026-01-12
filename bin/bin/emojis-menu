@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# The famous "get a menu of emojis to copy" script.
+
+# Get user selection via tofi from emoji file.
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    menu="tofi --height=95% --width=35% --fuzzy-match=true --font-size=22"
+    copy="wl-copy"
+    type="wtype"
+else
+    menu="menu-wrapper -e"
+    copy="xclip -sel c -i"
+    type="xdotool type"
+fi
+
+chosen=$(cut -d ';' -f1 ~/.local/share/emojis | $menu -p 'Emojis' | sed "s/ .*//")
+
+# Exit if none chosen.
+[ -z "$chosen" ] && exit
+
+# If you run this command with an argument, it will automatically insert the
+# character. Otherwise, show a message that the emoji has been copied.
+if [ -n "$1" ]; then
+    $type "$chosen"
+else
+    printf "%s" "$chosen" | $copy
+    notify-send "'$chosen' copied to clipboard." &
+fi

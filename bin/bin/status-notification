@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# notify-send "Reward -AKA deserts- (Last)" "Discord. Youtube."
+# notify-send "Punishment" "Go outside."
+notify-send "$(date +'%H:%M:%S')" "$(cal | sed "s/\<$(date +'%e' | tr -d ' ')\>/<b><span color='red'>&<\/span><\/b>/")" &
+hijri-status -n &
+notify-send "Stats" "$(internet-status) $(batt-status) $(volume-status)\n$(memory-status)\n$(disk-status)"

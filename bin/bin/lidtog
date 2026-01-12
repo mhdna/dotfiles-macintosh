@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Toggles sleep on laptop's lid close
+
+case "$(readlink -f /sbin/init)" in
+*systemd*) init="sysd" ;;
+*) init="notsysd" ;;
+esac
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	menu="tofi"
+else
+	menu="menu-wrapper"
+fi
+
+case "$(printf "Lid Sleep\nLid Don't Sleep" | $menu)" in
+"Lid Sleep")
+	if [ $init = "sysd" ]; then
+		sudo sh -c 'sed -i "s/^HandleLidSwitch=ignore/#HandleLidSwitch=suspend/" /etc/systemd/logind.conf;  systemctl kill -s HUP systemd-logind'
+	else
+		sudo sh -c 'sed -i "s/^HandleLidSwitch=ignore/#HandleLidSwitch=suspend/" /etc/elogind/logind.conf; pkill -HUP elogind'
+	fi
+	;;
+"Lid Don't Sleep")
+	if [ $init = "sysd" ]; then
+		sudo sh -c 'sed -i "s/^#HandleLidSwitch=suspend/HandleLidSwitch=ignore/" /etc/systemd/logind.conf; systemctl kill -s HUP systemd-logind'
+	else
+		sudo sh -c 'sed -i "s/^#HandleLidSwitch=suspend/HandleLidSwitch=ignore/" /etc/elogind/logind.conf; pkill -HUP elogind'
+	fi
+	;;
+*) exit 1 ;;
+esac

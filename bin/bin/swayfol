@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Focus window or open in sway
+
+swaymsg "[app_id=\"$1\"] focus" || $2

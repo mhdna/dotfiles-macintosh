@@ -1,0 +1,49 @@
+#!/bin/sh
+
+
+# Warning: not complete yet
+
+if [ "$TERMINAL" = "st" ]; then
+    cflag="-c"
+    tflag="-T"
+else
+    # alacritty
+    cflag="--class"
+    tflag="--title"
+fi
+
+while getopts 'c:e:n:t' opt; do
+	case "$opt" in
+	c) class="$OPTARG" ;;
+	n) name="$OPTARG" ;;
+	e) prg="$OPTARG" ;;
+	t) terminal="true" ;;
+	\?) exit 1 ;;
+	esac
+done
+
+# check if name exists, otherwise set class to the first word of $prg
+xdtarg="--class $class"
+
+if [ -z "$class" ]; then
+	if [ -n "$name" ]; then
+		name="$name"
+		xdtarg="--classname $name"
+	else
+		class="${prg##* }"
+		xdtarg="--class $class"
+	fi
+fi
+
+focus() {
+	# xdotool search $xdtarg windowactivate
+	xdotool search --desktop "$(xdotool get_desktop)" $xdtarg windowactivate
+}
+
+focus && exit 0
+
+if [ -n "$terminal" ]; then
+	$TERMINAL "$cflag" "$class" "$tflag" "$class" -e $prg
+else
+	$prg
+fi

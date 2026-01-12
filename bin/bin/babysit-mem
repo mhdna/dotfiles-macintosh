@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Asks to kill the program with the highest memory usage when overall usage is more than 90%
+
+menu() {
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        tofi --placeholder-text "$@"
+    else
+        menu-wrapper -p "$@"
+    fi
+}
+
+while true; do
+    mem_percent="$(free | awk '/^Mem/{print $3/$2 * 100.0}')"
+    mem_percent="${mem_percent%.*}" # remove floating points
+
+    if [ "$mem_percent" -gt 90 ]; then
+        info="$(ps -u $USER -o pid,comm,%mem --sort=-%mem | awk 'NR==2 {print $1, $2}')"
+        pid="${info%% *}"
+        app_name="${info#* }"
+        [ "$(printf "Yes\\nNo" | menu "You're running out of memory, kill $app_name?")" = "Yes" ] && kill -9 "$pid"
+    fi
+    sleep 5
+done

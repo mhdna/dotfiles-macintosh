@@ -1,0 +1,5 @@
+#!/bin/sh
+
+! pidof -s mbsync >/dev/null 2>&1 && exec mailsync >/dev/null 2>&1 &
+sleep 1
+pkill -RTMIN+2 ${STATUSBAR:-dwmblocks} >/dev/null 2>&1 &

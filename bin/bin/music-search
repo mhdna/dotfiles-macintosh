@@ -1,0 +1,5 @@
+#!/bin/sh
+
+title=$(mpc listall | fzf)
+
+[ -n "$title" ] && (mpc searchplay filename "$title" || (mpc add "$title" && mpc play $(mpc playlist | wc -l))) >/dev/null 2>&1

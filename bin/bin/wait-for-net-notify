@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# notification
+daemon="wait-for-net-daemon-notify"
+pidof -xs "$daemon" >/dev/null 2>&1 && notify-send -u low -t 1000 "daemon is already running" "Quitting..." && exit 0
+
+$daemon

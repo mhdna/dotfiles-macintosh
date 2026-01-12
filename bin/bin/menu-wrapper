@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+cfg="#999999"
+cbg="#ffffff"
+sbg="#999999"
+sfg="#000000"
+fg="#999999"
+fg2="#999999"
+bg1="#000000"
+bg2="#000000"
+fn="Mono 14"
+
+export BEMENU_OPTS="-W 0.5 -p '' -i -l 20 --single-instance --fn '$fn' --fb $bg1 --hf $sfg --af $fg --hb $sbg --ab $bg1 --nb $bg2 --nf $fg2 --ff $fg --tf $fg --cf $cfg --cb $cbg"
+# export BEMENU_OPTS="--single-instance --fn '$fn'"
+
+# [ "$1" = "-r" ] && prg="dmenu_run -l 0" || prg="dmenu -l 20"
+[ "$1" = "-r" ] && prg="bemenu-run" || prg="bemenu"
+[ "$1" == "-a" ] && echo "$BEMENU_OPTS" && exit 0
+
+$prg

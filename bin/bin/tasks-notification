@@ -1,0 +1,3 @@
+#!/bin/sh
+
+notify-send "Rules and Tasks" "$(cat ~/personal/tasks.txt)"

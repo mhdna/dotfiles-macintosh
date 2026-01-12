@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+profile="/etc/profile.d/plan9.sh"
+pkg="plan9port"
+
+! pacman -Qq "$pkg" >/dev/null 2>&1 && sudo pacman -S --noconfirm "$pkg"
+
+! grep 'append_path ()' > /dev/null 2>&1 "$profile" && {
+	echo -n 'append_path () {
+    case ":$PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH="${PATH:+$PATH:}$1"
+    esac
+}
+'
+	cat "$profile"
+} | sudo tee "$profile" > /dev/null 2>&1

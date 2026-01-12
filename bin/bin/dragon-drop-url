@@ -1,0 +1,48 @@
+#!/usr/bin/env sh
+
+# spaghetiest spagheti outthere
+
+cache_dir="${TMPDIR:-/tmp}/dragon-drop-url"
+
+die() {
+    [ -n "$1" ] && printf '%s\n' "$*" >&2;
+    exit 1
+}
+
+cleanup() {
+    rm -f -- "$cache_dir"/*
+}
+
+get_image() {
+	cd "$cache_dir" && filename="$(curl -O -J -L -w "%{filename_effective}" -s "$1")"
+}
+
+resize_image_smaller() {
+	magick "$cache_dir/$filename" -resize "200x200" "$cache_dir/$filename"
+}
+
+[ -z "$1" ] && die "No arguments given"
+# trap cleanup EXIT
+[ -d "$cache_dir" ] || mkdir -p -- "$cache_dir" || die
+
+if [ "$2" == "-c" ]; then
+	case "$1" in
+		*://*.*)
+			get_image "$1" || die
+			resize_image_smaller
+			;;
+		*) notify-send -u low -t 1000 "Invalid url: $1" >&2  && die ;;
+	esac
+else
+	while [ -n "$1" ]; do
+    case "$1" in
+        *://*.*)
+			get_image "$1" || die
+			;;
+        *) echo "Invalid url: $1" >&2 ;;
+    esac
+    shift
+	done
+fi
+
+dragon-drop -k --and-exit -a "$cache_dir/$filename"

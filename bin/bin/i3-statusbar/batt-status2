@@ -1,0 +1,17 @@
+#!/bin/sh
+
+battery=$(echo /sys/class/power_supply/BAT?)
+
+if [ -r "$battery"/present ] && [ $(cat "$battery"/present) = 1 ]
+then
+    capa=$(cat "$battery"/capacity)
+    status=$(cat "$battery"/status)
+    case "$status" in
+        Charging)    sym=' (+)' ;;
+        Discharging) sym=' (-)' ;;
+        *)           sym=''     ;;
+    esac
+    echo "$capa% $time$(procbar "$capa" 100 5)$sym"
+else
+    exit 1
+fi

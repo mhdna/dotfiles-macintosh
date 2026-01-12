@@ -1,0 +1,63 @@
+#!/bin/sh
+
+menu() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		tofi --placeholder-text "$@"
+	else
+		menu-wrapper -p "$@"
+	fi
+}
+
+notify_error() {
+	notify-send -t 2000 -u critical "$@"
+}
+
+url="${1:-$(printf "%s" | menu 'Paste url or file path')}"
+[ -z "$url" ] && exit 0
+
+base="$(basename "$url")"
+
+prgs=("nsxiv" "browser" "lynx" "$EDITOR" "mpv" "mpv audio" "mpc" "mpv float" "yt-thumbnail" "PDF" "Code ReadLater" "ReadLater" "queue download") # "yt download" "yt download last played using mpc"
+
+case "$(printf "%s\n" "${prgs[@]}" | menu "Open it with?")" in
+"${prgs[0]}")
+	if [[ "$url" == http* ]]; then
+		curl -sL "$url" >"/tmp/$(echo "$url" | sed "s/.*\///;s/%20/ /g")" && nsxiv-refile -a "/tmp/$(echo "$url" | sed "s/.*\///;s/%20/ /g")" >/dev/null 2>&1
+	else
+		nsxiv-refile "$url"
+	fi
+	;;
+"${prgs[1]}") setsid -f "$BROWSER" "$url" >/dev/null 2>&1 ;;
+"${prgs[2]}") setsid -f $TERMINAL -e lynx "$url" >/dev/null 2>&1 ;;
+"${prgs[3]}") curl -sL "$url" >"/tmp/$(echo "$url" | sed "s/.*\///;s/%20/ /g")" && setsid -f $TERMINAL -e "$EDITOR" "/tmp/$(echo "$url" | sed "s/.*\///;s/%20/ /g")" >/dev/null 2>&1 ;;
+"${prgs[4]}") setsid -f mpv -quiet "$url" >/dev/null 2>&1 ;;
+"${prgs[5]}") mpv --script-opts=layout=topbar,osc-visibility=always --profile=audio  "$url" ;;
+# "${prgs[5]}") $TERMINAL -e mpv -quiet --no-video "$url" ;;
+"${prgs[6]}") ytmpc "$url" ;;
+"${prgs[7]}") setsid -f mpv --no-osd --geometry=+0-0 --autofit=30% --title="mpvfloat" "$url" >/dev/null 2>&1 ;;
+# "mpv loop") setsid -f mpv -quiet --loop "$url" >/dev/null 2>&1 ;;
+# "mpv float") setsid -f $TERMINAL -e mpv --geometry=+0-0 --autofit=30%  --title="mpvfloat" "$url" >/dev/null 2>&1 ;;
+# setbg) curl -L "$url" > $XDG_CACHE_HOME/pic ; xwallpaper --zoom $XDG_CACHE_HOME/pic >/dev/null 2>&1 ;;
+"${prgs[8]}")
+	img="/tmp/yt_tmp_thumbnail"
+	yt-dlp --write-thumbnail --no-download --convert-thumbnail webp -o "$img" "$url" && nsxiv-refile "$img.webp"
+	;;
+"${prgs[9]}") curl -sL "$url" >"/tmp/$(echo "$url" | sed "s/.*\///;s/%20/ /g")" && zathura "/tmp/$(echo "$url" | sed "s/.*\///;s/%20/ /g")" >/dev/null 2>&1 ;;
+"${prgs[10]}") 
+	dir="$HOME/code-to-read"
+	[ -d "$dir/$(basename $url)" ] && { notify_error "Code Read Later" "Directory already exists"; exit 1; }
+	cd "$dir"  || return
+	git clone --depth 1 "$url" && notify-send "Read Later" "Cloned $url" || notify_error "Read Later" "Failed to download" >/dev/null 2>&1 ;;
+"${prgs[11]}") shiori add "$url" ;;
+"${prgs[12]}") qndl "$url" 'curl -LO' >/dev/null 2>&1 ;;
+# "Copy to clipboard") echo "$url" | tr -d '\n' | xclip -sel c -i ;;
+# "convert to PDF") wkhtmltopdf "$url" "$XDG_DOCUMENTS_DIR/readlater/$base.pdf"
+# notify-send "📜 $base.pdf downloaded"  ;;
+#|| notify-send "❗Exporting $base pdf failed" && exit 1
+# Html) single-file --browser-executable-path /usr/bin/chromium "$url" --output-directory "$XDG_DOCUMENTS_DIR/readlater"
+#       notify-send "📜 $base downloaded" ;;
+# ariaAdd) aria2c -i /tmp/ariaclip -d "$HOME/.aria2/sequences" "$url" && notify-send -u low 'Sequence Downloaded ✅' && mv /tmp/ariaclip "$HOME/.aria2/sequences/done.txt" ;;
+# ariaDownload) aria2c -d "$HOME/.aria2/files" "$url" && notify-send -u low 'File Downloaded ✅' ;;
+# "${prgs[10]}") yt "$url" ;;
+# "${prgs[11]}") yt "$(tail -n 1 ~/.cache/ytmpc-history | cut -d ';' -f 1)" ;;
+esac

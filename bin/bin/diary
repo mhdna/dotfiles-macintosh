@@ -1,0 +1,12 @@
+#!/bin/sh
+
+dir="$HOME/personal/diary"
+filename="$(date +%F).md"
+
+[ ! -d "$dir" ] && mkdir -p "$dir"
+
+path="$dir/$filename"
+
+[ ! -f "$path" ] && echo "# $(date +'%F %X')" > "$path"
+
+$EDITOR "$path"

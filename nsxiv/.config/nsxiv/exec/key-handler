@@ -1,0 +1,117 @@
+#!/usr/bin/bash
+
+menu() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		tofi --placeholder-text "$@"
+	else
+		menu-wrapper -p "$@"
+	fi
+}
+
+copy() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		wl-copy
+	else
+		xclip -i -sel c
+	fi
+}
+
+case "$1" in
+"s")
+	lf -remote "send $id unselect"
+	while read -r file; do
+		lf -remote "send $id select '$file'" && lf -remote "send $id toggle"
+	done
+	;;
+"b")
+	read -r file
+	setbg "$file"
+	;;
+"r")
+	while read -r file; do
+		name="$(menu "rename to: ")" 2>/dev/null
+		if [ -n "$name" ]; then
+			mv "$file" "$(dirname "$file")/$name"
+		fi
+	done
+	;;
+"c")
+	destdir="$(cat ${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs | menu "Copy file(s) to where?")"
+	while read -r file; do
+		cp "$file" "$destdir" && notify-send -i "$(readlink -f "$file")" "$file copied to $destdir." &
+	done
+	;;
+"m")
+	destdir="$(cat ${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs | menu "Move file(s) to where?")"
+	while read -r file; do
+		mv "$file" "$destdir" && notify-send -i "$(readlink -f "$file")" "🚚 $file moved to $destdir." &
+	done
+	;;
+"h")
+	while read -r file; do
+		convert -rotate 90 "$file" "$file"
+	done
+	;;
+"l")
+	while read -r file; do
+		convert -rotate -90 "$file" "$file"
+	done
+	;;
+"f")
+	while read -r file; do
+		convert -flop "$file" "$file"
+	done
+	;;
+"y")
+	read -r file
+	echo "$file" | tr '\n' ' ' | copy
+	;;
+"Y")
+	read -r file
+	readlink -f "$file" | tr -d '\n' | copy &&
+		notify-send "$(readlink -f "$file") copied to clipboard" &
+
+	;;
+"d")
+	files=()
+	while IFS= read -r file; do
+		files+=("$file")
+	done
+
+	# If there are files, confirm and delete
+	if [ "${#files[@]}" -gt 0 ]; then
+		setsid -f dragon-drop -k --and-exit -a "${files[@]}" >/dev/null 2>&1
+	fi
+	;;
+"D")
+	[ "$(printf "No\\nYes" | menu "Really move selected file(s) to trash?")" = "Yes" ] || exit
+	while read -r file; do
+		trash-put "$file" && notify-send "$file moved to trash."
+	done
+	;;
+
+"S")
+	[ "$(printf "No\\nYes" | menu "Really shred selected file(s)?")" = "Yes" ] || exit
+	while read -r file; do
+		shred -uvz "$file" && notify-send "$file shreded."
+	done
+	;;
+"g") tr '\n' '\0' | xargs -0 gimp & ;;
+"i")
+	read -r file
+	notify-send "File information" "$(mediainfo "$file")"
+	;;
+"o")
+	read -r file
+	name=${file%.*}
+
+	# check for a video file
+	for ext in webm mkv mp4; do
+		[ -f "$name.$ext" ] && setsid -f mpv "$name.$ext" -quiet >/dev/null 2>&1
+
+		# otherwise, search for a pdf file
+		pdfpath="$(exiftool "$file" | grep Author | cut -d ':' -f 2 | sed 's/^ //')"
+		[ -n "$pdfpath" ] && [ -f "$pdfpath" ] && setsid -f zathura "$pdfpath" >/dev/null 2>&1
+	done
+	;;
+esac

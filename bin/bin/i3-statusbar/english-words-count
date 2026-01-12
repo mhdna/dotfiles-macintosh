@@ -1,0 +1,13 @@
+#!/bin/sh
+
+count="$HOME/personal/notes/number_of_english_words.txt"
+[ ! -f "$count" ] && echo "0" > "$count"
+
+
+old="$(cat "$count")"
+case $BLOCK_BUTTON in
+	1) echo "$(( "$old" + 1 ))" > "$count" ;;
+	3) echo "$(( "$old" - 1 ))" > "$count" ;;
+esac
+
+echo "E: "$(cat "$count")""

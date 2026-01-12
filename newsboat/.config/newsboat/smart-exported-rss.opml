@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+<head>
+	<title>Newsfeeds exported from Smart RSS</title>
+</head>
+<body>
+
+	<outline text="blogs" title="blogs">
+		<outline text="Emacs guy - good stuff" title="Emacs guy - good stuff" type="rss" xmlUrl="https://blog.meain.io/feed.xml"/>
+		<outline text="Luke Blog" title="Luke Blog" type="rss" xmlUrl="https://lukesmith.xyz/rss.xml"/></outline>
+	<outline text="Chess" title="Chess">
+		<outline text="كش ملك الخطيب" title="كش ملك الخطيب" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCudvZnZVRdR55d_Rjk1XnSQ"/></outline>
+	<outline text="Computers" title="Computers">
+		<outline text="Computerphile" title="Computerphile" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC9-y-6csu5WGm29I7JiwpnA"/>
+		<outline text="Recreational Programming " title="Recreational Programming " type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCrqM0Ym_NbK1fqeQG2VIohg"/></outline>
+	<outline text="entertainment" title="entertainment">
+		<outline text="Icariaball - Funny politcal animations" title="Icariaball - Funny politcal animations" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC_2WbOWf6K_-6tX8LiBfHqQ"/></outline>
+	<outline text="go" title="go">
+		<outline text="Boldly Go" title="Boldly Go" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC79XhRzbR3YSnm3ODqgZ6EQ"/>
+		<outline text="Go tutorials and updates" title="Go tutorials and updates" type="rss" xmlUrl="https://gosamples.dev/index.xml"/>
+		<outline text="Gophercon" title="Gophercon" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCx9QVEApa5BKLw9r8cnOFEA"/>
+		<outline text="Russ Cox (Go team)" title="Russ Cox (Go team)" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC3P6PrEBAVH1UaiPOzZ-u-w"/>
+		<outline text="The Go Blog" title="The Go Blog" type="rss" xmlUrl="https://go.dev/blog/feed.atom"/></outline>
+	<outline text="unix" title="unix">
+		<outline text="BugsWriter" title="BugsWriter" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCngn7SVujlvskHRvRKc1cTw"/>
+		<outline text="Luke Smith" title="Luke Smith" type="rss" xmlUrl="https://videos.lukesmith.xyz/feeds/videos.xml?videoChannelId=2"/>
+		<outline text="Luke Smith" title="Luke Smith" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA"/></outline>
+	<outline text="AJ+ كبريت" title="AJ+ كبريت" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC-4KnPMmZzwAzW7SbVATUZQ"/>
+	<outline text="Al Jazeera – Breaking News, World News and Video from Al Jazeera" title="Al Jazeera – Breaking News, World News and Video from Al Jazeera" type="rss" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml"/>
+	<outline text="Arch Linux: Recent news updates" title="Arch Linux: Recent news updates" type="rss" xmlUrl="https://archlinux.org/feeds/news/"/>
+	<outline text="BBC" title="BBC" type="rss" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml?edition=int"/>
+	<outline text="Brodie Robertson" title="Brodie Robertson" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCld68syR8Wi-GY_n4CaoJGA"/>
+	<outline text="Calin Leafshade - Linux &amp;amp; Productivity Videos" title="Calin Leafshade - Linux &amp;amp; Productivity Videos" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCljOhRB2a3sQgLCdK9CHQvQ"/>
+	<outline text="Chris Titus Tech" title="Chris Titus Tech" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCg6gPGh8HU2U01vaFCAsvmQ"/>
+	<outline text="David Bombal" title="David Bombal" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCP7WmQ_U4GB3K51Od9QvM0w"/>
+	<outline text="EndTimes.Video" title="EndTimes.Video" type="rss" xmlUrl="https://endtimes.video/feed/"/>
+	<outline text="Eureka!" title="Eureka!" type="rss" xmlUrl="https://eureka.redwill.se/atom.xml"/>
+	<outline text="Fantasy &amp;amp; World Music by the Fiechters" title="Fantasy &amp;amp; World Music by the Fiechters" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCjMZjGhrFq_4llVS_x2XJ_w"/>
+	<outline text="FlareXes - hack guy" title="FlareXes - hack guy" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCVCcYvyMbN_azmwZLm593AA"/>
+	<outline text="GMHikaru" title="GMHikaru" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCweCc7bSMX5J4jEH7HFImng"/>
+	<outline text="GoodKnightChess" title="GoodKnightChess" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCDV0Kgy7jSyPpEJhWNZY9bA"/>
+	<outline text="javidx9" title="javidx9" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC-yuWVUplUJZvieEligKBkA"/>
+	<outline text="Jazeera Ar" title="Jazeera Ar" type="rss" xmlUrl="https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9"/>
+	<outline text="John Hammond" title="John Hammond" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCVeW9qkBjo3zosnqUbG7CFw"/>
+	<outline text="Josh Christiane" title="Josh Christiane" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCMIL2NVef3QpQ80Q2p_n7Kg"/>
+	<outline text="Kareem Elsayed كريم السيد" title="Kareem Elsayed كريم السيد" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCX5lX80yKjkzyXQWkkm3rOQ"/>
+	<outline text="Kris Occhipinti" title="Kris Occhipinti" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCf93fPKwotph47H3_KDcRyg"/>
+	<outline text="LandChad.net" title="LandChad.net" type="rss" xmlUrl="https://landchad.net/rss.xml"/>
+	<outline text="Leader Audio" title="Leader Audio" type="rss" xmlUrl="https://arabic.khamenei.ir/feed/service/13311"/>
+	<outline text="Leader Istifta" title="Leader Istifta" type="rss" xmlUrl="https://arabic.khamenei.ir/feed/service/11678"/>
+	<outline text="Leader Papers" title="Leader Papers" type="rss" xmlUrl="https://arabic.khamenei.ir/feed/service/11672"/>
+	<outline text="Lex Clips" title="Lex Clips" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCJIfeSCssxSC_Dhc5s7woww"/>
+	<outline text="Mad Hat" title="Mad Hat" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC7e_BXvNfjKFCgqR4LkUe9A"/>
+	<outline text="MEMRI TV Videos" title="MEMRI TV Videos" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC59Cpk70K2TwdmApJOTuW9g"/>
+	<outline text="Mental Outlaw" title="Mental Outlaw" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA"/>
+	<outline text="Metwally Labs" title="Metwally Labs" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCQFR7eBvWA0yaX60TaxZnMw"/>
+	<outline text="Midan - ميدان" title="Midan - ميدان" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCqPP4dbgr9Uddnzzuzr8qXQ"/>
+	<outline text="Mohamed Abusrea - محمد أبوسريع" title="Mohamed Abusrea - محمد أبوسريع" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCJu5uNExWKx1Vrv6Ah5SHfA"/>
+	<outline text="Mohammad Ali Fouani" title="Mohammad Ali Fouani" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCgAnTAonJ0S2gwb8ifX0b6g"/>
+	<outline text="Motiversity" title="Motiversity" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCAPByrKU5-R1emswVlyH_-g"/>
+	<outline text="MTV Lebanon News" title="MTV Lebanon News" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC9_XmAwE5szLHF76FjMylaw"/>
+	<outline text="Music Mind" title="Music Mind" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC6Umj85x9h8f7NyuDy14p6w"/>
+	<outline text="NeetCode" title="NeetCode" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC_mYaQAE6-71rjSN6CeCA-g"/>
+	<outline text="New Media Academy Life" title="New Media Academy Life" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCtJmfVv0a52Bu7BnJJtZXKw"/>
+	<outline text="Panahian • العربیة" title="Panahian • العربیة" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCgnQxBxj5UO2B2DxHuYN1AQ"/>
+	<outline text="ReadTube - جيل يقرأ" title="ReadTube - جيل يقرأ" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCu1NJiJlhrhmF5ZgT-0yWdA"/>
+	<outline text="The Coding Train" title="The Coding Train" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCvjgXvBlbQiydffZU7m1_aw"/>
+	<outline text="The Hated One" title="The Hated One" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCjr2bPAyPV7t35MvcgT3W8Q"/>
+	<outline text="ThePrimeagen" title="ThePrimeagen" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw"/>
+	<outline text="ThePrimeTime" title="ThePrimeTime" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ"/>
+	<outline text="vaticancatholic.com" title="vaticancatholic.com" type="rss" xmlUrl="https://vaticancatholic.com/feed/"/>
+	<outline text="Yasser Mamdouh" title="Yasser Mamdouh" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC4a5m_aUZQ-PARanwoOKHAw"/>
+	<outline text="أسئلة نص الليل" title="أسئلة نص الليل" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCYskjD6IuQJrxrW3I0EriZA"/>
+	<outline text="اسرار الشطرنج" title="اسرار الشطرنج" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UC4Cxai0CjeakRNj1HXXcDCA"/>
+	<outline text="القائد - فيديوهات" title="القائد - فيديوهات" type="rss" xmlUrl="https://arabic.khamenei.ir/feed/service/11663"/>
+	<outline text="القائد- بيانات" title="القائد- بيانات" type="rss" xmlUrl="https://arabic.khamenei.ir/feed/service/11665"/>
+	<outline text="حسين عبدالله" title="حسين عبدالله" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCFq4pOuTiZmfJyCxaYTT3Hg"/>
+	<outline text="دروس أونلاين" title="دروس أونلاين" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCEHvaZ336u7TIsUQ2c6SAeQ"/>
+	<outline text="عبدالله الشريف Abdullah ELshrif" title="عبدالله الشريف Abdullah ELshrif" type="rss" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCqlRE8sYdSeijg83yIDpq2w"/>
+	<outline text="مؤسسة نشر آثار حجة الإسلام سماحة الأستاذ بناهیان/ البیان المعنوی" title="مؤسسة نشر آثار حجة الإسلام سماحة الأستاذ بناهیان/ البیان المعنوی" type="rss" xmlUrl="http://arabic.bayanmanavi.ir.domains.blog.ir/rss/"/>
+	<outline text="موقع العهد الإخباري" title="موقع العهد الإخباري" type="rss" xmlUrl="https://alahednews.com.lb/rss"/></body>
+</opml>

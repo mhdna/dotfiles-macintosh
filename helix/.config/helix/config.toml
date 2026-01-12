@@ -1,0 +1,22 @@
+theme = "base16_terminal"
+
+[editor]
+true-color = true
+
+[editor.cursor-shape]
+insert = "bar"
+
+[editor.lsp]
+display-messages = true
+
+[keys.normal]
+G = "goto_file_end"
+X = "extend_line_above"
+ret = ["move_line_down", "goto_line_start"]
+
+[keys.normal.g]
+q = ":reflow"
+
+[keys.normal.space]
+q = ":quit"
+w = ":write"

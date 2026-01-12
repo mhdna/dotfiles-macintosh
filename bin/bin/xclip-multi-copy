@@ -1,0 +1,26 @@
+#!/bin/sh
+
+! command -v clipnotify >/dev/null 2>&1 && {
+	echo "clipnotify needs to be installed"
+	exit 1
+}
+
+clip=""
+[ "$1" = "-u" ] && urls="1"
+
+clear
+echo "Listening to clipboard events.."
+
+while clipnotify; do
+	new="$(xclip -sel c -o)"
+
+	if [ "$urls" = "1" ]; then
+		clip="$clip \"$new\""
+	else
+		clip="$clip $new"
+	fi
+
+	clear
+	echo "$clip"
+	# doesn't work: xclip -f -sel c -i "$clip"
+done

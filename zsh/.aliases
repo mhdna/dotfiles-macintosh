@@ -1,0 +1,227 @@
+#!/bin/sh
+
+# v() {
+# 	if [ -n "$1" ]; then
+# 		nvim $@
+# 	else
+# 		nvim .
+# 	fi
+# }
+# alias vimdiff="nvim -d"
+
+# [ -x "$(command -v nvim)" ] && alias vim="nvim_isolated -l ~/.config/nvim_minimal/" #vimdiff="nvim -d"
+
+# Use $XINITRC variable if file exists.
+[ -f "$XINITRC" ] && alias startx="startx $XINITRC"
+
+# sudo not required for some system commands
+for command in mount umount updatedb su; do
+	alias $command="sudo $command"
+done
+unset command
+
+config() {
+	git --git-dir=$HOME/.dotfiles/ --work-tree="$HOME" "$@"
+}
+
+# urlencode() {
+#     declare str="$*"
+#     declare encoded=""
+#     declare i c x
+#     for ((i = 0; i < ${#str}; i++)); do
+#         c=${str:$i:1}
+#         case "$c" in
+#             [-_.~~a-zA-Z0-9]) x="$c" ;;
+#             *) printf -v x '%%%02x' "'c$" ;;
+#         esac
+#         encoded+="$x"
+#     done
+#     echo "$encoded"
+# }
+
+# duck() {
+#     declare url=$(urlencode "$*")
+#     lynx "https://duckduckgo.com/lite?q=$url"
+# }
+
+# configa() {
+# 	while true; do
+
+# 		get_unstaged_file() {
+# 			# only show unstaged files
+# 			# "^M" are added, "^MM" are added but have modifications to be added, while "^ M are not added"
+# 			unstaged_file="$HOME/$(config status --porcelain | grep -E "(^ M|^MM)" | awk '{print $2}' | fzf)"
+# 		}
+
+# 		get_unstaged_file || return 1
+
+# 		config diff "$unstaged_file" &&
+# 			config add "$unstaged_file" &&
+# 			config status &&
+# 			echo "
+
+#         Type your commit message
+
+#         Or Press 'q' to leave
+#         'a' to add other files"
+# 		read -r ans
+
+# 		if [ $ans = "a" ]; then
+# 			continue
+# 		elif [ $ans = "q" ]; then
+# 			break
+# 		else
+# 			config commit -m "$ans" && break
+# 		fi
+# 	done
+# }
+
+try-harder_five() {
+	while ! "$@"
+	do
+		echo Again ...
+		sleep 5
+	done
+}
+
+pi() {
+	try-harder_five sudo pacman -S --noconfirm $@
+}
+
+pu() {
+	try-harder_five sudo pacman -Syu --noconfirm
+	try-harder_five yay -Syu --noconfirm -a
+}
+
+mg-convert_color() {
+	color="$1"
+	file_name="$2"
+	size="$3"
+	if [ -z "$size" ]; then
+		magick -size 1920x1080 xc:"$color" "$file_name"
+	else
+		magick -size "$size" xc:"$color" "$file_name"
+	fi
+}
+
+mg-transparent_image() {
+	 magcik "$1" -fuzz 10% -transparent white "$2"
+}
+
+# alias t="tgpt"
+alias rss="newsboat-wrapper"
+alias m="ncmpcpp"
+alias p="pnpm"
+alias a="php artisan"
+alias acache="artisan route:clear; artisan route:cache; artisan config:cache; artisan cache:clear"
+
+alias n="nvim $HOME/personal/notes"
+alias d="diary"
+# alias vc="pnpm create vite ./ --template react"
+
+# alias tp="trash-put"
+# alias tr="trash-restore"
+
+# alias v="helix"
+alias v="nvim"
+
+alias suspend="sudo systemctl suspend"
+alias Hibernate="sudo systemctl hibernate"
+# alias c="cd $HOME/projects/capstone/"
+alias disk="ncdu"
+alias ch="cht.sh"
+alias nonet="firejail --net=none --noprofile" # open apps into a sandbox with no internet access for them
+alias http="miniserve -p 8877 --enable-zip" # --upload-files --mkdir
+
+alias P="sudo pacman"
+# alias su="surf -z 1.5"
+alias res="nvim ~/.Xresources && xrdb ~/.Xresources && killall -USR1 st"
+alias ez="nvim ~/.zshrc; source ~/.zshrc"
+alias ze="zeditor"
+alias eo="nvim $HOME/.config/openbox/rc.xml; openbox --reconfigure"
+alias ea="nvim $HOME/.aliases; source $HOME/.aliases"
+alias en="nvim $HOME/.config/nvim"
+alias ep="nvim $HOME/Github/arch_setup_scripts/pkgs.conf; ~/Github/arch_setup_scripts/setup_packages.sh" # -c
+alias el="nvim $HOME/.config/lf/lfrc; [ -f /run/user/1000/lf."$USER".sock ] && lf -remote \"send $id source ~/.config/lf/lfrc\""
+alias eu="nvim $HOME/.config/newsboat/urls"
+alias ei="nvim $HOME/.config/i3/config; i3-msg reload"
+alias es="nvim $HOME/.config/sxhkd/sxhkdrc; pkill -usr1 -x sxhkd"
+# alias es="nvim $HOME/.config/sway/config" #; swaymsg reload"
+alias l="lf -command 'set nopreview' -command 'set ratios 1'"
+# alias ef="$EDITOR -c \"e ~/Github/arch_installer/firefox_addons.txt | vsplit ~/.config/firefox/overrides.js\"; arkenfox-auto-update"
+alias ef="$EDITOR ~/.config/firefox/overrides.js; arkenfox-auto-update"
+# alias n="nvim $HOME/personal/notes/"
+# alias l="nvim $HOME/personal/notes/language.org"
+# alias q="nvim $HOME/personal/notes/quotes.org"
+# alias ea="nvim $HOME/.config/awesome/rc.lua"
+
+alias bm="$EDITOR ~/.config/bm/bm-dirs; shortcuts"
+# alias s="shiori"
+alias s="sleep"
+alias su="sleep-until"
+alias cr="$EDITOR ~/Github/arch_setup_scripts/systemwide_configs/cronjobs.txt; crontab < ~/Github/arch_setup_scripts/systemwide_configs/cronjobs.txt"
+
+# alias ns="nix --extra-experimental-features \"nix-command flakes\" search nixpkgs"
+
+alias X="xclip-multi-copy -u"
+alias PWD="pwd | xclip -sel c -i"
+alias N="nsxiv-refile"
+# alias hx="helix"
+alias py="python"
+# alias ps="paste_to_script"
+# alias i="nmtui"
+alias y="yt-menu -f"
+alias yx="yt-menu -f \"\$(xclip -sel c -o)\""
+# alias em="emacsclient -c -nw" # --color=no
+# alias s="surf -z 1.6 -s"
+# alias s="shortcuts"
+# alias ref="shortcuts >/dev/null; source $XDG_CONFIG_HOME/shell/shortcutrc"
+# alias r="newsboat"
+alias ti="termdown --no-figlet"
+# alias tr="torwrap"
+# alias t="todo.sh"
+alias t="transs"
+alias ta="todo.sh lsp A"
+alias ex="exercism"
+# alias e="neomutt"
+# alias e="bicon command neomutt"
+alias fp="fix_python_pacman_package"
+alias m="ncmpcpp"
+# alias m="bicon command ncmpcpp"
+# alias h="try-harder"
+alias h="htop"
+
+alias g="git"
+alias G="gitk"
+alias gs="git status"
+alias gl="git log"
+alias ga="git add"
+alias gr="git reset"
+alias gc="git commit -m"
+alias gC="git clone"
+alias gb="git branch"
+alias gd="git diff"
+alias gC1="git clone --depth 1"
+
+alias cd="z"
+
+alias dr="dragon-drop"
+alias lsd="ls -d .*/ */"
+alias ls="ls -h --color=auto"
+alias ll="ls -hl --color=auto"
+alias ip="ip -color=auto"
+alias abook="abook -C $XDG_CONFIG_HOME/abook/abookrc --datafile $XDG_CONFIG_HOME/abook/addressbook"
+alias cp="cp -iv"
+alias mv="mv -iv"
+alias rm="rm -vI"
+alias bc="bc -lq"
+alias mkd="mkdir -pv"
+alias aria2c="aria2c --auto-file-renaming=false"
+alias ffmpeg="ffmpeg -hide_banner"
+alias grep="grep --color=auto"
+alias diff="diff --color=auto"
+alias nf="notify-send "
+alias ka="killall"
+# alias trem="transmission-remote"
+# alias z="zathura"
+alias x="xclip -sel c -i"

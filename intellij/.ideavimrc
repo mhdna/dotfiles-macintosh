@@ -1,0 +1,104 @@
+let mapleader = " "
+
+# set relativenumber
+# set number
+set ignorecase
+set smartcase
+set clipboard+=unnamedplus
+set mouse=ar
+set visualbell
+set surround
+set highlightedyank
+set ideamarks
+set ideajoin
+set commentary
+set argtextobj
+set textobj-entire
+set NERDTree
+set vim-paragraph-motion
+set textobj-indent
+set exchange
+
+sethandler <C-u> n:vim
+
+sethandler <C-e> n:ide
+sethandler <C-b> n:ide
+sethandler <C-q> n:ide
+sethandler <C-j> n:ide
+sethandler <C-n> n:ide
+
+sethandler <C-f> n:ide
+sethandler <C-y> n:ide
+sethandler <C-p> n:ide
+sethandler <C-n> n:ide
+
+sethandler <C-r> n:vim
+sethandler <C-y> n:ide
+sethandler <C-c> n:ide
+sethandler <C-s> n:ide
+sethandler <C-t> n:ide
+
+sethandler <C-h> n:ide
+
+" Same as default IDEA action, but only in insert mode. Enter block-visual
+" mode in normal mode.
+sethandler <C-v> i:ide
+
+map s <Action>(SelectIn)
+" Perhaps a bit useless compared to search anything.
+"map s <Action>(GotoSymbol)
+map <Leader>s <Action>(FileStructurePopup)
+map <Leader>S <Action>(StructuralSearchActions)
+" Perhaps just use the Idea shortcut Ctrl-Alt-B
+" Alt + N, then m (through the menu bar) also seems to work, but it is
+" non-unique.
+map <Leader>i <Action>(GotoImplementation)
+map <Leader>m <Action>(GotoImplementation)
+map <Leader>d <Action>(GotoImplementation)
+" Jump to next/previous error, show error description
+" https://stackoverflow.com/questions/13346245/keyboard-shortcut-to-display-error-in-intellij
+map <Leader>e <Action>(ShowErrorDescription)
+
+" Alt + F7 in idea.
+" Find usages in file is Ctrl + F7.
+" Alt + E, then F, then U (through the menu bar) also seems to work fine.
+map <Leader>f <Action>(FindUsages)
+map <Leader>F <Action>(HighlightUsagesInFile)
+" Alt + Insert in idea.
+map <Leader>g <Action>(Generate)
+" F12
+map <Leader>w <Action>(HideAllWindows)
+map <Leader>W <Action>(JumpToLastWindow)
+" Possibly redundant given "Run Anything" DoubleCtrl
+map <Leader>r <Action>(ChooseRunConfiguration)
+map <Leader>R <Action>(Refactorings.QuickListPopupAction)
+map <Leader>a <Action>(AnalyzeActionsPopup)
+
+" I like using space for jumping to the next error or issue
+map <CR> <Action>(GotoNextError)
+
+" Kind of makes more sense to use Backspace to go back... but could it be assigned a better action?
+map <Leader><Space> <Action>(GotoPreviousError)
+"map <BS> <Action>(GotoPreviousError)
+map <BS> <Action>(GotoRelated)
+
+" The default C-o and C-i behaviours have certain inconsistencies with
+" Vim which I can't quite pinpoint.
+" I'm using the default IntelliJ behaviours instead.
+map <C-o> <Action>(Back)
+map <C-i> <Action>(Forward)
+map g; <Action>(JumpToLastChange)
+map g, <Action>(JumpToNextChange)
+
+map <Leader>[ <Action>(EditorCodeBlockStart)
+" Can also use Ctrl-Shift-]
+map <Leader>] <Action>(EditorCodeBlockEnd)
+
+map <C-k> <Action>(EditorSelectWord)
+
+map <Leader>c <Action>(Run)
+
+map <Leader>k :tabclose<CR>
+
+" uppercase last inserted word
+imap <C-l> <Esc>bgUawea

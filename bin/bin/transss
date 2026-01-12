@@ -1,0 +1,3 @@
+#!/bin/sh
+
+transs -s& transs ar& transs aren & disown

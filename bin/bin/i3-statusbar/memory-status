@@ -1,0 +1,17 @@
+#!/bin/sh
+
+case $BLOCK_BUTTON in
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+free_percent="$(free | awk '/^Mem/{print $3/$2 * 100.0}' | awk -F. '{print $1}')"
+
+if [ "$free_percent" -gt 85 ]; then
+    echo "<span color=\"#ff0000\">M: $free_percent%</span>"
+else
+    # echo "<span color=\"#00ff00\">M: $free_percent%</span>"
+    echo "M: ${free_percent}%"
+fi
+
+# free --mebi | sed -n '2{p;q}' | awk '{printf ("%2.2fGiB\n", ( $3 / 1024))}'
+# free --mebi | sed -n '2{p;q}' | awk '{printf ("%2.2fGiB/%2.2fGiB\n", ( $3 / 1024), ($2 / 1024))}'

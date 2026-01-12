@@ -1,0 +1,29 @@
+#!/bin/sh
+
+menu() {
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		tofi --placeholder-text "$@"
+	else
+		menu-wrapper -p "$@"
+	fi
+}
+
+dst="$NOTES_DIR/language.org"
+
+getwords() {
+	word="$(menu "Enter Word: " </dev/null)"
+}
+getmeaning() {
+	mean="$(menu "Enter Meaning: " </dev/null)"
+}
+
+remind() {
+	word=$(grep "^- *[a-z]" "$NOTES_DIR/language.org" | shuf | head -n1 | tr -d '-')
+	echo "$word"
+}
+
+if [ "$1" = "r" ]; then
+	remind
+else
+	getwords && getmeaning && sed -i "s/^** More words/- $word\n\t: $mean\n** More words/" "$dst" && notify-send -t 2000 "Newword" "Word successfully added"
+fi

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+CURRENT_PANE="$(tmux display-message -p -F "#{session_name}")"
+popup_name="$1"
+[ "$popup_name" = "" ] && echo "You must provide a name."
+shift 1
+command="$@"
+
+if echo "$CURRENT_PANE" | grep -q "^$popup_name"; then
+	tmux detach-client
+else
+	# if [ "$1" = "single" ]; then
+	# 	tmux popup -d '#{pane_current_path}' -x50% -y50% -w50% -h50% -E "tmux attach -t 'p-$CURRENT_PANE' || tmux new -s 'p-$CURRENT_PANE'" || true
+	# else
+	tmux popup -xC -y0 -w70% -h80% -E "tmux attach -t $popup_name || tmux new -s $popup_name $command" || true
+	# fi
+fi

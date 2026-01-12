@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+import sys
+from fractions import Fraction
+
+
+def simplify_fraction(fraction_str):
+    try:
+        # Parse fraction
+        numerator, denominator = map(int, fraction_str.split("/"))
+        fraction = Fraction(numerator, denominator)
+
+        # Simplify fraction
+        simplified_fraction = fraction.limit_denominator()
+
+        return f"Simplified: {simplified_fraction}"
+    except ValueError:
+        return "Invalid input format. Please provide the fraction in the form of 'numerator/denominator'."
+
+
+def simplify_arithmetic(expression):
+    try:
+        result = eval(expression)
+        if isinstance(result, Fraction):
+            return f"Simplified: {result}"
+        else:
+            return f"Simplified: {result}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(
+            "Usage: ./simplify_fraction.py 'numerator/denominator' or 'arithmetic_expression'"
+        )
+        sys.exit(1)
+
+    input_str = sys.argv[1]
+    if "/" in input_str:
+        result = simplify_fraction(input_str)
+    else:
+        result = simplify_arithmetic(input_str)
+
+    print(result)
+
+# #!/usr/bin/env python3
+# import sys
+
+# from sympy import simplify
+
+
+# def main():
+#     # Read input expression from command line argument
+
+#     try:
+#         # Use sympy to simplify the expression
+#         simplified_expression = simplify(input_expression)
+#         print("Simplified expression:", simplified_expression)
+
+#     except Exception as e:
+#         print("Error:", e)
+
+
+# if __name__ == "__main__":
+#     if len(sys.argv) != 2:
+#         print("Usage: ./simplify.py 'input'")
+#         sys.exit(1)
+
+#     input_str = sys.argv[1]
+#     result = main(input_expression)
+#     print(result)

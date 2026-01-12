@@ -1,0 +1,4 @@
+#!/bin/sh
+
+yt-dlp-wrapper --remux-video opus -f bestaudio/best --no-write-thumbnail --embed-thumbnail \
+	--add-metadata -ic $@

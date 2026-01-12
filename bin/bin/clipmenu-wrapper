@@ -1,0 +1,5 @@
+#!/bin/sh
+
+CM_DIR="$HOME/.cache"
+# CM_HISTLENGTH=25
+CM_LAUNCHER="menu-wrapper" clipmenu

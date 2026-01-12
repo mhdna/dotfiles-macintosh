@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	menu="tofi --placeholder-text"
+else
+	menu="menu-wrapper -p"
+fi
+prgs=$(echo "" | mimeopen --ask "$1" 2>/dev/null)
+choice=$(echo "$prgs" | grep "[0-9]*)" | cut -d '(' -f 2 | cut -d ')' -f 1 | $menu "Open With: ")
+
+# execute
+id=$(echo "$prgs" | grep "$choice" | cut -d ')' -f 1)
+echo $id | mimeopen --ask "$1" >/dev/null 2>&1 &

@@ -1,0 +1,5 @@
+#!/bin/sh
+dir="$XDG_DATA_HOME/time"
+[ -d "$dir" ] || mkdir "$dir"
+date=$(date '+%y-%m-%d')
+echo $(($(cat "$dir/$date")+1)) > "$dir/$date"

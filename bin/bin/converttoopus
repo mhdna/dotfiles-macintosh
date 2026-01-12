@@ -1,0 +1,4 @@
+#!/bin/sh
+
+file="$1"
+ffmpeg -n -i "$file" -c:a libopus "${file%.*}.opus"

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# print() {
+# 	status=$(mpc status %state%)
+#       status="MPD: $status"
+# 	echo "$status"
+# }
+
+# print
+
+while :; do
+	mpc idle >/dev/null && mpd-notify # && print
+done

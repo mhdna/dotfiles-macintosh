@@ -1,0 +1,25 @@
+#!/bin/sh
+
+old="$1"
+# get old file's extension
+oldext=${old##*.}
+
+err(){
+    echo "Oops! Something went wrong"
+}
+
+case "$oldext" in
+    "org")
+        new="${old%.*}.md"
+        cp "$old" "$new"&&
+            sed -i 's/^\* /# /; s/^\*\* /## /; s/^\*\*\* /### /; s/^\*\*\*\* /#### /; s/^\*\*\*\*\* /##### /; s/^\*\*\*\*\*\* /###### /; s/\*/\*\*/g; s/_/\*/g; s/^(<#begin_src.*|#+BEGIN_SRC.*|#+end_src|#+END_SRC)/```/' "$new" &&
+            echo "Success: $old ==> $new" || err
+        ;;
+    "md")
+        new="${old%.*}.org"
+        cp "$old" "$new" &&
+        sed -i 's/^# /\* /; s/^## /\*\* /; s/^### /\*\*\* /; s/^#### /\*\*\*\* /; s/^##### /\*\*\*\*\* /; s/^###### /\*\*\*\*\*\* /; s/\*\*/\*/g; s/(?<!^)\*/_/g' "$new" &&
+            echo "Success: $old ==> $new" || err
+        ;;
+     *) err; exit 1;;
+ esac

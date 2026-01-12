@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# $1 is a url; $2 is a command
+[ -z "$1" ] && exit
+vids_dir="$XDG_VIDEOS_DIR"
+base="$(basename "$1")"
+notify-send "⏳ Queuing $base..."
+cmd="$2"
+[ -z "$cmd" ] && cmd="yt-dlp-wrapper --embed-metadata -ic"
+idnum="$(tsp $cmd "$1")"
+realname="$(echo "$base" | sed "s/?\(source\|dest\).*//;s/%20/ /g")"
+tsp -D "$idnum" mv "$base" "$vids_dir/$realname"
+tsp -D "$idnum" notify-send "👍 $realname done."

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# fix fonts issue with xlock
+
+locale
+locale -a
+localectl
+LANG=C LC_ALL=C xlock -mode bug

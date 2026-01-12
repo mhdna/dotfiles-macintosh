@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Usage
+# -d runs daemon
+# -n toggles next keyboard layout
+# -p toggles previous keyboard layout
+
+# TODO make it work incase X11 in tty1 and wayland on tty2
+
+daemon="keyboardd-status"
+keyboard="1:1:AT_Translated_Set_2_keyboard"
+
+# ! pidof -xs "$daemon" >/dev/null 2>&1 && sb-keyboardd "$keyboard" &
+# disown >/dev/null 2>&1
+
+next() {
+	swaymsg input "$keyboard" xkb_switch_layout next >/dev/null 2>&1
+}
+
+prev() {
+	swaymsg input "$keyboard" xkb_switch_layout prev >/dev/null 2>&1
+}
+
+case $BLOCK_BUTTON in
+1) next ;;
+3) prev ;;
+6) $TERMINAL -e $EDITOR "$0" ;;
+esac
+
+case "$1" in
+"-d") ! pidof -xs "$daemon" >/dev/null 2>&1 && sb-keyboardd "$keyboard" >/dev/null 2>&1 ;;
+"-n") next ;;
+"-p") prev ;;
+*)
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		# layout="$(swaymsg -t get_inputs | jq 'map(select(has("xkb_active_layout_name")))[0].xkb_active_layout_name' | tr -d "\"" | cut -c1-2 | tr '[:lower:]' '[:upper:]')"
+		# [ "$layout" != "EN" ] && echo "<span color=\"#ff0000\">$layout</span>" && exit 0
+		# echo "$layout"
+		swaylayout --listen "$keyboard"
+	else
+		xkbmon -o -u | cut -c 1-2
+	fi
+	;;
+esac

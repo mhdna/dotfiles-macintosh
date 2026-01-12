@@ -1,0 +1,102 @@
+#!/bin/sh
+
+# Usage:
+# `$0`: Ask for recording type via $menu
+# `$0 screencast`: Record only screen
+# `$0 audio`: Record only audio
+# `$0 kill`: Kill existing recording
+#
+# If there is already a running instance, user will be prompted to end it.
+
+menu="tofi --placeholder-text"
+
+getdim() { xrandr | sed -n "s/\s*\([0-9]\+x[0-9]\+\).*\*.*/\1/p"; }
+
+updateicon() {
+	echo "$1" >/tmp/recordingicon
+	pkill -RTMIN+4 "${STATUSBAR:-i3blocks}"
+}
+
+killrecording() {
+	recpid="$(cat /tmp/recordingpid)"
+	kill -15 "$recpid" # || exit 1
+	rm -f /tmp/recordingpid
+	updateicon ""
+	pkill -RTMIN+4 "${STATUSBAR:-i3blocks}"
+}
+
+screencast_selected() {
+	wl-screenrec -b "1 MB" --audio -g "$(slurp)" -f
+	# --audio-device "alsa_output.pci-0000_00_1f.3.hdmi-stereo.monitor"
+	"$HOME/screencast-$(date '+%y%m%d-%H%M-%S').mkv" &
+	echo $! >/tmp/recordingpid
+	updateicon "REC"
+}
+
+screencast_selected_noaudio() {
+	wl-screenrec -b "1 MB" -g "$(slurp)" -f \
+		"$HOME/screencast-$(date '+%y%m%d-%H%M-%S').mkv" &
+	echo $! >/tmp/recordingpid
+	updateicon "REC"
+}
+
+screencast() {
+	wl-screenrec -b "1 MB" --audio -f "$HOME/screencast-$(date '+%y%m%d-%H%M-%S').mkv" &
+	# --audio-device "alsa_output.pci-0000_00_1f.3.hdmi-stereo.monitor" -f \
+	echo $! >/tmp/recordingpid
+	updateicon "REC"
+}
+
+# webcamhidef() {
+# 	ffmpeg \
+# 		-f v4l2 \
+# 		-i /dev/video0 \
+# 		-video_size 1920x1080 \
+# 		"$HOME/webcam-$(date '+%y%m%d-%H%M-%S').mkv" &
+# 	echo $! >/tmp/recordingpid
+# 	updateicon "Cam(HD)"
+# }
+
+webcam() {
+	ffmpeg \
+		-f v4l2 \
+		-i /dev/video0 \
+		-video_size 640x480 \
+		"$HOME/webcam-$(date '+%y%m%d-%H%M-%S').mkv" &
+	echo $! >/tmp/recordingpid
+	updateicon "Cam"
+}
+
+audio() {
+	ffmpeg \
+		-f pulse -i default \
+		-c:a flac \
+		"$HOME/audio-$(date '+%y%m%d-%H%M-%S').flac" &
+	echo $! >/tmp/recordingpid
+	updateicon "Aud"
+}
+
+askrecording() {
+	choice=$(printf "screencast\\nscreencast selected\\nscreencast selected no audio\\naudio\\nwebcam" | $menu "Select recording style:")
+	case "$choice" in
+	audio) audio ;;
+	screencast) screencast ;;
+	"screencast selected") screencast_selected ;;
+	"screencast selected no audio") screencast_selected_noaudio ;;
+	webcam) webcam ;;
+	esac
+}
+
+asktoend() {
+	response=$(printf "No\\nYes" | $menu "Recording still active. End recording?") &&
+		[ "$response" = "Yes" ] && killrecording
+}
+
+case "$1" in
+audio) audio ;;
+screencast) screencast ;;
+screencast_selected) screencast_selected ;;
+screencast_selected_no_audio) screencast_selected_noaudio ;;
+kill) killrecording ;;
+*) ([ -f /tmp/recordingpid ] && asktoend && exit) || askrecording ;;
+esac

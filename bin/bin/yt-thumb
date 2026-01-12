@@ -1,0 +1,5 @@
+#!/bin/sh
+
+yt-dlp -S res:720 -o "%(title)s.%(ext)s" \
+    --external-downloader aria2c --add-metadata -ic --max-filesize 2G --write-subs --write-auto-subs --write-thumbnail --convert-thumbnails jpg $@
+# --no-playlist

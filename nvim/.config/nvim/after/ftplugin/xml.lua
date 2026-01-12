@@ -1,0 +1,1 @@
+-- vim.opt_local.equalprg = "xmllint --format -"

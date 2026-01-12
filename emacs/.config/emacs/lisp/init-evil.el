@@ -1,0 +1,332 @@
+(defun set-keys ()
+  ;; https://github.com/emacs-evil/evil-collection#key-translation
+
+  (defvar my-intercept-mode-map (make-sparse-keymap)
+    "High precedence keymap.")
+
+  (define-minor-mode my-intercept-mode
+    "Global minor mode for higher precedence evil keybindings."
+    :global t)
+
+  (my-intercept-mode)
+
+  (dolist (state											 '(normal visual insert))
+    (evil-make-intercept-map
+     ;; NOTE: This requires an evil version from 2018-03-20 or later
+     (evil-get-auxiliary-keymap my-intercept-mode-map state t t)
+     state))
+
+  (evil-define-key										 '(insert) my-intercept-mode-map
+    (kbd "M-SPC")												 'nil
+    (kbd "C-u")												 'kill-start-of-line)
+
+  (evil-define-key										 '(normal visual) my-intercept-mode-map
+    (kbd "M-u")												 'universal-argument
+		(kbd "M-d")                         'my-duplicate-line
+    (kbd "M-S-u")												 'negative-argument
+    (kbd "z d")												 'dictionary-lookup-definition
+    ;; fix gj, gk when using evil-org-mode
+    ;; (kbd "gj")												 'evil-next-visual-line
+    ;; (kbd "gk")												 'evil-previous-visual-line
+    ;; (kbd "C-SPC")												 'toggle-input-method
+
+    ;; (kbd "C-w s")												 'my-split-window-below-and-switch
+    ;; (kbd "C-w v")												 'my-split-window-right-and-switch
+
+    ;; Leader keybindings
+    ;; NOTE: I use SPC instead of setting up <leader> because otherwise my-intercept-mode-map won't work, and things like <leader>al won't work either
+    (kbd "SPC w")                      'save-buffer
+    (kbd "SPC W")                      'write-file
+    (kbd "SPC =")                      'my-indent-buffer
+    (kbd "-")                      '(lambda () (interactive) (dired default-directory))
+    ;; (kbd "SPC al")										 'align-regexp
+    ;; (kbd "SPC a=")										 'my-align-single-equals
+    (kbd "SPC a")                       'org-agenda
+    (kbd "SPC B")											 'magit-blame-toggle
+    (kbd "SPC g")											 'magit-status
+    ;; (kbd "SPC l")											 'consult-flymake
+    (kbd "SPC y")											 'consult-yank-pop
+    (kbd "gs")                         'consult-ripgrep
+    (kbd "SPC R")											 'find-file-root
+    ;; (kbd "SPC S")											 'delete-trailing-whitespace
+    (kbd "SPC u")											 'undo-tree-visualize
+    (kbd "SPC M")											 'make-frame
+    (kbd "SPC W")											 'write-file
+    (kbd "SPC O")											 'browse-url-xdg-open
+
+    ;; (kbd "SPC s")											 'my-split-term
+    (kbd "SPC f")                      'find-file
+    (kbd "SPC v")											 'find-alternate-file
+    (kbd "SPC b")											 'switch-to-buffer
+    (kbd "SPC r")											 'consult-recent-file
+    (kbd "SPC j")											 'bookmark-jump
+    (kbd "SPC J")											 'my-bookmark-set
+    (kbd "SPC k")											 'my-close-current-buffer
+    (kbd "C-S-T")											 'my-open-last-closed
+    (kbd "SPC P")											 'project-switch-project
+    (kbd "SPC p")											 'project-find-file
+    (kbd "SPC c")											 'org-capture
+    (kbd "SPC C")											 'calc
+    ;; (kbd "SPC i")											 'consult-imenu
+    (kbd "SPC d")											 'my-diary-file-open
+    (kbd "SPC D")											 'my-journal-file-open
+    (kbd "SPC t")											 'my-org-todo-open
+    ;; (kbd "SPC s")                      '(lambda () (interactive) (find-file (org-file-path "week.org")))
+    ;; (kbd "SPC s")											 'my-chatgpt-switch-or-open
+    (kbd "SPC s")											 'vterm
+    (kbd "SPC T")											 'org-capture-todo
+    ;; (kbd "SPC n")											 '(lambda () (interactive) (org-capture nil "n"))
+    (kbd "SPC n")											 'my-notes-open
+    (kbd "SPC R")                      '(lambda () (interactive) (load-file user-init-file))
+    ;; (kbd "M-h")											 'mark-whole-buffer
+
+    ;; (kbd "M-e")											 '(lambda()
+		;; 																		(interactive)
+		;; 																		(my-anki-language-expand  "anki-english-words.org" "English Words" "anki-english-word"))
+    ;; (kbd "M-E")											 '(lambda()
+		;; 																		(interactive)
+		;; 																		(my-anki-language-expand  "anki-english-phrases.org" "English Phrases" "anki-english-phrase"))
+    ;; (kbd "M-a")											 '(lambda()
+		;; 																		(interactive)
+		;; 																		(my-anki-language-expand  "anki-arabic-words.org" "Arabic Words" "anki-arabic-word"))
+    ;; (kbd "M-A")											 '(lambda()
+		;; 																		(interactive)
+		;; 																		(my-anki-language-expand   "anki-arabic-phrases.org" "Arabic Phrases" "anki-arabic-phrase")))
+    ;; (kbd "M-e")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-language-item "english-words.org" "English Words"))
+    ;; (kbd "M-E")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-language-item  "english-phrases.org" "English Phrases"))
+    ;; (kbd "M-a")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-language-item  "arabic-words.org" "Arabic Words"))
+    ;; (kbd "M-A")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-language-item   "arabic-phrases.org" "Arabic Phrases")))
+    ;; (kbd "M-q")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-h2tag "questions.org" "Questions")))
+    ;; (kbd "M-t")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-h2tag org-todo-file "Index")))
+    ;; (kbd "M-b")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-h2tag org-todo-file "Index")))
+    ;; (kbd "M-n")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-h2tag "news.org" "News")))
+    ;; (kbd "M-Q")											 '(lambda()
+    ;; 																				(interactive)
+    ;; 																				(my-org-insert-h2tag "quotes.org" "Index"))
+    )
+	(evil-define-key										 '(normal visual) html-mode-map
+    (kbd "SPC o")											 'browse-url-of-buffer)
+
+	(evil-define-key										 '(normal visual) org-mode-map
+		(kbd "SPC /")											 'org-sparse-tree
+		(kbd "M-p")											   'anki-editor-push-notes
+		(kbd "SPC e")											 'my-org-emphasize
+		(kbd "M-b")											 'my-org-emphasize-bold
+		(kbd "SPC A")											 'my-mark-done-and-archive
+		(kbd "SPC i")											 'my-org-goto
+		;; (kbd "SPC E")											 'org-export-dispatch
+		(kbd "SPC E")											 'org-display-inline-images
+		(kbd "SPC xi")										 'org-clock-in
+		(kbd "SPC xo")										 'org-clock-out
+		(kbd "SPC xx")										 'org-clock-display
+		(kbd "SPC l")											 'org-store-link
+		(kbd "SPC L")											 'org-insert-link
+		(kbd "SPC o")											 'org-open-at-point
+		)
+
+	(evil-define-key										 '(normal visual) emacs-lisp-mode-map
+		(kbd "SPC e")											 'eval-last-sexp
+		(kbd "SPC E")											 'my-eval-region-or-buffer
+		(kbd "(")																 'evil-previous-open-paren
+		(kbd ")")																 'evil-next-close-paren)
+
+	;; c-c quit insert mode and so on
+	(define-key minibuffer-local-map (kbd "C-c")							 'minibuffer-keyboard-quit)
+	(evil-define-key 'insert 'global (kbd "C-c") 'evil-normal-state)
+	(evil-define-key 'visual 'global (kbd "C-c") 'evil-exit-visual-state)
+	)
+
+;; Global Bindings
+(global-set-key (kbd "M-v")						 'yank) ;; paste
+;; (global-set-key (kbd "M-v")						 'paste-from-clipboard) ;; (was: yank)
+;; (Global-set-key (kbd "M-S-v")						 'paste-from-primary)
+(global-set-key (kbd "C-w")						 'backward-kill-word)
+
+;; unset keys for M-0 through M-9
+;; M-[0-4] are especially annoying if they close windows or open new splits if envoked with universal-argument prefix
+(dotimes (i 10)
+  (global-unset-key (kbd (format "M-%d" i))))
+
+;; quit everything with escape whenever possible.
+(defun minibuffer-keyboard-quit ()
+  "Abort recursive edit.
+In Delete Selection mode, if the mark is active, just deactivate it;
+then it takes a second \\[keyboard-quit] to abort the minibuffer."
+  (interactive)
+  (if (and delete-selection-mode transient-mark-mode mark-active)
+      (setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
+
+(global-set-key (kbd "C-SPC")	'toggle-input-method)
+(define-key minibuffer-local-map (kbd "C-SPC")							 'toggle-input-method)
+(define-key minibuffer-local-ns-map [escape]					 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-completion-map [escape]	 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-must-match-map [escape]	 'minibuffer-keyboard-quit)
+(define-key minibuffer-local-isearch-map [escape]			 'minibuffer-keyboard-quit)
+
+
+(define-key minibuffer-local-map (kbd "C-u")							 'kill-start-of-line)
+
+;; prevent esc esc esc from quitting minibuffer
+(define-key minibuffer-local-map "\e\e\e" 'ignore)
+
+(defun config-evil ()
+
+  "Configure evil mode."
+  ;; Use Emacs state in these additional modes.
+  (dolist (mode '(
+                  eshell-mode
+                  git-rebase-mode
+                  image-mode
+                  term-mode
+                  ))
+    (evil-set-initial-state mode 'emacs))
+
+  (delete 'term-mode evil-insert-state-modes)
+  (delete 'eshell-mode evil-insert-state-modes)
+
+  ;; Use insert state in these additional modes.
+  (dolist (mode '(twittering-edit-mode
+                  magit-log-edit-mode))
+    (add-to-list 'evil-insert-state-modes mode))
+
+  (add-to-list 'evil-buffer-regexps '("\\*Flymake ")))
+
+(use-package evil
+  :init
+  ;; for evil-collection
+  (setq evil-want-C-u-scroll t)
+  ;; Disable C-i to jump forward to restore TAB functionality in Org mode.
+  (setq evil-want-C-i-jump nil)
+  (setq evil-want-Y-yank-to-eol t)
+  (setq evil-want-keybinding nil)
+  (setq evil-split-window-below t)
+  ;; no vim insert bindings
+  (setq evil-disable-insert-state-bindings t)
+  (setq evil-split-window-right t)
+  :config
+  (add-hook 'evil-mode-hook 'set-keys)
+  (add-hook 'evil-mode-hook 'config-evil)
+  (evil-mode 1))
+
+(use-package evil-org
+  :after org
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda () (evil-org-set-key-theme)))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-collection-mode-list
+        '(
+          calendar
+          calc
+          dired
+          info
+          help
+          ibuffer
+          magit
+          doc-view
+          eshell
+          ripgrep
+          rg
+          flymake
+          flycheck
+          dictionary
+          compile
+          eldoc
+          image
+          ibuffer
+          man
+          eww
+          pdf
+          ))
+  (evil-collection-init))
+
+(use-package evil-nerd-commenter
+  :after evil
+  :config
+  (evilnc-default-hotkeys t))
+
+;; Automatic insert-mode for certain hooks
+(add-hook 'org-insert-heading-hook (apply-partially #'evil-insert 1))
+(add-hook 'org-capture-mode-hook 'evil-insert-state)
+
+;; (setq tab-always-indent 'complete)
+
+;; set default undo-tree system if installed
+(when (package-installed-p 'undo-tree)
+  (evil-set-undo-system 'undo-tree))
+
+;; ;; change cursor shape
+;; (setq-default cursor-type 'box) ;; (bar . 3)
+;; (setq cursor-states '(
+;; 					  "evil-normal-state-cursor"
+;; 					  "evil-insert-state-cursor"
+;; 					  "evil-emacs-state-cursor"
+;; 					  "evil-visual-state-cursor"
+;; 					  "evil-motion-state-cursor"
+;; 					  "evil-replace-state-cursor"
+;; 					  "evil-operator-state-cursor"
+;; 					  ))
+;; (dolist (state cursor-states)
+;;   (set (intern state) cursor-type))
+;; ;; set blinking interval
+;; ;; (setq blink-cursor-interval 0.7)
+;; (add-hook 'minibuffer-setup-hook
+;;           (lambda ()
+;;             (setq-local cursor-type 'box)))
+
+;; (use-package evil-multiedit
+;;   :config
+;;   (evil-multiedit-default-keybinds))
+
+(use-package evil-numbers
+  :config
+  (evil-define-key '(normal visual) 'global (kbd "+") 'evil-numbers/inc-at-pt)
+  (evil-define-key '(normal visual) 'global (kbd "-") 'evil-numbers/dec-at-pt)
+  (evil-define-key '(normal visual) 'global (kbd "C-=") 'evil-numbers/inc-at-pt-incremental)
+  (evil-define-key '(normal visual) 'global (kbd "C--") 'evil-numbers/dec-at-pt-incremental))
+
+(when (package-installed-p 'org-download) ;; didn't work for (when (package-installed-p 'evil) so I put it the other way around instead
+	(evil-define-key										 '(normal visual) org-mode-map
+		(kbd "SPC RET")											 'org-download-yank))
+
+;; ;; fix clipboard
+;; (setq x-select-enable-clipboard nil)
+;; (define-key evil-visual-state-map (kbd "M-y") (kbd "\"+y"))
+;; ;; (define-key evil-normal-state-map (kbd "M-y") (kbd "\"+y")) ;; doesn't work
+;; (setq my-evil-keymaps '(evil-normal-state-map
+;;                         evil-insert-state-map
+;;                         evil-ex-completion-map
+;;                         evil-ex-search-keymap))
+;; (dolist (keymap my-evil-keymaps)
+;;   (define-key (eval keymap) (kbd "M-v") 'my-paste-from-clipboard)
+;;   (define-key (eval keymap) (kbd "M-V") 'my-paste-from-primary))
+
+(provide 'init-evil)

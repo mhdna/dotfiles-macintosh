@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "debug-pyeval --quiet --file "$QUTE_CONFIG_DIR/scripts/qmreload.py"" >> "$QUTE_FIFO"
+echo "message-info 'reloading quickmarks'" >> "$QUTE_FIFO"

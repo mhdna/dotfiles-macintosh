@@ -1,0 +1,5 @@
+#!/bin/sh
+
+which "$1" >/dev/null 2>&1 || { echo "no such file" && exit 1; }
+
+$EDITOR "$(which "$1")"

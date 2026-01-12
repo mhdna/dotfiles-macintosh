@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# case $BLOCK_BUTTON in
+# 3)
+# 	notify-send "$(salah)"
+#     # so calling it next doesn't send double messages
+# 	exit 0
+# 	;;
+# esac
+
+[ "$1" = "-n" ] && notify-send "$(salah)" && exit 0
+
+salah -d

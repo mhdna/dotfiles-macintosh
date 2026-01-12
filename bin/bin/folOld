@@ -1,0 +1,66 @@
+#!/bin/sh
+
+# Focus or Launch
+
+xopts=""
+topts=""
+tsetclass="--class"
+
+activate() {
+	# use the program's name as the class name for xdo and/or terminal if no custom name/class were set
+	if [ "$cclass" != true ] && [ "$cname" != true ]; then
+		if [ "$term" != true ]; then
+			id="$(xdotool search --class "$prg" | tail -n 1)"
+			xopts="${xopts} $id"
+		else
+			# set class as the last word in -e prg (i.e. the prg name)
+			id="$(xdotool search --class "${prg##* }" | tail -n 1)"
+			xopts="${xopts} $id"
+			topts="$tsetclass ${prg##* }"
+		fi
+	fi
+
+	if [ "$term" = true ]; then
+		# shellcheck disable=SC2086
+		xdo activate $xopts || $TERMINAL $topts $prg
+	else
+		# shellcheck disable=SC2086
+		xdo activate $xopts || $prg
+	fi
+}
+
+usage() {
+	echo "Usage:
+    -t Open as a tui window (make sure to put it before all)
+    -d Same desktop
+    -n Custom name to focus on
+    -N Custom class to focus and launch when running as tui
+    -h Show this help prompt"
+}
+
+xopts="${xopts} -d"
+while getopts 'tn:N:e:h' opt; do
+	case "$opt" in
+	t) term=true ;;
+	# d) xopts="${xopts} -d" ;;
+	n)
+		id="$(xdotool search --name "$OPTARG" | tail -n 1)"
+		xopts="${xopts} $id"
+		cname=true
+		;;
+	N)
+		[ "$term" = true ] && topts="${topts} $tsetclass $OPTARG"
+		id="$(xdotool search --class "$OPTARG" | tail -n 1)"
+		xopts="${xopts} $id"
+		cclass=true
+		;;
+	e) [ "$term" = true ] && prg="${prg} -e $OPTARG" || prg="$OPTARG" ;;
+	h) usage ;;
+	\?)
+		usage
+		exit 1
+		;;
+	esac
+done
+
+activate

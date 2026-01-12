@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Description:
+# Send files to a connected kdeconnect device
+
+mykdc >/dev/null 2>&1 &&
+	chosen="$(kdeconnect-cli -a | fzf)"
+[ -z "$chosen" ] && exit 0 # exit if empty (you can't do *| fzf || exit 1* in the previous row)
+
+id="$(echo "$chosen" | cut -d ":" -f 2 | cut -d " " -f 2)"
+
+kdeconnect-cli --device "$id" --share "$@" >/dev/null 2>&1 || notify-send '📱 Kdeconnect' 'Sending has failed'

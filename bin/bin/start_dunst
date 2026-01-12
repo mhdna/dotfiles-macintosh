@@ -1,0 +1,3 @@
+#!/bin/sh
+
+! pidof -s dunst >/dev/null 2>&1 && dunst --startup_notification >/dev/null 2>&1 &disown

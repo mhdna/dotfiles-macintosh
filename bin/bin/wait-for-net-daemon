@@ -1,0 +1,33 @@
+#!/bin/sh
+
+update_status() {
+    pkill -RTMIN+8 "${STATUSBAR:-i3blocks}"
+}
+
+startwaiting() {
+    file="/tmp/wait-for-net-status"
+    echo "Waiting" >"$file"
+    update_status
+}
+
+stopwaiting() {
+    [ -f "$file" ] && rm "$file"
+    update_status
+    pidof -xs "$(basename "$0")" | xargs kill -9 >/dev/null 2>&1
+}
+
+# [ "$1" = "-s" ] && stopwaiting && exit 0
+
+trap stopwaiting HUP INT QUIT TERM PWR EXIT
+
+startwaiting
+
+while true; do
+    # TODO: check if the nmcli is enough so I remove the ping command
+    if ping -q -c 1 8.8.8.8 >/dev/null 2>&1; then # && { nmcli networking connectivity | grep -q full; }; then
+        # if nmcli networking connectivity | grep -q full; then
+        stopwaiting
+        break
+    fi
+    sleep 2
+done

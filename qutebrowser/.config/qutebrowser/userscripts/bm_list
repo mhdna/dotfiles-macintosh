@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# if [ "$1" = "-t" ]; then
+# 	tag="$(menu-wrapper -p 'Tags' < "$QUTE_CONFIG_DIR/bookmarks_tags" )"
+# 	url="$(shiori list -j -t "$tag" | jq -r '.[].url' | menu-wrapper -p 'Bookmarks')"
+# else
+# 	url="$(shiori list -j | jq -r '.[] | "\(.url) \(.tags.[].name)"' | menu-wrapper -p 'Bookmarks' | cut -d " " -f 1)" # || \(.tags.[].name
+# fi
+url="$(buku-menu)"
+
+[ -z "$url" ] && exit 0
+echo "open -t $url" >>"$QUTE_FIFO"

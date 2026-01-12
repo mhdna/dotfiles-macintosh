@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Pick a color from screen and copy it to clipboard on X11 and Wayland
+if [ -n "$WAYLAND_DISPLAY" ]; then
+	hyprpicker | tr -d '\n' | wl-copy
+else
+	xcolor -f hex | tr -d '\n' | xclip -sel c -i
+fi

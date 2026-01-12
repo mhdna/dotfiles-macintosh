@@ -1,0 +1,5 @@
+#!/bin/sh
+
+url="$(bm list $1 -v | rofi -i -dmenu | cut -d " " -f 1)"
+[ -z "$url" ] && exit 0
+$BROWSER $url

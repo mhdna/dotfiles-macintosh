@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+
+read -rp "Task: " task
+[ -z "$task" ] && exit 0
+
+todo.sh add "$task"

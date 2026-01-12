@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Wayland variables
+export SDL_VIDEODRIVER=wayland >/dev/null 2>&1 &
+export _JAVA_AWT_WM_NONREPARENTING=1 >/dev/null 2>&1 &
+export QT_QPA_PLATFORM=wayland >/dev/null 2>&1 &
+export XDG_SESSION_DESKTOP=sway >/dev/null 2>&1 &
+export QT_QPA_PLATFORM=wayland >/dev/null 2>&1 &
+export QT_WAYLAND_DISABLE_WINDOWDECORATION="1" >/dev/null 2>&1 &
+export _JAVA_AWT_WM_NONREPARENTING=1 >/dev/null 2>&1 &
+export TERMINAL="foot"
+export QT_QPA_PLATFORM=wayland
+export WLR_DRM_NO_ATOMIC=1
+
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP >/dev/null 2>&1 &
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway >/dev/null 2>&1 &
+# export STATUSBAR="i3blocks"
+
+# ! pidof -s transmission-daemon >/dev/null 2>&1 && eval $TRANSMISSION_DAEMON >/dev/null 2>&1 &
+# sb-keyboard -d >/dev/null 2>&1 &
+salah >/dev/null 2>&1 &
+# aw-qt &
+
+autostart="mpd batsignal"   # sb-mpdup dunst babysit_mem
+sudo modprobe -r uvcvideo & # disable camera
+
+# sudo -b ydotoold --socket-path="$YDOTOOL_SOCKET" --socket-own="$(id -u):$(id -g)" &
+
+for program in $autostart; do
+	pidof -xs "$program" || "$program" &
+done >/dev/null 2>&1
+
+# dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY
+# dbus-update-activation-environment --all
+
+# dbus-launch
+exec ssh-agent sway

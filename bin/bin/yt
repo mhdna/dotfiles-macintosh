@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# args="--write-subs --write-auto-subs --write-thumbnail --convert-thumbnails jpg"
+# [ "$1" != "-f" ] && args=""
+
+yt-dlp-wrapper -S res:1080 --add-metadata -ic --max-filesize 2G $@

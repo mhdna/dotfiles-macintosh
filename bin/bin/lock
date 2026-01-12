@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [[ -n $WAYLAND_DISPLAY ]]; then
+	swaylock -e -F -k -l --indicator-idle-visible -f -c 555555
+	# waylock
+else
+	# slock
+	# myxlock
+	# i3lock -c 000000
+	xsecurelock
+fi

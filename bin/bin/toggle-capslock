@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# toggle caps lock
+xdotool key Caps_Lock

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+url="$(yt-dlp --get-url --default-search 'ytsearch' "$@" | tail -n1)"
+mpv --video=no "$url"

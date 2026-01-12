@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# doesn't seem to work
+
+get() {
+    conf="$HOME/.config/gtk-3.0/settings.ini"
+    grep "$1" "$conf" | cut -d '=' -f 2
+}
+
+theme="$(get "gtk-theme-name")"
+font="$(get "gtk-font-name")"
+icon="$(get "gtk-icon-theme-name")"
+cursor="$(get "gtk-cursor-theme-name")"
+
+gsettings set org.gnome.desktop.interface "gtk-theme" "$theme"
+gsettings set org.gnome.desktop.interface "icon-theme" "$icon"
+gsettings set org.gnome.desktop.interface "font-name" "$font"
+gsettings set org.gnome.desktop.interface "cursor-theme" "$cursor"

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+new="$XDG_CACHE_HOME/marktime-status"
+old="$XDG_CACHE_HOME/marktime-status-old"
+
+update() {
+	cp "$new" "$old"
+	date +'%d %H:%M' > "$new"
+}
+
+[ ! -f "$new" ] && update
+
+case $BLOCK_BUTTON in
+	1) update ;;
+esac
+
+cat "$new" | cut -d ' ' -f 2
+

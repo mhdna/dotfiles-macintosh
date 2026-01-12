@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Repeatedly try to download a file using aria2c
+
+url="$1"
+while true; do
+	aria2c --auto-file-renaming=false "$url"
+	exit_status=$?
+	if [ $exit_status -eq 0 ]; then
+		break
+	else
+		echo "Download failed. Retrying in 5 seconds..."
+		sleep 5
+	fi
+done

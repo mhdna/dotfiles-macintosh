@@ -1,0 +1,8 @@
+#!/bin/sh
+
+killall xkbmon
+
+xkbmon -u |
+while read -r line; do
+	echo "$line"| cut -c 1-2
+done

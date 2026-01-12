@@ -1,0 +1,32 @@
+#!/bin/sh
+
+[ -z "$1" ] || [ -z "$2" ] && exit 1
+year="$1"
+day="$2"
+
+dir="$PWD/$year/$day-day"
+input="$dir/input.txt"
+main="$dir/$day-day.py"
+
+mkdir -p "$dir" &&
+	cd "$dir" &&
+	[ ! -f "$input" ] && curl "https://adventofcode.com/$year/day/$day/input" --cookie "session=$(cat ~/.aoc_cookie.txt)" >"$input"
+
+if [ ! -f "$main" ]; then
+	printf "#!/usr/bin/env python3
+
+with open(\"%s\", \"r\") as file:
+\tdata = file.readlines()
+
+def p1():
+\tpass
+
+def p2():
+\tpass
+
+
+p1()
+p2()" "$input" >>"$main"
+fi
+
+$EDITOR +8 "$main"

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+menu() {
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        tofi --placeholder-text "$@"
+    else
+        menu-wrapper -p "$@"
+    fi
+}
+
+url="${1:-$(printf "%s" | menu 'Paste url or file path')}"
+IFS=$'\n' readarray -t url_title_name <<<"$(yt-dlp --skip-download --get-filename -f bestaudio --get-url --get-title -o "%(title)s.%(ext)s" "$url")"
+
+[ "${#url_title_name[1]}" -eq 0 ] && exit 1
+
+title="${url_title_name[0]}"
+audio="${url_title_name[1]}"
+filename="${url_title_name[2]}"
+
+# Save metadata for later use
+history="$HOME/.cache/ytmpc-history"
+! grep -q "$url" "$history" && printf "\n%s ; %s" "$url" "$title" >>"$history" &
+
+# add the track to mpd and play
+
+mpc --wait stop && mpc clear && { mpc add "$audio" && mpc play; } &
+
+thumbs_dir="/tmp/ytmpc_thumbs"
+yt-dlp --write-thumbnail -o "%(title)s.%(ext)s" --convert-thumbnail jpg --skip-download "$url" -P "$thumbs_dir" >/dev/null 2>&1
+
+# Get YouTube video title for system notification
+notify-send "Playing:" "$title" -i "$thumbs_dir/${filename%.*}.jpg" #-i "$(yt-dlp --get-thumbnail <url> --skip-download)"
