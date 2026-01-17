@@ -10,7 +10,7 @@ set previewer '~/.config/lf/preview'
 set sixel
 set ratios 1:2:2
 set reverse true
-set globsearch true
+# set globsearch true
 set incsearch true
 set sortby ctime
 set info size
