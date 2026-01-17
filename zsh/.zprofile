@@ -75,10 +75,25 @@ export GEM_HOME="$XDG_DATA_HOME/gem/ruby/3.3.0/bin/"
 # export ftp_proxy=$http_proxy
 # export rsync_proxy=$http_proxy
 
-eval $(dircolors ~/.dircolors)
+eval $(gdircolors ~/.dircolors)
+
+BREW_BIN="/usr/local/bin/brew"
+if [ -f "/opt/homebrew/bin/brew" ]; then
+    BREW_BIN="/opt/homebrew/bin/brew"
+fi
+
+if type "${BREW_BIN}" &> /dev/null; then
+    export BREW_PREFIX="$("${BREW_BIN}" --prefix)"
+    for bindir in "${BREW_PREFIX}/opt/"*"/libexec/gnubin"; do export PATH=$bindir:$PATH; done
+    for bindir in "${BREW_PREFIX}/opt/"*"/bin"; do export PATH=$bindir:$PATH; done
+    for mandir in "${BREW_PREFIX}/opt/"*"/libexec/gnuman"; do export MANPATH=$mandir:$MANPATH; done
+    for mandir in "${BREW_PREFIX}/opt/"*"/share/man/man1"; do export MANPATH=$mandir:$MANPATH; done
+fi
+
+HOMEBREW_NO_AUTO_UPDATE=1
 
 # -H for it to not treat symlinks as the dst, but the directories that they point to
-export PATH="$PATH:$(find -H $HOME/bin $HOME/.local/bin $HOME/mhd-bin -type d -printf ":%p" ):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME"
+export PATH="$PATH:$(find -H $HOME/bin $HOME/bin -type d ):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME"
 # setsid -f mailsync >/dev/null 2>&1&
 
 # Start graphical server on user's current tty if not already running and put the outputs into ~/.local/share/xorg/

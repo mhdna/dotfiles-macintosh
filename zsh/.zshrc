@@ -164,7 +164,7 @@ edit-file () {
 lfcd () {
    # set -e
    tmp="$(mktemp)"
-   trap 'rm -f $tmp >/dev/null 2>&1 && trap - HUP INT QUIT TERM PWR EXIT' HUP INT QUIT TERM PWR EXIT
+   trap 'rm -f $tmp >/dev/null 2>&1 && trap - HUP INT QUIT TERM EXIT' HUP INT QUIT TERM EXIT
    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
        lf -last-dir-path="$tmp" "$@"
    else
