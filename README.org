@@ -1,0 +1,12 @@
+Mahdi's Macintosh Dotfiles
+
+** Installation
+
+- Install stow packages & dependencies:
+
+=make stow=
+
+
+- Link the dotfiles
+
+=make dots=
