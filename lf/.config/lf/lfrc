@@ -177,9 +177,9 @@ cmd select-files ${{
     files=$(
         if [ "$lf_hidden" = 'false' ]; then
             # select all files except idden files and files in hidden directories
-            find "$PWD" -mindepth 1 -type f -not -name '.*' -not -path '*/.*' -name "$pattern" -print0
+            gfind "$PWD" -mindepth 1 -type f -not -name '.*' -not -path '*/.*' -name "$pattern" -print0
         else
-            find "$PWD" -mindepth 1 -type f -name "$pattern" -print0
+            gfind "$PWD" -mindepth 1 -type f -name "$pattern" -print0
         fi |
         xargs -0 printf ' %q'
         )
@@ -194,9 +194,9 @@ cmd select-files ${{
 cmd select-dirs &{{
     dirs=$(
         if [ "$lf_hidden" = 'false' ]; then
-            find "$PWD" -mindepth 1 -type d -not -name '.*' -print0
+            gfind "$PWD" -mindepth 1 -type d -not -name '.*' -print0
         else
-            find "$PWD" -mindepth 1 -type d -print0
+            gfind "$PWD" -mindepth 1 -type d -print0
         fi |
         xargs -0 printf ' %q'
     )
@@ -234,7 +234,7 @@ rm -rf $1
 
 #fzf
 cmd fzf_jump ${{
-res="$(find . -maxdepth 15 -not -path '*/[@.]*' | fzf --prompt='Jump to: ')" && {
+res="$(gfind . -maxdepth 15 -not -path '*/[@.]*' | fzf --prompt='Jump to: ')" && {
 if [ -f "$res" ]; then
 		cmd="select"
 elif [ -d "$res" ]; then
@@ -395,7 +395,7 @@ cmd movecto ${{
 clear; tput cup $(($(tput lines)/3)); tput bold
 set -f
 clear; echo "Move to where?"
-dest="$(find . -maxdepth 2 -type d | fzf)" &&
+dest="$(gfind . -maxdepth 2 -type d | fzf)" &&
 		for x in $fx; do
 				mv -iv "$x" "$dest"
 		done &&
@@ -542,7 +542,7 @@ map M moveto
 map <a-m> movecto
 map Z pdfConvert
 
-map / Search
+# map / Search
 map ? Search-back
 map <a-/> search
 map <a-?> search-back
