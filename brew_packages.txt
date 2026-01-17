@@ -1,0 +1,33 @@
+# New packages
+# Coreutils
+findutils # necessary
+gnu-indent
+gnu-sed
+gnutls
+grep
+gnu-tar
+gawk
+
+zsh-autosuggestions
+rust      # (for cargo)
+# mysql     # development related
+mailutils # mimetype
+ffmpeg
+rg
+rga    # ripgrep all
+pandoc # dependency for ripgrepp-all
+bat    # for lf previews
+
+# # for bucklespring
+# alure
+# pkg-config
+
+qutebrowser
+aerospace
+
+# zathura
+zathura
+zathura-cb
+zathura-djvu
+zathura-pdf-mupdf
+zathura-ps

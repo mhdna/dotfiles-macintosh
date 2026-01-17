@@ -6,3 +6,14 @@ dots:
 
 delete:
 	./stow-wrapper.sh --verbose --target=$$HOME --delete */
+
+brew:
+	brew install --file=./brew_packages.txt
+
+os:
+	# Change default Screenshots Location
+	defaults write com.apple.screencapture location ~/Pictures/Screenshots
+
+services:
+	# Services
+	# brew services start mysql
