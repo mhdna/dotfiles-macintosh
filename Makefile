@@ -7,7 +7,7 @@ dots:
 delete:
 	./stow-wrapper.sh --verbose --target=$$HOME --delete */
 
-brew:
+brew: prepare-zathura
 	brew install --file=./brew_packages.txt
 
 os:
@@ -16,4 +16,7 @@ os:
 
 services:
 	# Services
-	# brew services start mysql
+	brew services start mysql
+
+prepare-zathura:
+	brew tap homebrew-zathura/zathura
