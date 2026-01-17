@@ -9,6 +9,7 @@ delete:
 
 brew: prepare-zathura
 	brew install --file=./brew_packages.txt
+	brew install --cask --file=./brew_cask_packages.txt
 
 os:
 	# Change default Screenshots Location
