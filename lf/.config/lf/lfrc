@@ -7,7 +7,7 @@ set period 1
 # set previewer 'pistol'
 set previewer '~/.config/lf/preview'
 # set cleaner '~/.config/lf/cleaner'
-set sixel
+# set sixel
 set ratios 1:2:2
 set reverse true
 # set globsearch true
