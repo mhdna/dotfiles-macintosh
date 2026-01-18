@@ -93,7 +93,7 @@ fi
 HOMEBREW_NO_AUTO_UPDATE=1
 
 # -H for it to not treat symlinks as the dst, but the directories that they point to
-export PATH="$PATH:$(find -H $HOME/bin $HOME/bin -type d ):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME"
+export PATH="$PATH:$(gfind -H $HOME/bin $HOME/bin -type d -printf ":%p"):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME"
 # setsid -f mailsync >/dev/null 2>&1&
 
 # Start graphical server on user's current tty if not already running and put the outputs into ~/.local/share/xorg/
