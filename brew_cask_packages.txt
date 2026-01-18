@@ -1,4 +1,5 @@
 emacs
 libreoffice
 # jordanbaird-ice
+background-music # disable sound per app
 # sioyek
