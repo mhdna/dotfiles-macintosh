@@ -33,3 +33,17 @@ zathura-pdf-mupdf
 zathura-ps
 
 emacs-mac
+
+# yazi & its dependencies
+yazi
+ffmpeg
+sevenzip
+jq
+poppler
+fd
+ripgrep
+fzf
+zoxide
+resvg
+imagemagick
+font-symbols-only-nerd-font
