@@ -7,7 +7,7 @@ dots:
 delete:
 	./stow-wrapper.sh --verbose --target=$$HOME --delete */
 
-brew: prepare-zathura
+brew: prepare-emacs prepare-zathura
 	brew install --file=./brew_packages.txt
 	brew install --cask --file=./brew_cask_packages.txt
 
@@ -18,6 +18,9 @@ os:
 services:
 	# Services
 	brew services start mysql
+
+prepare-emacs:
+	 brew tap railwaycat/emacsmacport
 
 prepare-zathura:
 	brew tap homebrew-zathura/zathura
