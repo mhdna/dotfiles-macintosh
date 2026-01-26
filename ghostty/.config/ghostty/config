@@ -6,3 +6,4 @@ cursor-shape = block
 cursor-blink = true
 
 window-decoration = none
+macos-option-as-alt = true
