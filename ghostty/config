@@ -1,0 +1,8 @@
+theme = 3024 Night
+font-family = "Menlo"
+font-size = 15
+
+cursor-shape = block
+cursor-blink = true
+
+window-decoration = none
