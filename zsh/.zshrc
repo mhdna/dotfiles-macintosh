@@ -194,6 +194,7 @@ yazicd () {
 # source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh 2>/dev/null
 source /usr/share/zsh/plugins/pnpm-shell-completion/pnpm-shell-completion.zsh 2>/dev/null
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh/zsh-artisan/artisan.plugin.zsh 2>/dev/null
 # source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 # source /usr/share/zsh/scripts/git-prompt.zsh
