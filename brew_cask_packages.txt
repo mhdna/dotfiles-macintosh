@@ -3,3 +3,5 @@ libreoffice
 # jordanbaird-ice
 background-music # disable sound per app
 # sioyek
+zed
+easy-move-plus-resize
