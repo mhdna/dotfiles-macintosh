@@ -8,3 +8,4 @@ easy-move-plus-resize
 monitorcontrol
 activitywatch
 alt-tab
+jellyfin
