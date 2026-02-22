@@ -48,3 +48,7 @@ zoxide
 resvg
 imagemagick
 font-symbols-only-nerd-font
+
+# # development
+# postgresql
+# psql
