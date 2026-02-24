@@ -28,7 +28,7 @@ map ا scroll left
 # map / page-bottom
 
 # unmap q
-set scroll-step 200
+set scroll-step 100
 
 map b toggle_statusbar
 map <C-n> navigate next
@@ -44,45 +44,45 @@ set font                        "monospace 15"
 # Yank file full path keymap
 map Y feedkeys ":exec zathura-copy-path $FILE<Return>"
 
-# set notification-error-bg       "#282828" # bg
-# set notification-error-fg       "#fb4934" # bright:red
-# set notification-warning-bg     "#282828" # bg
-# set notification-warning-fg     "#fabd2f" # bright:yellow
-set notification-bg             "#000000" # bg
-set notification-fg             "#ffffff" # bright:green
+set notification-error-bg       "#282828" # bg
+set notification-error-fg       "#fb4934" # bright:red
+set notification-warning-bg     "#282828" # bg
+set notification-warning-fg     "#fabd2f" # bright:yellow
+set notification-bg             "#1d2d2d" # bg
+set notification-fg             "#ebdbb2" # bright:green
 
-# set completion-bg               "#504945" # bg2
-# set completion-fg               "#ebdbb2" # fg
-# set completion-group-bg         "#3c3836" # bg1
-# set completion-group-fg         "#928374" # gray
-# set completion-highlight-bg     "#83a598" # bright:blue
-# set completion-highlight-fg     "#504945" # bg2
+set completion-bg               "#504945" # bg2
+set completion-fg               "#ebdbb2" # fg
+set completion-group-bg         "#3c3836" # bg1
+set completion-group-fg         "#928374" # gray
+set completion-highlight-bg     "#83a598" # bright:blue
+set completion-highlight-fg     "#504945" # bg2
 
-# # Define the color in index mode
-# set index-bg                    "#504945" # bg2
-# set index-fg                    "#ebdbb2" # fg
-# set index-active-bg             "#83a598" # bright:blue
-# set index-active-fg             "#504945" # bg2
+# Define the color in index mode
+set index-bg                    "#504945" # bg2
+set index-fg                    "#ebdbb2" # fg
+set index-active-bg             "#83a598" # bright:blue
+set index-active-fg             "#504945" # bg2
 
-# set inputbar-bg                 "#282828" # bg
-# set inputbar-fg                 "#ebdbb2" # fg
+set inputbar-bg                 "#282828" # bg
+set inputbar-fg                 "#ebdbb2" # fg
 
-# set statusbar-bg                "#282828" # bg2
-# set statusbar-fg                "#ebdbb2" # fg
+set statusbar-bg                "#282828" # bg2
+set statusbar-fg                "#ebdbb2" # fg
 
-# set highlight-color             "#fabd2f" # bright:yellow
-# set highlight-active-color      "#fe8019" # bright:orange
+set highlight-color             "#fabd2f" # bright:yellow
+set highlight-active-color      "#fe8019" # bright:orange
 
-# set default-bg                  "#282828" # bg
-# set default-fg                  "#ebdbb2" # fg
-# set render-loading              true
-# set render-loading-bg           "#282828" # bg
-# set render-loading-fg           "#ebdbb2" # fg
+set default-bg                  "#282828" # bg
+set default-fg                  "#ebdbb2" # fg
+set render-loading              true
+set render-loading-bg           "#282828" # bg
+set render-loading-fg           "#ebdbb2" # fg
 
-set recolor-lightcolor          "#000000" # bg
-# set recolor-darkcolor           "#ebdbb2" # fg
+set recolor-lightcolor          "#1d2d2d" # bg
+set recolor-darkcolor           "#ebdbb2" # fg
 set recolor                     "true"
 set recolor-keephue             true      # keep original color when recoloring
 
-set default-bg                  "#000000" # bg
-set highlight-fg             "#000000"
+set default-bg                  "#282828" # bg
+set highlight-fg             "#ebdbb2"
