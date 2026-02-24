@@ -1,0 +1,37 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "current_line_highlight": "gutter",
+  "selection_highlight": true,
+  "use_autoclose": false,
+  "cursor_blink": false,
+  "auto_update": true,
+  "buffer_line_height": "standard",
+  // "show_edit_predictions": false,
+  "gutter": {
+    "line_numbers": false,
+  },
+  "agent_ui_font_size": 16.0,
+  "ui_font_family": "Helvetica",
+  "buffer_font_weight": 400.0,
+  "buffer_font_family": "MesloLGM Nerd Font",
+  "icon_theme": "Seti Icon Theme",
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": false,
+  },
+  "vim_mode": true,
+  "ui_font_size": 16.0,
+  "buffer_font_size": 15.0,
+  "theme": {
+    "mode": "dark",
+    "light": "Acme Light",
+    "dark": "Gruvbox Dark",
+  },
+}

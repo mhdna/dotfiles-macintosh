@@ -1,0 +1,38 @@
+{
+  "$schema": "https://zed.dev/schema/themes/v0.2.0.json",
+  "name": "Zed Red - Demonic",
+  "author": "brad",
+  "themes": [
+    {
+      "name": "Zed Red - Demonic",
+      "appearance": "light",
+      "style": {
+        "surface.background": "#ffffff",
+        "background": "#ffffff",
+        "status_bar.background": "#ffffff",
+        "editor.foreground": "#000000",
+        "editor.background": "#ffffff",
+		 "terminal.background": "#ffffff",
+		 "terminal.foreground": "#000000",
+		 "terminal.dim_foreground": "#ffffff",
+		 "terminal.bright_foreground": "#ffffff",
+        "panel.background": "#ffffff",
+        "panel.focused_border": "#ff0000",
+        "pane.focused_border": "#ff0000",
+		         "players": [
+          {
+            "cursor": "#ff0000"
+
+		  }],
+	  "syntax": {
+          "comment": {
+            "color": "#999999",
+            "font_style": "italic",
+            "font_weight": null
+          }
+	  }
+
+      }
+    }
+  ]
+}
