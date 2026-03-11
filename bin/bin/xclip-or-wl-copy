@@ -1,8 +1,12 @@
 #!/bin/sh
 
 
-if [ -n "$WAYLAND_DISPLAY" ]; then
-    wl-copy
+if [ "$(uname -s)" == "Darwin" ]; then
+	pbcopy
 else
-    xclip -sel c -i
+	if [ -n "$WAYLAND_DISPLAY" ]; then
+		wl-copy
+	else
+		xclip -sel c -i
+	fi
 fi
