@@ -10,3 +10,11 @@ Mahdi's Macintosh Dotfiles
 - Link the dotfiles
 
 =make dots=
+
+*** Disable the dock
+defaults write com.apple.dock autohide -bool true && killall Dock
+
+*** Restore the dock
+
+defaults delete com.apple.dock autohide-delay && killall Dock
+defaults write com.apple.dock no-bouncing -bool FALSE && killall Dock
