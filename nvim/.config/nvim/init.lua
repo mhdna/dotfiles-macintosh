@@ -3,7 +3,7 @@
 -- plugins and packages {{{
 local ehandler = require("error-handler").handler
 
--- load plugin infrastructure
+-- -- load plugin infrastructure
 xpcall(require, ehandler, "plugin-management")
 
 -- xpcall(require, ehandler, "lsp.setup")
@@ -15,6 +15,6 @@ require("core.emacs_keymaps")
 require("core.colorscheme")
 -- require("core.nocolors")
 -- require "lf-nvim"
--- require("core.autocommands")
+require("core.autocommands")
 require("core.usercommands")
 require("core.disable_builtin")

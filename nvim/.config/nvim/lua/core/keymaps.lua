@@ -1,29 +1,22 @@
 -- local utils = require("utils")
 -- local DiagnosticPrevKey = "<C-p>"
 -- local DiagnosticNextKey = "<C-n>"
-
 local opts = { noremap = true }
-
 vim.keymap.set("i", "<M-backspace>", "<C-w>")
-
 vim.keymap.set("n", "Q", "gq")
 vim.keymap.set("n", "<F1>", "")
-
 -- vim.keymap.set("n", "<M-a>", "<Esc>mogg<S-v>Gy'ozz", opts)
 vim.keymap.set("n", "<M-a>", "<Esc>gg<S-v>G", opts)
 -- vim.keymap.set("c", "<C-g>", "<C-c>")
 vim.keymap.set("n", "<C-c>", "<Esc>")
-
 vim.keymap.set("i", "<M-n>", "<C-n>")
 vim.keymap.set("i", "<M-p>", "<C-p>")
-
 vim.keymap.set("n", "<leader>w", ":w<CR>", { noremap = true, silent = true })
 -- vim.keymap.set("n", "-", ":term lf %<CR>i", { noremap = true, silent = true })
 -- vim.keymap.set("n", "-", ":Ex<Cr>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>W", ":w ", opts)
 vim.keymap.set("n", "<leader>E", ":e `which `<Left>", opts)
-
 function ToggleSystemClipboard()
 	local current = vim.opt.clipboard:get()
 	if vim.tbl_contains(current, "unnamedplus") then
@@ -34,40 +27,29 @@ function ToggleSystemClipboard()
 		print("Clipboard: unnamedplus enabled")
 	end
 end
-
 vim.api.nvim_set_keymap("n", "<leader>c", ":lua ToggleSystemClipboard()<CR>", { noremap = true, silent = true })
-
 -- vim.keymap.set("n", "<leader>b", ":b ", opts)
 -- vim.keymap.set("n", "<leader>U", ":MasonUpdate<CR>:Lazy update<CR>", opts)
 vim.keymap.set("n", "<leader>U", ":Lazy update<CR>", opts)
-
 vim.keymap.set("n", "<leader>e", "siW", { silent = true })
-
 -- vim.keymap.set('i', '<c-u>', '<esc>d^i')
-
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("n", "J", "mzJ`z")
-
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-
 -- Perform dot commands over visual blocks
 vim.keymap.set("v", ".", ":normal .<CR>", opts)
-
 -- copy to clipboard
 -- vim.keymap.set("n", "<leader>y", '"*y', opts)
 -- vim.keymap.set("n", "<leader>Y", '"*y$', opts)
-
 -- Copy to clipboard in visual mode
 -- vim.api.nvim_set_keymap("n", "<M-y>", '"+y', { noremap = true, silent = true }) -- doesn't work in Emacs, so I don't want conflicts
 vim.api.nvim_set_keymap("v", "<M-y>", '"+y', { noremap = true, silent = true })
 -- Paste from clipboard in visual mode
 -- vim.api.nvim_set_keymap("v", "<M-S-y>", '"+p', { noremap = true, silent = true })
-
 -- repeat substituion in mode
 vim.keymap.set("v", "&", ":&&<CR>", opts)
-
 vim.keymap.set("n", "<backspace>", ":Arabic<CR>", opts)
 -- vim.keymap.set({ "i", "v" }, "<M-backspace>", "<Esc>:Arabic<CR>li", opts)
 vim.keymap.set("n", "<Leader>m", ':call mkdir(expand("%:p:h"), "p")<CR>', opts)
@@ -79,10 +61,8 @@ vim.keymap.set("n", "<Leader>m", ':call mkdir(expand("%:p:h"), "p")<CR>', opts)
 -- vim.keymap.set("n", "<C-S-j>", "<c-w>-", opts)
 -- vim.keymap.set("n", "<C-S-h>", "<c-w><", opts)
 -- vim.keymap.set("n", "<C-S-l>", "<c-w>>", opts)
-
 vim.keymap.set("n", "<leader>o", ":!opout <c-r>%<CR><CR>", opts)
 vim.keymap.set("n", "<leader>o", ":!opout <c-r>%<CR><CR>", opts)
-
 -- copy file paths
 vim.keymap.set("n", "yp", '<cmd>let @+ = expand("%")<cr>', opts)
 vim.keymap.set("n", "yP", '<cmd>let @+ = expand("%:p")<cr>', opts)
@@ -103,14 +83,10 @@ vim.keymap.set("v", "<S-s>", ":s//g<left><Left>", opts)
 --     " nnoremap :g/ :g/\v
 --     " nnoremap :g// :g//
 -- ]])keymaps
-
 vim.keymap.set("n", "<C-l>", ":nohl<CR>")
-
 -- vim.keymap.set("n", "-", "<Cmd>Explore<CR>")
-
 vim.keymap.set("n", "<leader><leader>x", ":w<CR>:!chmod +x %<CR>", opts)
 -- vim.keymap.set("n", "<leader>t", ":filetype detect<CR>", opts)
-
 -- save as super user
 vim.cmd([[cabbrev w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!]])
 vim.keymap.set(
@@ -119,28 +95,20 @@ vim.keymap.set(
 	":execute 'silent! write !sudo tee % >/dev/null' <bar> edit!<CR>",
 	{ noremap = true, buffer = bufnr }
 )
-
 -- Formatting
 -- vim.keymap.set("n", "<leader>=", ":Format<CR>:w<CR>", { noremap = true, buffer = bufnr, silent = true })
-
 -- vim.keymap.set({ "n", "v" }, "<leader>c", ":w!<CR>:Compile<CR>", { noremap = true, buffer = 0, silent = true })
-
 vim.keymap.set({ "n", "v" }, "<leader><leader>d", ":g/^$/d<CR>", opts)
-
 -- function smart_indent()
 -- 	vim.fn.feedkeys([[mz==]])
 -- 	local current_line = vim.fn.line(".")
 -- 	local indented_line = vim.fn.indent(current_line)
-
 -- 	if vim.fn.matchstr(getline(current_line), "\v^s*$") == "" then
 -- 		vim.fn.feedkeys([[`zj]])
 -- 	end
-
 -- 	vim.fn.feedkeys([[`zi]])
 -- end
-
 -- vim.keymap.set('n', '<Leader>h', '<Cmd>noh<CR>', opts)
-
 -- emacs like tab
 -- vim.cmd([[
 -- function! SmartIndent()
@@ -161,16 +129,13 @@ vim.keymap.set({ "n", "v" }, "<leader><leader>d", ":g/^$/d<CR>", opts)
 -- vim.keymap.set("i", "<Tab>", smart_indent())
 -- vim.keymap.set("i", "<Tab>", 'col(\'.\')>1 ? "==" : "<Esc>mzi<Right>"')
 -- vim.keymap.set("i", "<Tab>", "getline('.') =~ '^[[:space:]]*$' ? '<Right>' : '==<C-o>==<C-o>'")
-
 -- -- resizing splits
 -- vim.keymap.set("n", "=", "3<C-w>>")
 -- vim.keymap.set("n", "+", "3<C-w>+")
 -- vim.keymap.set("n", "-", "3<C-w><")
 -- vim.keymap.set("n", "_", "3<C-w>-")
-
 -- last split
 vim.keymap.set("n", "<M-p>", "<C-w><C-p>")
-
 -- search same line
 vim.keymap.set("n", "<M-s>", function()
 	local line = vim.fn.getline(".")
@@ -180,8 +145,14 @@ vim.keymap.set("n", "<M-s>", function()
 	end
 end, opts)
 vim.keymap.set("n", "<M-D>", ":g/^$/d<CR>")
-vim.keymap.set("v", "<M-d>", ":DeleteEmptyLinesInVisual<CR>")
+vim.keymap.set("n", "<C-k>", ":g!//d<Left><Left>")
+-- vim.keymap.set("v", "<C-k>", ':!python3 ./calculate-average.sh "$(xargs)"')
+vim.cmd([[
+" Visual mode mapping: <Leader>x
+vnoremap <C-k> :<C-U>echo system('python3 ./calculate-average-cost.py ' . shellescape(join(getline("'<", "'>"), "\n")))<CR>
+]])
 
+vim.keymap.set("v", "<M-d>", ":DeleteEmptyLinesInVisual<CR>")
 -- increase resizing splits ratio
 for _, var in ipairs({ "+", "-", ">", "<" }) do
 	vim.keymap.set("n", "<C-w>" .. var, "10<C-w>" .. var)
@@ -190,12 +161,10 @@ vim.keymap.set("n", "<C-w><C-k>", "10<C-w>+")
 vim.keymap.set("n", "<C-w><C-j>", "10<C-w>-")
 vim.keymap.set("n", "<C-w><C-h>", "10<C-w><")
 vim.keymap.set("n", "<C-w><C-l>", "10<C-w>>")
-
 -- vim.keymap.set("n", "<C-w>", "3<C-w>>")
 -- vim.keymap.set("n", "+", "3<C-w>+")
 -- vim.keymap.set("n", "-", "3<C-w><")
 -- vim.keymap.set("n", "_", "3<C-w>-")
-
 -- Key mappings for folding/unfolding in Markdown files
 -- vim.keymap.set('n', '<Tab>', function()
 -- 	local success, _ = pcall(vim.cmd, "normal! za")
@@ -205,11 +174,9 @@ vim.keymap.set("n", "<C-w><C-l>", "10<C-w>>")
 -- end, { noremap = true, silent = true })
 vim.keymap.set("n", "zO", "zR")
 vim.keymap.set("n", "zC", "zM")
-
 -- Warning, might cause your system to totally crash without recovery
 -- vim.keymap.set("n", "j", "gj", { noremap = true, silent = true })
 -- vim.keymap.set("n", "k", "gk", { noremap = true, silent = true })
-
 -- duplicate line
 vim.keymap.set("n", "<M-d>", ":t.<CR>", { noremap = true, silent = true })
 vim.keymap.set("v", "<M-s>", ':s/\\v(\\S+)/"\\1"/g<CR>', {
@@ -222,22 +189,18 @@ vim.keymap.set("v", "<M-s>", ':s/\\v(\\S+)/"\\1"/g<CR>', {
 -- 	'<Esc>:let save_cursor=getpos(".")<CR>:call append(line("."), getline("."))<CR>:call setpos(".", save_cursor)<CR>gi',
 -- 	{ noremap = true, silent = true }
 -- )
-
 -- markdown
 -- vim.cmd("nmap <Leader>p :w !mdview -b<CR>")
-
 --  Format columns in visual mode.
 vim.cmd([[
 	vnoremap <Leader>c :!sed 's/^/-/' \| column -t \| sed 's/^-//'<CR>
 	vnoremap <Leader>C :!sed 's/^/-/' \| column -t \| sed 's/^-//'<CR>gv=
 	]])
-
 -- " Alt-right/left to navigate forward/backward in the tags stack.
 -- vim.cmd([[
 -- map <ESC>h <C-T>
 -- map <ESC>l <C-]>
 -- ]])
-
 -- folding
 -- vim.cmd([[
 -- 	nmap <M-j> zo
@@ -248,7 +211,6 @@ vim.cmd([[
 -- 	set foldmethod=marker
 -- 	set foldlevel=500
 -- 	]])
-
 -- toggle statusline
 vim.cmd([[
 	let s:hidden_all = 0
@@ -269,10 +231,8 @@ vim.cmd([[
 		endfunction
 		nnoremap <leader><leader>h :call ToggleHiddenAll()<CR>
 		]])
-
 -- vim.keymap.set("n", "<leader>t", colorscheme.ToggleTheme, opts)
 -- vim.keymap.set("n", "<leader>t", colorscheme.Dark, opts)
-
 -- vim.cmd([[
 -- fun TConfirmQuit()
 --     if &modified
@@ -290,12 +250,10 @@ vim.cmd([[
 -- nmap <F3> :call TConfirmQuit()<CR>
 -- nmap <F4> :wq<CR>
 -- ]])
-
 -- Diagnostic keymaps
 -- if vim.lsp.get_clients() ~= nil then
 -- 	vim.keymap.set("n", DiagnosticPrevKey, vim.diagnostic.goto_prev)
 -- 	vim.keymap.set("n", DiagnosticNextKey, vim.diagnostic.goto_next)
 -- end
-
 vim.keymap.set("n", "<M-k>", vim.diagnostic.open_float)
 -- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist)

@@ -46,19 +46,19 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 -- 	command = '!shortcuts | lf -remote "send $id source ~/.config/lf/shortcutrc"',
 -- })
 
-vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-	--     pattern = { os.getenv("HOME") .. "/.config/sway/config" },
-	--     command = "!swaymsg reload"
-	pattern = { vim.loop.fs_realpath(os.getenv("HOME") .. "/.config/i3/config") },
-	command = "silent !i3-msg reload",
-})
+-- vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+-- 	--     pattern = { os.getenv("HOME") .. "/.config/sway/config" },
+-- 	--     command = "!swaymsg reload"
+-- 	pattern = { vim.loop.fs_realpath(os.getenv("HOME") .. "/.config/i3/config") },
+-- 	command = "silent !i3-msg reload",
+-- })
 
-vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-	--     pattern = { os.getenv("HOME") .. "/.config/sway/config" },
-	--     command = "!swaymsg reload"
-	pattern = { vim.loop.fs_realpath(os.getenv("HOME") .. "/.config/sway/config") },
-	command = "silent !swaymsg reload",
-})
+-- vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+-- 	--     pattern = { os.getenv("HOME") .. "/.config/sway/config" },
+-- 	--     command = "!swaymsg reload"
+-- 	pattern = { vim.loop.fs_realpath(os.getenv("HOME") .. "/.config/sway/config") },
+-- 	command = "silent !swaymsg reload",
+-- })
 
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 	pattern = { vim.loop.fs_realpath(os.getenv("HOME") .. "/.config/lf/lfrc") },

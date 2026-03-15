@@ -6,7 +6,7 @@ function modify_hl(ns, name, changes)
 	vim.api.nvim_set_hl(ns, name, vim.tbl_deep_extend("force", def, changes))
 end
 
-vim.opt.termguicolors = true -- Enable 24-bit RGB colors
+vim.opt.termguicolors = false -- Enable 24-bit RGB colors
 
 function RemoveBackground()
 	vim.cmd("highlight Normal guibg=None ctermbg=None")
@@ -381,9 +381,9 @@ function M.Dark()
 	-- dracula()
 	-- green()
 	-- Brown()
-	Default_Dark()
+	-- Default_Dark()
 	-- GruberDarker()
-	-- Minimal_Dark()
+	Minimal_Dark()
 	-- PaperColor()
 	-- Vscode()
 	-- monokai()
