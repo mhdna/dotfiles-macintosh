@@ -23,6 +23,8 @@ bat    # for lf previews
 # alure
 # pkg-config
 
+termusic # music player
+
 qutebrowser
 aerospace
 
