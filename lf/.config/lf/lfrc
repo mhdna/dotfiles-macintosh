@@ -6,7 +6,7 @@ set scrolloff 10
 set period 1
 # set previewer 'pistol'
 set previewer '~/.config/lf/preview'
-# set cleaner '~/.config/lf/cleaner'
+set cleaner '~/.config/lf/cleaner'
 # set sixel
 set ratios 1:2:2
 set reverse true
@@ -36,8 +36,8 @@ set info size
 # }}
 
 # # no colors
-# set promptfmt "%u@%h:%d%f"
-# set statfmt "%p| %c| %u| %g| %S| %t| -> %l"
+set promptfmt "%u@%h:%d%f"
+set statfmt "%p| %c| %u| %g| %S| %t| -> %l"
 # set borderfmt        "\033[0m"
 # set cursoractivefmt  "\033[7m"
 # set cursorparentfmt  "\033[7m"
@@ -276,30 +276,33 @@ cmd open &{{
 # if [ -n "${NVIM-}" ]; then
 # else
 	case $(file --dereference --brief --mime-type -- "$f") in
-			# text/html) setsid -f surf -z 1.5 $fx >/dev/null 2>&1;;
+			# text/html) surf -z 1.5 $fx >/dev/null 2>&1;;
 			text/html|application/x-bittorrent) rifle "$fx";;
-			# text/org) setsid -f myemacsclient $f >/dev/null 2>&1 ;;
+			# text/org) myemacsclient $f >/dev/null 2>&1 ;;
 			# NOTE: the above is the old none application/* implementation
-			image/x-xcf) setsid -f gimp $fx >/dev/null 2>&1 ;;
+			image/x-xcf) gimp $fx >/dev/null 2>&1 ;;
 			image/*)
-			# setsid -f pqiv --thumbnail-persistence=$HOME/.cache/pqiv/ --max-depth 1 "$PWD" 2>/dev/null
+			# pqiv --thumbnail-persistence=$HOME/.cache/pqiv/ --max-depth 1 "$PWD" 2>/dev/null
 			# nsxiv-refile "$fx"
 			rotdir $f | grep -i "\.\(svg\|png\|jpg\|jpeg\|gif\|webp\|tif\|ico\)\(_large\)*$" |
-					setsid -f nsxiv-wrapper -aio 2>/dev/null | while read -r file; do
+					nsxiv-wrapper -aio 2>/dev/null | while read -r file; do
 							[ -z "$file" ] && continue
 							lf -remote "send select \"$file\""
 							lf -remote "send toggle"
 					done
 					;;
-			image/vnd.djvu|application/pdf|application/octet-stream|application/postscript|application/epub*)  setsid -f xdg-open $fx ;; # zathura-fit-width
-			# video/x-ms-asf) setsid -f mpv --profile=fast $f -quiet >/dev/null 2>&1;;
-			audio/*|video/x-ms-asf) setsid -f mpv --script-opts=layout=topbar,osc-visibility=always --profile=audio $f > /dev/null 2>&1 ;;
-			# audio/*|video/x-ms-asf) setsid -f $TERMINAL -e mpv $f >/dev/null 2>&1  ;;
-			video/*) setsid -f mpv $f -quiet >/dev/null 2>&1 ;;
+			image/vnd.djvu|application/pdf|application/octet-stream|application/postscript|application/epub*)  zathura $fx ;; # zathura-fit-width
+			# video/x-ms-asf) mpv --profile=fast $f -quiet >/dev/null 2>&1;;
+			# audio/*|video/x-ms-asf) mpv --script-opts=layout=topbar,osc-visibility=always --profile=audio $f > /dev/null 2>&1 ;;
+			audio/*|video/x-ms-asf) open $f;;
+			# audio/*|video/x-ms-asf) $TERMINAL -e mpv $f >/dev/null 2>&1  ;;
+			# video/*) mpv $f -quiet >/dev/null 2>&1 ;;
+			video/*) open $f;;
 			# libreoffice filetypes
-			application/vnd.openxmlformats-officedocument.wordprocessingml.document|application/vnd.oasis.opendocument.text|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|application/octet-stream|application/vnd.oasis.opendocument.spreadsheet|application/vnd.oasis.opendocument.spreadsheet-template|application/vnd.openxmlformats-officedocument.presentationml.presentation|application/vnd.oasis.opendocument.presentation-template|application/vnd.oasis.opendocument.presentation|application/vnd.ms-powerpoint|application/vnd.oasis.opendocument.graphics|application/vnd.oasis.opendocument.graphics-template|application/vnd.oasis.opendocument.formula|application/vnd.oasis.opendocument.database|application/msword) setsid -f libreoffice $fx >/dev/null 2>&1 ;;
-			application/pgp-encrypted|application/*|text/*|application/x-trash|application/x-shellscript|application/json|inode/x-empty|application/x-subrip) setsid -f $TERMINAL -e $EDITOR "$f">/dev/null 2>&1;;
-			*) for f in $fx; do setsid -f rifle $f >/dev/null 2>&1; done;;
+			# application/vnd.openxmlformats-officedocument.wordprocessingml.document|application/vnd.oasis.opendocument.text|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|application/octet-stream|application/vnd.oasis.opendocument.spreadsheet|application/vnd.oasis.opendocument.spreadsheet-template|application/vnd.openxmlformats-officedocument.presentationml.presentation|application/vnd.oasis.opendocument.presentation-template|application/vnd.oasis.opendocument.presentation|application/vnd.ms-powerpoint|application/vnd.oasis.opendocument.graphics|application/vnd.oasis.opendocument.graphics-template|application/vnd.oasis.opendocument.formula|application/vnd.oasis.opendocument.database|application/msword) open $fx > /dev/null 2>&1;;
+			# /Applications/LibreOffice.app/Contents/MacOS/soffice $fx >/dev/null 2>&1 ;;
+			application/pgp-encrypted|application/*|text/*|application/x-trash|application/x-shellscript|application/json|inode/x-empty|application/x-subrip) $TERMINAL -e $EDITOR "$f">/dev/null 2>&1;;
+			*) for f in $fx; do open $f >/dev/null 2>&1; done;;
 	esac
 # fi
 }}
