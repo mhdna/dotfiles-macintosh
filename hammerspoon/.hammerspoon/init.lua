@@ -31,21 +31,50 @@ configFileWatcher:start()
 
 require("app_switcher")
 require("move_windows")
-require("silent_alttab")
+require("toggle_apps")
+require("per_app_tab_switch")
 
--- switch keyboard layout
-hs.hotkey.bind({ "alt" }, "space", function()
-	local layouts = hs.keycodes.layouts()
-	local current = hs.keycodes.currentSourceID()
-	local currentIndex = hs.fnutils.indexOf(layouts, current) or 1
-	local nextIndex = (currentIndex % #layouts) + 1
-	hs.keycodes.currentSourceID(layouts[nextIndex])
-	hs.alert.show(hs.keycodes.currentLayout())
+-- require("silent_alttab")
+
+-- -- switch keyboard layout
+-- hs.hotkey.bind({ "ctrl" }, "space", function()
+-- 	local current = hs.keycodes.currentLayout()
+-- 	if current == "ABC" then
+-- 		hs.keycodes.setLayout("Arabic - PC")
+-- 	else
+-- 		hs.keycodes.setLayout("ABC")
+-- 	end
+-- 	hs.timer.doAfter(0.1, function()
+-- 		hs.alert.show(hs.keycodes.currentLayout())
+-- 	end)
+-- end)
+
+hs.hotkey.bind({ "cmd", "alt" }, "T", function()
+	local finderPath = hs.osascript.applescript([[
+        tell application "Finder"
+           try
+                set thePath to (POSIX path of (target of front window as alias))
+            on error
+                set thePath to (POSIX path of (desktop as alias))
+            end try
+        end tell
+        return thePath
+    ]])
+	if finderPath then
+		hs.execute("open -a Terminal " .. finderPath)
+	end
 end)
 
 -- show mission control
-hs.hotkey.bind({ "alt" }, "escape", function()
+hs.hotkey.bind({ "alt" }, "§", function()
 	hs.spaces.toggleMissionControl()
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "f", function()
+	local win = hs.window.focusedWindow()
+	if win then
+		win:toggleFullScreen()
+	end
 end)
 
 -- volume controls
@@ -53,29 +82,29 @@ hs.hotkey.bind({ "alt" }, "-", function()
 	hs.audiodevice.defaultOutputDevice():setVolume(hs.audiodevice.current().volume - 5)
 end)
 
--- mute toggle
-hs.hotkey.bind({ "alt", "shift" }, "-", function()
-	local device = hs.audiodevice.defaultOutputDevice()
-	device:setMuted(not device:muted())
-	if device:muted() then
-		hs.alert.show("Muted")
-	else
-		hs.alert.show("Unmuted")
-	end
-end)
+-- -- mute toggle
+-- hs.hotkey.bind({ "alt", "shift" }, "-", function()
+-- 	local device = hs.audiodevice.defaultOutputDevice()
+-- 	device:setMuted(not device:muted())
+-- 	if device:muted() then
+-- 		hs.alert.show("Muted")
+-- 	else
+-- 		hs.alert.show("Unmuted")
+-- 	end
+-- end)
 
-hs.hotkey.bind({ "alt" }, "=", function()
-	hs.audiodevice.defaultOutputDevice():setVolume(hs.audiodevice.current().volume + 5)
-end)
+-- hs.hotkey.bind({ "alt" }, "=", function()
+-- 	hs.audiodevice.defaultOutputDevice():setVolume(hs.audiodevice.current().volume + 5)
+-- end)
 
--- brightness controls
-hs.hotkey.bind({ "alt" }, ",", function()
-	hs.brightness.set(hs.brightness.get() - 5)
-end)
+-- -- brightness controls
+-- hs.hotkey.bind({ "alt" }, ",", function()
+-- 	hs.brightness.set(hs.brightness.get() - 5)
+-- end)
 
-hs.hotkey.bind({ "alt" }, ".", function()
-	hs.brightness.set(hs.brightness.get() + 5)
-end)
+-- hs.hotkey.bind({ "alt" }, ".", function()
+-- 	hs.brightness.set(hs.brightness.get() + 5)
+-- end)
 
 -- simple_switcher = require("simple_switcher")
 -- switcher = simple_switcher.new({ title_width = 1000, item_height = 32 })

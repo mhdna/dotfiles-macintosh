@@ -74,14 +74,53 @@ local function activateOrLaunch(bundleID)
 	end
 end
 
--- Switch to Safari by pressing Control+Option+Shift+S
+local previousApp = nil
+local function activateOrToggle(bundleID)
+	local frontmostApp = hs.application.frontmostApplication()
+
+	if frontmostApp and frontmostApp:bundleID() == bundleID then
+		if previousApp then
+			previousApp:activate()
+		end
+	else
+		previousApp = frontmostApp
+		hs.application.launchOrFocusByBundleID(bundleID)
+	end
+end
+
 hs.hotkey.bind({ "alt" }, "w", function()
-	activateOrLaunch("org.mozilla.firefox")
+	activateOrToggle("org.mozilla.firefox")
+end)
+
+hs.hotkey.bind({ "alt" }, "f", function()
+	activateOrToggle("com.microsoft.VSCode")
+end)
+
+hs.hotkey.bind({ "alt" }, "n", function()
+	activateOrToggle("md.obsidian")
+end)
+
+-- hs.hotkey.bind({ "alt" }, "z", function()
+-- 	activateOrToggle("dev.zed.Zed")
+-- end)
+
+hs.hotkey.bind({ "alt", "cmd" }, "c", function()
+	activateOrToggle("org.hammerspoon.Hammerspoon")
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "w", function()
+	activateOrToggle("com.brave.Browser")
 end)
 
 -- Switch to Messages by pressing Option+Enter
+-- hs.hotkey.bind({ "alt" }, "e", function()
+-- 	activateOrLaunch("org.gnu.Emacs")
+-- end)
+
+-- Switch to Messages by pressing Option+Enter
 hs.hotkey.bind({ "alt" }, "t", function()
-	activateOrLaunch("com.apple.Terminal")
+	-- activateOrLaunch("net.kovidgoyal.kitty")
+	activateOrToggle("com.github.wez.wezterm")
 end)
 
 -- com.apple.MobileSMS
@@ -97,7 +136,7 @@ hs.hotkey.bind({}, "F3", function()
 end)
 
 -- print current window bundle id
-hs.hotkey.bind({ "cmd", "shift" }, "c", function()
+hs.hotkey.bind({ "alt", "shift" }, "c", function()
 	-- copy it from clipboard
 	hs.pasteboard.setContents(hs.application.frontmostApplication():bundleID())
 	hs.alert.show(hs.application.frontmostApplication():bundleID())
