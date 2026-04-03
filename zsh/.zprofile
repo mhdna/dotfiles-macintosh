@@ -7,7 +7,7 @@ export BROWSER="browser-wrapper"
 export MEDIA="/mnt/media"
 export XDG_DOWNLOAD_DIR="$HOME/Downloads"
 export XDG_MUSIC_DIR="$HOME/Music"
-export XDG_VIDEOS_DIR="$HOME/Videos"
+export XDG_VIDEOS_DIR="$HOME/Movies"
 export XDG_PICTURES_DIR="$HOME/Pictures"
 export XDG_DOCUMENTS_DIR="$HOME/Documents"
 export NOTES_DIR="$HOME/personal/notes"
@@ -90,7 +90,7 @@ if type "${BREW_BIN}" &> /dev/null; then
     for mandir in "${BREW_PREFIX}/opt/"*"/share/man/man1"; do export MANPATH=$mandir:$MANPATH; done
 fi
 
-HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_AUTO_UPDATE=1
 
 # -H for it to not treat symlinks as the dst, but the directories that they point to
 export PATH="$PATH:$(gfind -H $HOME/bin $HOME/bin -type d -printf ":%p"):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME"

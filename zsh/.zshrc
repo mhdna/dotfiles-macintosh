@@ -9,10 +9,10 @@
 
 source $HOME/.zprofile
 
-# # disable annoying "you have a new mail" messages
-# unset MAILCHECK
-# # fix nix package manager conflict with local packages' libraries
-# unset LD_LIBRARY_PATH
+# disable annoying "you have a new mail" messages
+unset MAILCHECK
+# fix nix package manager conflict with local packages' libraries
+unset LD_LIBRARY_PATH
 
 # Prompt color settings
 autoload -U colors && colors
@@ -58,8 +58,8 @@ autoload -U colors && colors
 # }
 
 # PS1='%{$fg[green]%}[%n@%m]%{$reset_color%} %1~%b %# '
-PS1='%n@%m %1~%b$(git_prompt_info) $ '
-# PS1='%1~ %# '
+# PS1='%n@%m %1~%b$(git_prompt_info) $ '
+PS1='%1~ %# '
 zstyle ':completion:*' completer _expand_alias _complete _ignored # expand aliases on tab (default is C-x a)
 
 # # I cannot handle two lines for prompt, it's ridiculous and hirts my feelings. I always think that something went wrong with my previous command when saying two lines come out
@@ -196,6 +196,8 @@ source /usr/share/zsh/plugins/pnpm-shell-completion/pnpm-shell-completion.zsh 2>
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh/zsh-artisan/artisan.plugin.zsh 2>/dev/null
+source ~/.config/zsh/zsh-wakatime/zsh-wakatime.plugin.zsh 2>/dev/null
+
 # source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 # source /usr/share/zsh/scripts/git-prompt.zsh
 # source /usr/share/git-prompt.zsh/examples/ascii.zsh 2>/dev/null

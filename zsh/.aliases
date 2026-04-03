@@ -110,10 +110,14 @@ mg-transparent_image() {
 
 # alias t="tgpt"
 alias rss="newsboat-wrapper"
+alias f="open -a Finder"
+alias code="open -a \"Visual Studio Code\""
 alias m="ncmpcpp"
 alias p="pnpm"
 alias a="php artisan"
 alias acache="artisan route:clear; artisan route:cache; artisan config:cache; artisan cache:clear"
+
+alias bi="brew install"
 
 alias n="nvim $HOME/personal/notes"
 alias d="diary"
@@ -123,7 +127,7 @@ alias d="diary"
 # alias tr="trash-restore"
 
 # alias v="helix"
-alias v="nvim"
+alias vim="nvim"
 
 alias suspend="sudo systemctl suspend"
 alias Hibernate="sudo systemctl hibernate"
@@ -223,5 +227,5 @@ alias diff="diff --color=auto"
 alias nf="notify-send "
 alias ka="killall"
 # alias trem="transmission-remote"
-# alias z="zathura"
+alias za="zathura"
 alias x="xclip -sel c -i"
