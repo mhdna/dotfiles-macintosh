@@ -122,6 +122,22 @@ end)
 -- tapAltTab = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, mapAltTab)
 -- tapAltTab:start()
 
+simple_switcher = require("simple_switcher")
+switcher = simple_switcher.new({ title_width = 1000, item_height = 32 })
+local function mapAltTab(event)
+	local flags = event:getFlags()
+	local chars = event:getCharacters()
+	if chars == "\t" and flags:containExactly({ "cmd" }) then
+		-- switcher:next()
+		return true
+	elseif chars == string.char(25) and flags:containExactly({ "cmd", "shift" }) then
+		-- switcher:previous()
+		return true
+	end
+end
+tapAltTab = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, mapAltTab)
+tapAltTab:start()
+
 -- Finally, show a notification that we finished loading the config
 -- hs.notify.new({ title = "Hammerspoon", subTitle = "Configuration loaded" }):send()
 -- hs.alert.showWithImage(

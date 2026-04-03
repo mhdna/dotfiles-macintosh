@@ -114,25 +114,26 @@ end)
 
 -- Switch to Messages by pressing Option+Enter
 -- hs.hotkey.bind({ "alt" }, "e", function()
--- 	activateOrLaunch("org.gnu.Emacs")
+-- 	activateOrToggle("org.gnu.Emacs")
 -- end)
 
 -- Switch to Messages by pressing Option+Enter
 hs.hotkey.bind({ "alt" }, "t", function()
-	-- activateOrLaunch("net.kovidgoyal.kitty")
-	activateOrToggle("com.github.wez.wezterm")
+	activateOrToggle("net.kovidgoyal.kitty")
+	-- activateOrToggle("com.github.wez.wezterm")
+	-- activateOrToggle("org.alacritty")
 end)
 
 -- com.apple.MobileSMS
 
 -- Switch to Apple Mail by pressing Command+F2
 hs.hotkey.bind({ "cmd" }, "F2", function()
-	activateOrLaunch("com.apple.mail")
+	activateOrToggle("com.apple.mail")
 end)
 
 -- Switch to Passwords by pressing F3 without any modifiers
 hs.hotkey.bind({}, "F3", function()
-	activateOrLaunch("com.apple.Passwords")
+	activateOrToggle("com.apple.Passwords")
 end)
 
 -- print current window bundle id
