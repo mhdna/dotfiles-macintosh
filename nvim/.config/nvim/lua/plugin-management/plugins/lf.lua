@@ -1,6 +1,7 @@
 return {
 	"ptzz/lf.vim",
 	dependencies = "voldikss/vim-floaterm",
+	enabled = false,
 
 	init = function()
 		vim.cmd([[

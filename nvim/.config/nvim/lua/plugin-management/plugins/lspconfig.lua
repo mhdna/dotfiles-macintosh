@@ -3,8 +3,8 @@
 
 return {
 	"neovim/nvim-lspconfig",
-	event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-	enabled = false,
+	-- event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+	-- enabled = false,
 	-- ft = lsp_filetypes,
 	dependencies = {
 		-- Automatically install LSPs to stdpath for neovim

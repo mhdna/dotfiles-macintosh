@@ -6,7 +6,7 @@ return {
 	"WhoIsSethDaniel/mason-tool-installer.nvim",
 	event = { "BufReadPost", "BufNewFile", "BufWritePre" },
 	-- ft = lsp_filetypes,
-	enabled = false,
+	-- enabled = false,
 	config = function()
 		require("mason-tool-installer").setup({
 

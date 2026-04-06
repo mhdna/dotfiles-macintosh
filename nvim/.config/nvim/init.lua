@@ -4,6 +4,7 @@
 local ehandler = require("error-handler").handler
 
 -- -- load plugin infrastructure
+vim.opt.termguicolors = true
 xpcall(require, ehandler, "plugin-management")
 
 -- xpcall(require, ehandler, "lsp.setup")

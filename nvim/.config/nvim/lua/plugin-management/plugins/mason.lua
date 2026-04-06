@@ -3,8 +3,8 @@
 return {
 
 	"williamboman/mason.nvim",
-	enabled = false,
-	event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+	-- enabled = false,
+	-- event = { "BufReadPost", "BufNewFile", "BufWritePre" },
 	-- ft = lsp_filetypes,
 	opts = {
 		registries = {

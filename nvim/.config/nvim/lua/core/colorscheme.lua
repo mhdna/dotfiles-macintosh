@@ -6,7 +6,7 @@ function modify_hl(ns, name, changes)
 	vim.api.nvim_set_hl(ns, name, vim.tbl_deep_extend("force", def, changes))
 end
 
-vim.opt.termguicolors = false -- Enable 24-bit RGB colors
+vim.opt.termguicolors = true -- Enable 24-bit RGB colors
 
 function RemoveBackground()
 	vim.cmd("highlight Normal guibg=None ctermbg=None")
@@ -18,16 +18,24 @@ end
 function Gruvbox()
 	require("gruvbox").setup({
 		-- transparent_mode = true,
-		contrast = "", -- can be "hard", "soft" or empty string
-		overrides = {
-			-- 	-- 	WildMenu = { fg = "#ff9900" },
-			-- Normal = { bg = "#1d1d1d" },
-			-- Normal = { bg = "None" },
-			-- 	-- 	TelescopeNormal = { bg = "#222222" },
-		},
+		contrast = "hard", -- can be "hard", "soft" or empty string
+		-- overrides = {
+		-- 	-- 	WildMenu = { fg = "#ff9900" },
+		-- Normal = { bg = "#1d1d1d" },
+		-- Normal = { bg = "None" },
+		-- 	-- 	TelescopeNormal = { bg = "#222222" },
+		-- },
 	})
 	vim.cmd("colorscheme gruvbox")
-	vim.cmd("highlight WarningMsg guibg=darkyellow guifg=black")
+	-- vim.cmd("highlight WarningMsg guibg=darkyellow guifg=black")
+	-- vim.cmd([[
+	-- 	highlight! link SignColumn Normal
+	-- 	highlight! link DiagnosticSignHint SignColumn
+	-- 	highlight! link DiagnosticSignError SignColumn
+	-- 	highlight! link DiagnosticSignWarn SignColumn
+	-- 	highlight! link DiagnosticSignInfo SignColumn
+	-- 	highlight! link DiagnosticSignOk SignColumn
+	-- ]])
 	-- vim.g.gruvbox_baby_transparent_mode = 1
 	-- vim.cmd("colorscheme gruvbox-baby")
 end
@@ -70,6 +78,7 @@ function Quiet()
 		highlight link DiagnosticSignWarn SignColumn
 		highlight link DiagnosticSignInfo SignColumn
 		highlight link DiagnosticSignOk SignColumn
+		highlight link SignColumn Normal
 		" doesn't help
 		" highlight DiagnosticVirtualTextInfo ctermfg=black
 		" highlight DiagnosticVirtualTextError ctermfg=black
@@ -110,9 +119,14 @@ end
 
 function Minimal_Dark()
 	local dark_theme = "vim"
+	vim.cmd("colorscheme " .. dark_theme)
 	vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "black", fg = "white" })
 	vim.api.nvim_set_hl(0, "StatusLine", { bg = "black", fg = "white" })
-	vim.cmd("colorscheme " .. dark_theme)
+	vim.api.nvim_set_hl(0, "SignColumn", { bg = "black", fg = "white" })
+	vim.api.nvim_set_hl(0, "FloatBorder", { bg = "red", fg = "white" })
+	vim.api.nvim_set_hl(0, "Pmenu", { bg = "black", fg = "white" })
+	-- vim.api.nvim_set_hl(0, "PmenuSel", { underline = 1, bg = "red", fg = "black" })
+	-- vim.api.nvim_set_hl(0, "CmpItemKind", { fg = colors.beige })
 	-- vim.api.nvim_set_hl(0, "CursorLine", { bg = "None", fg = "None", underline = 1 })
 	RemoveBackground()
 end
@@ -171,7 +185,81 @@ function Default_Dark()
 	vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "black", fg = "white" })
 	-- modify_hl(0, "LineNr", { bg = colors.darkbrown })
 	-- modify_hl(0, "CursorLineNr", { bg = colors.darkbrown, fg = "Yellow" })
-	-- modify_hl(0, "SignColumn", { bg = colors.darkbrown })
+	modify_hl(0, "SignColumn", { bg = colors.darkbrown })
+	-- modify_hl(0, "DiagnosticSignError", { bg = colors.darkbrown })
+	-- modify_hl(0, "DiagnosticSignWarn", { bg = colors.darkbrown })
+	-- modify_hl(0, "DiagnosticSignInfo", { bg = colors.darkbrown })
+	-- modify_hl(0, "DiagnosticSignOk", { bg = colors.darkbrown })
+
+	-- -- -- Map a key to trigger the theme toggle
+	-- -- vim.api.nvim_set_keymap('n', '<Leader>t', ':lua ToggleTheme()<CR>', { noremap = true, silent = true })
+
+	if dark_theme == "vim" then
+		-- vim.api.nvim_set_hl(0, "Pmenu", { fg = colors.beige, bg = colors.brown })
+		-- vim.api.nvim_set_hl(0, "PmenuSel", { underline = 1, bg = colors.beige, fg = "black" })
+		vim.api.nvim_set_hl(0, "Pmenu", { fg = "black", bg = colors.gray })
+		vim.api.nvim_set_hl(0, "PmenuSel", { underline = 1, bg = "red", fg = "black" })
+		vim.api.nvim_set_hl(0, "CmpItemKind", { fg = colors.beige })
+		-- vim.api.nvim_set_hl(0, "Visual", { fg = colors.beige, bg = colors.brown })
+	end
+	RemoveBackground()
+end
+
+function YT_THEME()
+	local dark_theme = "vim"
+	vim.opt.bg = "dark"
+	local colors = {
+		darkgray = "#222222",
+		gray = "#999999",
+		brown = "#65411f",
+		darkbrown = "#2B1E08",
+		yellow = "#ffff00",
+		brownish_gray = "#332821",
+		beige = "#fbf1c7",
+	}
+
+	vim.cmd("colorscheme " .. dark_theme)
+	-- disable annoying
+	for _, c in ipairs({ "TroubleText", "CursorLineSign" }) do
+		vim.cmd("highlight " .. c .. " guibg=0 ctermbg=0")
+	end
+
+	modify_hl(0, "Whitespace", { fg = "#777777" })
+	modify_hl(0, "CursorLine", { bg = colors.darkgray })
+	modify_hl(0, "CursorColumn", { bg = colors.darkgray })
+	modify_hl(0, "IncSearch", { bg = "black", fg = "white" })
+	modify_hl(0, "WinSeparator", { fg = "gray", bg = 0 })
+	modify_hl(0, "TelescopeBorder", { fg = colors.gray, bg = 0 })
+	modify_hl(0, "TelescopePrompt", { fg = colors.darkgray, bg = 0 })
+
+	modify_hl(0, "NonText", { fg = "#888888", bg = 0 }) -- e.g. EOL
+	modify_hl(0, "FloatBorder", { fg = "#888888", bg = 0 }) -- e.g. EOL
+
+	vim.cmd([[
+		 highlight! link EndOfBuffer	Normal
+		 " highlight NormalFloat guibg=None ctermbg=None
+		 " highlight! link Whitespace Comment
+		 ]])
+	-- modify_hl(0, "Comment", { fg = "#777777" })
+
+	vim.o.bg = "dark"
+	vim.api.nvim_set_hl(0, "TabLineFill", { bg = "#333333" })
+	vim.api.nvim_set_hl(0, "TabLine", { bg = "#333333" })
+	vim.api.nvim_set_hl(0, "TabLineSel", { bold = 1, underline = 1 })
+	-- vim.api.nvim_set_hl(0, "StatusLine", { fg = colors.white, bg = "blue" })
+	vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
+	vim.api.nvim_set_hl(0, "NormalFloat", { bg = colors.darkgray })
+	vim.api.nvim_set_hl(0, "@text.note", { bg = "Yellow", bold = 1 })
+	vim.api.nvim_set_hl(0, "@text.danger", { bg = "Red", bold = 1 }) -- E.g. BUG
+	vim.api.nvim_set_hl(0, "@text.warning", { bg = "Blue", bold = 1 }) -- E.g. FIX
+	vim.api.nvim_set_hl(0, "FIXME", { ctermfg = "Red", bg = "Red" })
+	vim.api.nvim_set_hl(0, "BUG", { ctermfg = "Red", bg = "Red" })
+	vim.api.nvim_set_hl(0, "Whitespace", { fg = "#222222" })
+	vim.api.nvim_set_hl(0, "StatusLine", { bg = "black", fg = "white" })
+	vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "black", fg = "white" })
+	-- modify_hl(0, "LineNr", { bg = colors.darkbrown })
+	-- modify_hl(0, "CursorLineNr", { bg = colors.darkbrown, fg = "Yellow" })
+	modify_hl(0, "SignColumn", { bg = "black" })
 	-- modify_hl(0, "DiagnosticSignError", { bg = colors.darkbrown })
 	-- modify_hl(0, "DiagnosticSignWarn", { bg = colors.darkbrown })
 	-- modify_hl(0, "DiagnosticSignInfo", { bg = colors.darkbrown })
@@ -315,7 +403,6 @@ function Vscode()
 		-- style = 'light'
 
 		-- Enable transparent background
-		transparent = false,
 
 		-- Enable italic comment
 		italic_comments = true,
@@ -347,9 +434,9 @@ end
 
 function GruberDarker()
 	vim.cmd("colorscheme gruber-darker")
-	vim.api.nvim_set_hl(0, "Comment", { fg = "#999999" })
+	-- vim.api.nvim_set_hl(0, "Comment", { fg = "#999999" })
 	-- vim.api.nvim_set_hl(0, "Visual", { bg = "blue" })
-	vim.api.nvim_set_hl(0, "TelescopeNormal", { fg = "black", bg = "gray" })
+	-- vim.api.nvim_set_hl(0, "TelescopeNormal", { fg = "black", bg = "gray" })
 	-- vim.api.nvim_set_hl(0, "BufferLineBackground", { fg = "black", bold = 1, bg = "gray" })
 	-- vim.api.nvim_set_hl(0, "BufferLineTabSelected", { fg = "black", bold = 1, bg = "gray" })
 	-- vim.api.nvim_set_hl(0, "BufferLineTabSeparator", { fg = "black", bold = 1, bg = "gray" })
@@ -359,8 +446,9 @@ function GruberDarker()
 	-- vim.api.nvim_set_hl(0, "BufferLineFill", { fg = "black", bold = 1, bg = "gray" })
 	-- vim.api.nvim_set_hl(0, "TelescopeSelection", { fg = "#770000", underline = 1, bold = 1, bg = "yellow" })
 	-- vim.api.nvim_set_hl(0, "TelescopeMatching", { fg = "blue" })
-	vim.api.nvim_set_hl(0, "Pmenu", { bg = "#888888", fg = "black" })
-	vim.api.nvim_set_hl(0, "PmenuSel", { fg = "#770000", underline = 1, bg = "yellow" })
+	-- vim.api.nvim_set_hl(0, "Pmenu", { bg = "#888888", fg = "black" })
+	-- vim.api.nvim_set_hl(0, "PmenuSel", { fg = "#770000", underline = 1, bg = "yellow" })
+
 	vim.api.nvim_set_hl(0, "WildMenu", { bg = "black", fg = "white" })
 	vim.api.nvim_set_hl(0, "CmpItemKind", { fg = "white" })
 	vim.api.nvim_set_hl(0, "MatchParen", { fg = "black", bg = "darkgrey" })
@@ -382,14 +470,23 @@ function M.Dark()
 	-- green()
 	-- Brown()
 	-- Default_Dark()
+	-- YT_THEME()
 	-- GruberDarker()
-	Minimal_Dark()
+	-- -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#77000", fg = "#000000" })
+	-- -- vim.api.nvim_set_hl(0, "FloatBorder", { bg = "yellow", fg = "#000000" })
+	-- -- vim.cmd("highlight Normal guibg=#111111")
+	-- vim.cmd("highlight NormalFloat guibg=#050505")
+	-- vim.cmd("highlight FloatBorder guibg=None guifg=white")
+	-- vim.cmd("highlight Cursor guifg=black guibg=white")
+	-- modify_hl(0, "Comment", { italic = true, fg = "#333333" })
+	-- vim.api.nvim_set_hl(0, "Visual", { bg = "yellow", fg = "black" })
+	-- Minimal_Dark()
 	-- PaperColor()
 	-- Vscode()
 	-- monokai()
 	-- matrix()
 	-- solarized()
-	-- Gruvbox()
+	Gruvbox()
 	-- vim.cmd('colorscheme vim')
 	RemoveBackground()
 end

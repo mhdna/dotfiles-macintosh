@@ -5,14 +5,12 @@
 
 return {
 	"williamboman/mason-lspconfig.nvim",
-	event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-	enabled = false,
+	-- event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+	-- enabled = false,
 	-- ft = lsp_filetypes,
-	dependencies = { "williamboman/mason.nvim", "saghen/blink.cmp" },
+	-- dependencies = { "williamboman/mason.nvim", "saghen/blink.cmp" },
+	dependencies = { "williamboman/mason.nvim" },
 	--- @type MasonLspconfigSettings
-	opts = {
-		automatic_installation = true,
-	},
 	config = function()
 		local mason_lspconfig = require("mason-lspconfig")
 		local servers = {
@@ -43,17 +41,17 @@ return {
 			-- 		debounce_text_changes = 200,
 			-- 	},
 			-- },
-			marksman = {},
+			-- marksman = {},
 			lua_ls = {
 				Lua = {
 					workspace = { checkThirdParty = false },
 					telemetry = { enable = false },
 				},
 			},
-			intelephense = {}, -- php
-			phpactor = {},
+			-- intelephense = {}, -- php
+			-- phpactor = {},
 			dockerls = {},
-			tailwindcss = {},
+			-- tailwindcss = {},
 			-- emmet_ls = {
 			-- 	filetypes = {
 			-- 		"css",
@@ -103,14 +101,14 @@ return {
 			-- 	},
 			-- },
 			-- tsserver = {},
-			volar = {
-				--  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
-				--  init_options = {
-				-- vue = {
-				--   hybridMode = false,
-				-- },
-				-- },
-			},
+			-- volar = {
+			-- 	--  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+			-- 	--  init_options = {
+			-- 	-- vue = {
+			-- 	--   hybridMode = false,
+			-- 	-- },
+			-- 	-- },
+			-- },
 			-- ts_ls = { },
 			-- stimulus_ls = {},
 			html = {},
@@ -118,15 +116,18 @@ return {
 		}
 		mason_lspconfig.setup({
 			ensure_installed = vim.tbl_keys(servers),
-		})
-
-		vim.diagnostic.config({
-			virtual_text = false,
-
-			signs = false,
-			underline = false,
-			--     update_in_insert = true, -- otherwise it updates on insertLeave
-			--     severity_sort = false,
+			automatic_enable = true,
+			-- handlers = {
+			-- mason_lspconfig.setup_handlers({
+			-- 	function(server_name)
+			-- 		require("lspconfig")[server_name].setup({
+			-- 			capabilities = capabilities,
+			-- 			on_attach = on_attach,
+			-- 			settings = servers[server_name],
+			-- 		})
+			-- 	end,
+			-- })
+			-- },
 		})
 
 		vim.api.nvim_create_user_command("OrganizeImports", function()
@@ -178,54 +179,50 @@ return {
 			callback = function(args)
 				local client = vim.lsp.get_client_by_id(args.data.client_id)
 				client.server_capabilities.semanticTokensProvider = nil
-			end,
-		})
+				vim.opt_local.signcolumn = "yes"
 
-		local capabilities = require("blink.cmp").get_lsp_capabilities()
-		local on_attach = function(_, bufnr)
-			vim.opt_local.signcolumn = "no"
+				local nmap = function(keys, func)
+					vim.keymap.set("n", keys, func, { silent = true, buffer = bufnr, noremap = true })
+				end
 
-			local nmap = function(keys, func)
-				vim.keymap.set("n", keys, func, { silent = true, buffer = bufnr, noremap = true })
-			end
+				nmap("<leader>lr", vim.lsp.buf.rename)
+				nmap("<leader>li", ":OrganizeImports<CR>:w<CR>")
+				nmap("<leader>la", vim.lsp.buf.code_action)
 
-			nmap("<leader>lr", vim.lsp.buf.rename)
-			nmap("<leader>li", ":OrganizeImports<CR>:w<CR>")
-			nmap("<leader>la", vim.lsp.buf.code_action)
+				nmap("gd", vim.lsp.buf.definition)
+				nmap("gD", vim.lsp.buf.type_definition)
 
-			nmap("gd", vim.lsp.buf.definition)
-			nmap("gD", vim.lsp.buf.type_definition)
+				nmap("gr", require("telescope.builtin").lsp_references)
+				nmap("<leader>s", require("telescope.builtin").lsp_document_symbols)
+				-- nmap("<leader>S", require("telescope.builtin").lsp_dynamic_workspace_symbols)
+				-- nmap("<leader>s", require("telescope.builtin").treesitter)
 
-			nmap("gr", require("telescope.builtin").lsp_references)
-			nmap("<leader>s", require("telescope.builtin").lsp_document_symbols)
-			-- nmap("<leader>S", require("telescope.builtin").lsp_dynamic_workspace_symbols)
-			-- nmap("<leader>s", require("telescope.builtin").treesitter)
+				-- See `:help K` for why this keymap
+				nmap("<C-]>", vim.lsp.buf.signature_help)
+				nmap("<S-k>", vim.lsp.buf.hover)
 
-			-- See `:help K` for why this keymap
-			nmap("<C-]>", vim.lsp.buf.signature_help)
-			nmap("<S-k>", vim.lsp.buf.hover)
-
-			-- nmap("<C-Insert>", function()
-			-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-			-- end)
-			-- nmap("<M-Insert>", function()
-			-- 	vim.lsp.buf.add_workspace_folder()
-			-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-			-- end)
-			-- nmap("<M-S-Insert>", function()
-			-- 	vim.lsp.buf.remove_workspace_folder()
-			-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-			-- end)
-		end
-
-		mason_lspconfig.setup_handlers({
-			function(server_name)
-				require("lspconfig")[server_name].setup({
-					capabilities = capabilities,
-					on_attach = on_attach,
-					settings = servers[server_name],
+				vim.diagnostic.config({
+					virtual_text = true,
+					-- signs = false,
+					underline = true,
+					-- update_in_insert = true, -- otherwise it updates on insertLeave
+					-- severity_sort = false,
 				})
+
+				-- nmap("<C-Insert>", function()
+				-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+				-- end)
+				-- nmap("<M-Insert>", function()
+				-- 	vim.lsp.buf.add_workspace_folder()
+				-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+				-- end)
+				-- nmap("<M-S-Insert>", function()
+				-- 	vim.lsp.buf.remove_workspace_folder()
+				-- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+				-- end)
 			end,
 		})
+
+		-- local capabilities = require("blink.cmp").get_lsp_capabilities()
 	end,
 }

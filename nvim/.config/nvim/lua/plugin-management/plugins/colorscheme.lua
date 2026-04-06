@@ -16,6 +16,7 @@ return {
 	-- },
 	-- { "maxmx03/solarized.nvim" },
 	{ "https://git.filnar.com/fiplox/gruber-darker.nvim" },
+	{ "lunacookies/vim-plan9" },
 	{
 		-- causes start screen to redraw
 		"ellisonleao/gruvbox.nvim",
@@ -29,7 +30,7 @@ return {
 		-- 	-- }
 		-- },
 	},
-	{
-		"phha/zenburn.nvim",
-	},
+	-- {
+	-- 	"phha/zenburn.nvim",
+	-- },
 }

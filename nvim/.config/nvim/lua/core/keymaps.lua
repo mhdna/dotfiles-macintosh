@@ -11,7 +11,7 @@ vim.keymap.set("n", "<M-a>", "<Esc>gg<S-v>G", opts)
 vim.keymap.set("n", "<C-c>", "<Esc>")
 vim.keymap.set("i", "<M-n>", "<C-n>")
 vim.keymap.set("i", "<M-p>", "<C-p>")
-vim.keymap.set("n", "<leader>w", ":w<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>w", "<cmd>silent write<CR>", { noremap = true, silent = true })
 -- vim.keymap.set("n", "-", ":term lf %<CR>i", { noremap = true, silent = true })
 -- vim.keymap.set("n", "-", ":Ex<Cr>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { noremap = true, silent = true })
@@ -256,4 +256,5 @@ vim.cmd([[
 -- 	vim.keymap.set("n", DiagnosticNextKey, vim.diagnostic.goto_next)
 -- end
 vim.keymap.set("n", "<M-k>", vim.diagnostic.open_float)
+
 -- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist)

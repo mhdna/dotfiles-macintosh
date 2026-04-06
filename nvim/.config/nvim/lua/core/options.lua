@@ -14,8 +14,8 @@ local opt = vim.opt
 -- doesn't work great with qterminal (e.g. when lsp turned on with virtual text)
 -- opt.termbidi = true
 
--- opt.pumheight = 15
--- opt.pumwidth = 15
+opt.pumheight = 15
+opt.pumwidth = 15
 opt.laststatus = 0
 opt.cmdheight = 1
 opt.statusline = "%<%f   %h%m%r%= %-14.(%l[%L],%c%V%) %P %y"
@@ -44,12 +44,13 @@ opt.statusline = "%<%f   %h%m%r%= %-14.(%l[%L],%c%V%) %P %y"
 opt.history = 100 -- Remember N lines in history
 -- opt.synmaxcol = 240 -- Max column for syntax highlighting
 -- opt.compatible = false
-opt.incsearch = true  -- highlight incrementally rather than the whole word word
+opt.incsearch = true -- highlight incrementally rather than the whole word word
 -- vim.g.netrw_browsex_viewer = os.getenv("BROWSER")
 opt.ignorecase = true -- only ignore case if write uppercase letter
-opt.smartcase = true  -- only ignore case if write uppercase letter
+opt.smartcase = true -- only ignore case if write uppercase letter
 -- vim.formatoptions +=cro
 opt.guicursor = "n:block"
+
 -- "n-v-c-ci:block,i-ve:ver25,r-cr:hor20,o:block,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 -- opt.linebreak = false
 -- NOTE: see help tabstop to see options for spaces over tabs
@@ -75,7 +76,7 @@ opt.undodir = cache .. "/nvim/undodir/"
 opt.backupdir = cache .. "/nvim/backup/"
 opt.backup = true
 opt.encoding = "utf-8"
-opt.scrolloff = 10 -- confuses me when used with scrolling screen with c-y and c-e
+-- opt.scrolloff = 10 -- confuses me when used with scrolling screen with c-y and c-e
 
 -- Spellchecking
 -- opt.spell = true
@@ -111,23 +112,23 @@ opt.scrolloff = 10 -- confuses me when used with scrolling screen with c-y and c
 -- opt.wildignore:append { "Cargo.lock", "Cargo.Bazel.lock" }
 
 -- Cool floating window popup menu for completion on command line
--- opt.pumblend = 17
--- opt.wildmode = "longest:full"
--- opt.wildoptions = "pum"
+opt.pumblend = 17
+opt.wildmode = "longest:full"
+opt.wildoptions = "pum"
 
 opt.showcmd = true
-opt.cmdheight = 1    -- Height of the command bar
+opt.cmdheight = 1 -- Height of the command bar
 opt.incsearch = true -- Makes search act like search in modern browsers
 -- opt.showmatch      = true -- show matching brackets when text indicator is over them
 -- opt.relativenumber = true -- Show line numbers
 -- opt.number = true -- But show the actual number for the line we're on
-opt.ignorecase = true   -- Ignore case when searching...
-opt.smartcase = true    -- ... unless there is a capital letter in the query
-opt.hidden = true       -- I like having buffers stay around
+opt.ignorecase = true -- Ignore case when searching...
+opt.smartcase = true -- ... unless there is a capital letter in the query
+opt.hidden = true -- I like having buffers stay around
 opt.equalalways = false -- I don't like my windows changing all the time
-opt.updatetime = 1000   -- Make updates happen faster
+opt.updatetime = 1000 -- Make updates happen faster
 opt.hlsearch = false
-opt.scrolloff = 4       -- Make it so there are always ten lines below my cursor
+opt.scrolloff = 4 -- Make it so there are always ten lines below my cursor
 
 -- -- these guys make movement slower
 -- opt.cursorline = true -- Highlight the current line
@@ -150,7 +151,7 @@ opt.scrolloff = 4       -- Make it so there are always ten lines below my cursor
 -- opt.colorcolumn = "80"
 
 opt.pumblend = 8
--- opt.signcolumn = "yes"
+opt.signcolumn = "yes"
 opt.wildmode = "longest:full"
 opt.wildoptions = "pum"
 
@@ -204,8 +205,34 @@ opt.fillchars = { eob = "~" }
 opt.diffopt = { "internal", "filler", "closeoff", "hiddenoff", "algorithm:minimal" }
 
 -- -- better netrw
--- vim.g.netrw_browse_split = 0
--- vim.g.netrw_banner = 0
--- vim.g.netrw_winsize = 25
+vim.g.netrw_browse_split = 0
+vim.g.netrw_banner = 0
+vim.g.netrw_winsize = 25
 
 -- opt.guifont = "Mono:h16" -- text below applies for VimScript
+
+-- -- yt settings
+-- vim.cmd([[set guifont=Fantasque\ Sans\ Mono:h36]])
+-- opt.signcolumn = "yes"
+-- vim.g.neovide_cursor_animation_length = 0.08
+-- vim.g.neovide_cursor_trail_size = 0.3
+-- vim.g.neovide_cursor_animate_in_insert_mode = true
+-- vim.g.neovide_cursor_animate_command_line = true
+-- opt.scrolloff = 15 -- Make it so there are always ten lines below my cursor
+-- vim.cmd([[
+-- set noruler
+-- set noshowcmd
+-- set laststatus=0
+-- set noshowmode
+-- ]])
+
+-- vim.o.winborder = "bold"
+-- -- vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+
+-- -- vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+-- vim.keymap.set("n", "-", ":Ex<CR>")
+-- vim.cmd("map! <D-v> <C-R>+")
+-- vim.cmd([[cabbrev w <cmd>silent write<cr>]])
+-- vim.cmd([[cabbrev wa <cmd>silent wall<cr>]])
+-- vim.cmd([[cabbrev wq <cmd>silent wq<cr>]])
+-- vim.opt.cmdheight = 0

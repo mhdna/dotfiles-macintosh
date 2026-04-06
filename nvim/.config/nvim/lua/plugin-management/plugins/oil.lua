@@ -1,6 +1,6 @@
 return {
 	"stevearc/oil.nvim",
-	enabled = false,
+	-- enabled = false,
 	config = function()
 		require("oil").setup(
 			{
