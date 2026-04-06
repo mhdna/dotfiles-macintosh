@@ -1,14 +1,14 @@
-# import = ["~/.config/alacritty/themes/light-xterm.toml"]
-# import = ["~/.config/alacritty/themes/gruvbox-dark.toml"]
+# general.import = ["~/.config/alacritty/themes/light-xterm.toml"]
+# general.import = ["~/.config/alacritty/themes/gruvbox-dark.toml"]
 general.import = ["~/.config/alacritty/themes/xterm.toml"]
 
 [colors.primary]
 background = '#000000'
 foreground = '#ffffff'
 
-[colors.cursor]
-cursor = "#ffffff"
-text = "CellBackground"
+# [colors.cursor]
+# cursor = "#ffffff"
+# text = "CellBackground"
 
 [colors.hints.end]
 background = "#1d1f21"
@@ -18,8 +18,8 @@ foreground = "#fabd2f"
 background = "#fabd2f"
 foreground = "#1d1f21"
 
-[cursor.style]
-blinking = "always"
+# [cursor.style]
+# blinking = "always"
 
 # [cursor]
 # blink_interval = 500
@@ -36,22 +36,22 @@ blinking = "always"
 TERM = "xterm-256color"
 
 [font]
-size = 14
+size = 17
 
 [font.bold]
-family = "monospace"
+family = "Menlo"
 style = "Bold"
 
 [font.bold_italic]
-family = "monospace"
+family = "Menlo"
 style = "Bold Italic"
 
 [font.italic]
-family = "monospace"
+family = "Menlo"
 style = "Italic"
 
 [font.normal]
-family = "monospace"
+family = "Menlo"
 style = "Regular"
 
 [[hints.enabled]]
@@ -77,5 +77,6 @@ hide_when_typing = true
 columns = 73
 lines = 28
 
-# [window]
+[window]
 # opacity = 0.7
+option_as_alt = "Both"
