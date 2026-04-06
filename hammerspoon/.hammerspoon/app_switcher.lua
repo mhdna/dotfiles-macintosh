@@ -88,11 +88,23 @@ local function activateOrToggle(bundleID)
 	end
 end
 
+hs.hotkey.bind({ "alt" }, "f", function()
+	activateOrToggle("com.apple.finder")
+end)
+
+hs.hotkey.bind({ "alt" }, "s", function()
+	activateOrToggle("com.apple.systempreferences")
+end)
+
+hs.hotkey.bind({ "alt" }, "g", function()
+	activateOrToggle("com.apple.QuickTimePlayerX")
+end)
+
 hs.hotkey.bind({ "alt" }, "w", function()
 	activateOrToggle("org.mozilla.firefox")
 end)
 
-hs.hotkey.bind({ "alt" }, "f", function()
+hs.hotkey.bind({ "alt" }, "v", function()
 	activateOrToggle("com.microsoft.VSCode")
 end)
 
@@ -108,8 +120,20 @@ hs.hotkey.bind({ "alt", "cmd" }, "c", function()
 	activateOrToggle("org.hammerspoon.Hammerspoon")
 end)
 
+hs.hotkey.bind({ "alt", "shift" }, "o", function()
+	activateOrToggle("com.obsproject.obs-studio")
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "d", function()
+	activateOrToggle("com.hnc.Discord")
+end)
+
 hs.hotkey.bind({ "alt", "shift" }, "w", function()
 	activateOrToggle("com.brave.Browser")
+end)
+
+hs.hotkey.bind({ "alt" }, "p", function()
+	activateOrToggle("com.microsoft.Powerpoint")
 end)
 
 -- Switch to Messages by pressing Option+Enter

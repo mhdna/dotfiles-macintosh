@@ -66,9 +66,33 @@ hs.hotkey.bind({ "cmd", "alt" }, "T", function()
 end)
 
 -- show mission control
-hs.hotkey.bind({ "alt" }, "§", function()
+hs.hotkey.bind({ "alt" }, "tab", function()
 	hs.spaces.toggleMissionControl()
 end)
+
+hs.hotkey.bind({ "alt" }, "]", function()
+	hs.spaces.goRight()
+end)
+
+hs.hotkey.bind({ "alt" }, "[", function()
+	hs.spaces.goRight()
+end)
+
+-- -- wait for internet
+-- hs.hotkey.bind({ "alt" }, "i", function()
+-- 	hs.timer.doUntil(
+-- 		function() -- condition: internet is back
+-- 			local result = hs.execute("ping -c 1 -t 1 8.8.8.8 > /dev/null 2>&1")
+-- 			return result == true
+-- 		end,
+-- 		function() -- action while waiting: do nothing
+-- 		end,
+-- 		1 -- check every 1 second
+-- 	)
+-- 	hs.timer.doAfter(0, function()
+-- 		hs.alert.show("🔴Internet is Back", 1)
+-- 	end)
+-- end)
 
 hs.hotkey.bind({ "alt", "shift" }, "f", function()
 	local win = hs.window.focusedWindow()
@@ -112,31 +136,15 @@ end)
 -- 	local flags = event:getFlags()
 -- 	local chars = event:getCharacters()
 -- 	if chars == "\t" and flags:containExactly({ "cmd" }) then
--- 		switcher:next()
+-- 		-- switcher:next()
 -- 		return true
 -- 	elseif chars == string.char(25) and flags:containExactly({ "cmd", "shift" }) then
--- 		switcher:previous()
+-- 		-- switcher:previous()
 -- 		return true
 -- 	end
 -- end
 -- tapAltTab = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, mapAltTab)
 -- tapAltTab:start()
-
-simple_switcher = require("simple_switcher")
-switcher = simple_switcher.new({ title_width = 1000, item_height = 32 })
-local function mapAltTab(event)
-	local flags = event:getFlags()
-	local chars = event:getCharacters()
-	if chars == "\t" and flags:containExactly({ "cmd" }) then
-		-- switcher:next()
-		return true
-	elseif chars == string.char(25) and flags:containExactly({ "cmd", "shift" }) then
-		-- switcher:previous()
-		return true
-	end
-end
-tapAltTab = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, mapAltTab)
-tapAltTab:start()
 
 -- Finally, show a notification that we finished loading the config
 -- hs.notify.new({ title = "Hammerspoon", subTitle = "Configuration loaded" }):send()
@@ -144,4 +152,5 @@ tapAltTab:start()
 -- 	"configuration reloaded",
 -- 	hs.image.imageFromPath("~/Pictures/hammer-spoon-image.jpg"):setSize({ w = 100, h = 100 })
 -- )
+--
 hs.alert.show("configuration reloaded", 0.3)
