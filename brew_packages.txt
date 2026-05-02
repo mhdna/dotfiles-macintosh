@@ -4,6 +4,7 @@ findutils # necessary
 gnu-indent
 gnu-sed
 gnutls
+rar
 grep
 gnu-tar
 gawk
@@ -18,6 +19,7 @@ rg
 rga    # ripgrep all
 pandoc # dependency for ripgrepp-all
 bat    # for lf previews
+figlet
 
 # # for bucklespring
 # alure
@@ -54,3 +56,5 @@ font-symbols-only-nerd-font
 # # development
 # postgresql
 # psql
+
+flowvision # imageviewer
