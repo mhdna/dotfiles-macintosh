@@ -58,3 +58,4 @@ font-symbols-only-nerd-font
 # psql
 
 flowvision # imageviewer
+pear-devs/pear/pear-desktop # run /usr/bin/xattr -cr /Applications/Pear\ Desktop.app afterwards
