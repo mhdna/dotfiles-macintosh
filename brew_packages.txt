@@ -59,3 +59,11 @@ font-symbols-only-nerd-font
 
 flowvision # imageviewer
 pear-devs/pear/pear-desktop # run /usr/bin/xattr -cr /Applications/Pear\ Desktop.app afterwards
+
+# lf previews
+bat
+ffmpegthumbnailer
+poppler
+exiftool
+
+pqiv # image viewer
