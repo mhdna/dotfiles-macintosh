@@ -19,7 +19,7 @@ return {
 					debounce_text_changes = 500,
 				},
 			},
-			ruff = {},
+			-- ruff = {},
 			gopls = {},
 			-- solidity = {},
 			-- solidity_ls_nomicfoundation = {},
@@ -101,6 +101,7 @@ return {
 			-- 	},
 			-- },
 			-- tsserver = {},
+			vue_ls = {},
 			-- volar = {
 			-- 	--  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
 			-- 	--  init_options = {
@@ -109,25 +110,23 @@ return {
 			-- 	-- },
 			-- 	-- },
 			-- },
-			-- ts_ls = { },
+			ts_ls = {},
 			-- stimulus_ls = {},
 			html = {},
 			cssls = {},
 		}
+		local capabilities = require("blink.cmp").get_lsp_capabilities()
 		mason_lspconfig.setup({
 			ensure_installed = vim.tbl_keys(servers),
-			automatic_enable = true,
-			-- handlers = {
-			-- mason_lspconfig.setup_handlers({
-			-- 	function(server_name)
-			-- 		require("lspconfig")[server_name].setup({
-			-- 			capabilities = capabilities,
-			-- 			on_attach = on_attach,
-			-- 			settings = servers[server_name],
-			-- 		})
-			-- 	end,
-			-- })
-			-- },
+			automatic_enable = false,
+			handlers = {
+				function(server_name)
+					require("lspconfig")[server_name].setup({
+						capabilities = capabilities,
+						settings = servers[server_name],
+					})
+				end,
+			},
 		})
 
 		vim.api.nvim_create_user_command("OrganizeImports", function()
@@ -223,6 +222,5 @@ return {
 			end,
 		})
 
-		-- local capabilities = require("blink.cmp").get_lsp_capabilities()
 	end,
 }

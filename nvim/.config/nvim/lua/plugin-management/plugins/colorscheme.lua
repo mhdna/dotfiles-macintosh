@@ -15,8 +15,8 @@ return {
 	-- 	"Mofiqul/vscode.nvim",
 	-- },
 	-- { "maxmx03/solarized.nvim" },
-	{ "https://git.filnar.com/fiplox/gruber-darker.nvim" },
-	{ "lunacookies/vim-plan9" },
+	-- { "https://git.filnar.com/fiplox/gruber-darker.nvim" },
+	-- { "lunacookies/vim-plan9" },
 	{
 		-- causes start screen to redraw
 		"ellisonleao/gruvbox.nvim",

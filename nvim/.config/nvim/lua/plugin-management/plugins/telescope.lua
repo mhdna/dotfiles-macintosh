@@ -2,7 +2,7 @@
 --- @type LazyPluginSpec
 return {
 	"nvim-telescope/telescope.nvim",
-	branch = "0.1.x",
+	-- branch = "0.1.x",
 	cmd = "Telescope",
 	dependencies = {
 		{ "prochri/telescope-all-recent.nvim", config = true },
@@ -24,10 +24,10 @@ return {
 			"<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>",
 			desc = "Switch Buffer",
 		},
-		{ "<leader>:",  "<cmd>Telescope command_history<cr>", desc = "Command History" },
-		{ "<leader>f",  "<cmd>Telescope find_files<cr>",      desc = "Find Files" },
-		{ "<leader>gf", "<cmd>Telescope git_files<cr>",       desc = "Find Files (git-files)" },
-		{ "<leader>r",  "<cmd>Telescope oldfiles<cr>",        desc = "Recent" },
+		{ "<leader>:", "<cmd>Telescope command_history<cr>", desc = "Command History" },
+		{ "<leader>f", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
+		{ "<leader>gf", "<cmd>Telescope git_files<cr>", desc = "Find Files (git-files)" },
+		{ "<leader>r", "<cmd>Telescope oldfiles<cr>", desc = "Recent" },
 		{
 			"<leader>F",
 			function()
@@ -35,22 +35,22 @@ return {
 			end,
 			desc = "Recent (cwd)",
 		},
-		{ "<leader>gc", "<cmd>Telescope git_commits<CR>",               desc = "Commits" },
-		{ "<leader>gs", "<cmd>Telescope git_status<CR>",                desc = "Status" },
+		{ "<leader>gc", "<cmd>Telescope git_commits<CR>", desc = "Commits" },
+		{ "<leader>gs", "<cmd>Telescope git_status<CR>", desc = "Status" },
 		{ "<leader>sb", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Buffer" },
-		{ "<leader>sc", "<cmd>Telescope command_history<cr>",           desc = "Command History" },
-		{ "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>",       desc = "Document Diagnostics" },
-		{ "<leader>sD", "<cmd>Telescope diagnostics<cr>",               desc = "Workspace Diagnostics" },
-		{ "<leader>sh", "<cmd>Telescope help_tags<cr>",                 desc = "Help Pages" },
-		{ "<leader>sH", "<cmd>Telescope highlights<cr>",                desc = "Search Highlight Groups" },
-		{ "<leader>sj", "<cmd>Telescope jumplist<cr>",                  desc = "Jumplist" },
-		{ "<leader>sk", "<cmd>Telescope keymaps<cr>",                   desc = "Key Maps" },
-		{ "<leader>sl", "<cmd>Telescope loclist<cr>",                   desc = "Location List" },
-		{ "<leader>sM", "<cmd>Telescope man_pages<cr>",                 desc = "Man Pages" },
-		{ "<leader>sm", "<cmd>Telescope marks<cr>",                     desc = "Jump to Mark" },
-		{ "<leader>so", "<cmd>Telescope vim_options<cr>",               desc = "Options" },
-		{ "<leader>sR", "<cmd>Telescope resume<cr>",                    desc = "Resume" },
-		{ "<leader>sq", "<cmd>Telescope quickfix<cr>",                  desc = "Quickfix List" },
+		{ "<leader>sc", "<cmd>Telescope command_history<cr>", desc = "Command History" },
+		{ "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "Document Diagnostics" },
+		{ "<leader>sD", "<cmd>Telescope diagnostics<cr>", desc = "Workspace Diagnostics" },
+		{ "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
+		{ "<leader>sH", "<cmd>Telescope highlights<cr>", desc = "Search Highlight Groups" },
+		{ "<leader>sj", "<cmd>Telescope jumplist<cr>", desc = "Jumplist" },
+		{ "<leader>sk", "<cmd>Telescope keymaps<cr>", desc = "Key Maps" },
+		{ "<leader>sl", "<cmd>Telescope loclist<cr>", desc = "Location List" },
+		{ "<leader>sM", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
+		{ "<leader>sm", "<cmd>Telescope marks<cr>", desc = "Jump to Mark" },
+		{ "<leader>so", "<cmd>Telescope vim_options<cr>", desc = "Options" },
+		{ "<leader>sR", "<cmd>Telescope resume<cr>", desc = "Resume" },
+		{ "<leader>sq", "<cmd>Telescope quickfix<cr>", desc = "Quickfix List" },
 		{
 			"gs",
 			"<cmd>Telescope live_grep<cr>",
@@ -83,7 +83,7 @@ return {
 
 		require("telescope").setup({
 			defaults = {
-				layout_strategy = "vertical",
+				layout_strategy = "horizontal",
 				sorting_strategy = "ascending",
 				results_title = false,
 				layout_config = {
@@ -100,8 +100,8 @@ return {
 						prompt_position = "top",
 					},
 					horizontal = {
-						height = 0.7,
-						width = 0.6,
+						height = 0.8,
+						width = 0.9,
 						column_padding = "",
 						-- width = { padding = 0 },
 						-- height = { padding = 0 },
@@ -121,12 +121,15 @@ return {
 						height = 0.8,
 						preview_cutoff = 0, -- needed in vertical
 						prompt_position = "bottom",
-						width = 0.9,
+						width = 0.8,
 					},
 				},
-				border = false,
-				-- borderchars             = {"─", "│", "─", "│", "┌", "┐", "┘", "└"},
+				border = true,
+				-- borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 				preview = false,
+				-- preview = {
+				-- 	treesitter = false,
+				-- },
 				winblend = -1,
 				mappings = {
 					n = {

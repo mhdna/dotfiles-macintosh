@@ -8,15 +8,6 @@ return {
 		"nvim-treesitter/nvim-treesitter-textobjects",
 		"windwp/nvim-ts-autotag", -- auto rename and close html tags
 		-- "nvim-treesitter/nvim-treesitter-refactor",
-		-- {
-		--   "joosepalviste/nvim-ts-context-commentstring",
-		--   config = function()
-		--     -- required for Comment.nvim
-		--     require("ts_context_commentstring").setup {
-		--       enable_autocmd = false,
-		--     }
-		--   end,
-		-- },
 		"romgrk/nvim-treesitter-context",
 	},
 	build = ":TSUpdate",
@@ -67,7 +58,7 @@ return {
 		-- },
 
 		-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-		-- auto_install = true,
+		auto_install = true,
 
 		highlight = {
 			-- `false` will disable the whole extension
@@ -205,19 +196,34 @@ return {
 		-- })
 
 		-- context
-		vim.treesitter.query.set("lua", "context", "") -- disable context for lua
-		require("treesitter-context").setup({ enable = true })
-		vim.keymap.set({ "n", "v" }, "<M-u>", function()
-			require("treesitter-context").go_to_context()
-		end, { silent = true })
+		require("treesitter-context").setup({
+			enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+			multiwindow = false, -- Enable multiwindow support.
+			max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
+			min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+			line_numbers = true,
+			multiline_threshold = 20, -- Maximum number of lines to show for a single context
+			trim_scope = "outer", -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+			mode = "cursor", -- Line used to calculate context. Choices: 'cursor', 'topline'
+			-- Separator between context and content. Should be a single character string, like '-'.
+			-- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+			separator = nil,
+			zindex = 20, -- The Z-index of the context window
+			on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+		})
+		-- vim.treesitter.query.set("lua", "context", "") -- disable context for lua
+		-- require("treesitter-context").setup({ enable = true })
+		-- vim.keymap.set({ "n", "v" }, "<M-u>", function()
+		-- 	require("treesitter-context").go_to_context()
+		-- end, { silent = true })
 
-		config = function()
-			vim.cmd([[
-		                     hi TreesitterContext guisp=Grey guibg=#333333
-		" highlight! link TreesitterContext  Visual
-		                     hi TreesitterContextBottom gui=underline
-		]])
-		end
+		-- config = function()
+		-- 	vim.cmd([[
+		--                      hi TreesitterContext guisp=Grey guibg=#333333
+		-- " highlight! link TreesitterContext  Visual
+		--                      hi TreesitterContextBottom gui=underline
+		-- ]])
+		-- end
 
 		-- -- Folding Module
 		-- vim.opt.foldmethod = "expr"

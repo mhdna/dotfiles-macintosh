@@ -18,13 +18,15 @@ end
 function Gruvbox()
 	require("gruvbox").setup({
 		-- transparent_mode = true,
-		contrast = "hard", -- can be "hard", "soft" or empty string
-		-- overrides = {
-		-- 	-- 	WildMenu = { fg = "#ff9900" },
-		-- Normal = { bg = "#1d1d1d" },
-		-- Normal = { bg = "None" },
-		-- 	-- 	TelescopeNormal = { bg = "#222222" },
-		-- },
+		contrast = "", -- can be "hard", "soft" or empty string
+		overrides = {
+			-- 	WildMenu = { fg = "#ff9900" },
+			-- Normal = { bg = "#1d1d1d" },
+			-- NormalFloat = { bg = "NONE" },
+			-- FloatBorder = { bg = "NONE" },
+			-- Normal = { bg = "None" },
+			-- 	-- 	TelescopeNormal = { bg = "#222222" },
+		},
 	})
 	vim.cmd("colorscheme gruvbox")
 	-- vim.cmd("highlight WarningMsg guibg=darkyellow guifg=black")
@@ -382,6 +384,7 @@ function Boring()
 	highlight! link DiagnosticSignWarn SignColumn
 	highlight! link DiagnosticSignInfo SignColumn
 	highlight! link DiagnosticSignOk SignColumn
+	highlight! String ctermfg=lightgreen guifg=lightgreen
 ]])
 end
 
@@ -488,7 +491,7 @@ function M.Dark()
 	-- solarized()
 	Gruvbox()
 	-- vim.cmd('colorscheme vim')
-	RemoveBackground()
+	-- RemoveBackground()
 end
 
 -- causes arabic text to disappear in comments with certain fonts

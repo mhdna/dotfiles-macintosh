@@ -16,9 +16,24 @@ local opt = vim.opt
 
 opt.pumheight = 15
 opt.pumwidth = 15
-opt.laststatus = 0
+opt.laststatus = 3
 opt.cmdheight = 1
 opt.statusline = "%<%f   %h%m%r%= %-14.(%l[%L],%c%V%) %P %y"
+-- opt.number = true
+-- opt.relativenumber = true
+
+vim.g.neovide_hide_mouse_when_typing = true
+
+vim.cmd([[
+" Disable cursor animation
+let g:neovide_cursor_animation_length = 0
+
+" Disable cursor trail
+let g:neovide_cursor_trail_size = 0
+
+" Disable cursor antialiasing blur
+let g:neovide_cursor_vfx_mode = ""
+]])
 
 -- <U+%04B>
 -- vim.cmd([[
@@ -49,7 +64,7 @@ opt.incsearch = true -- highlight incrementally rather than the whole word word
 opt.ignorecase = true -- only ignore case if write uppercase letter
 opt.smartcase = true -- only ignore case if write uppercase letter
 -- vim.formatoptions +=cro
-opt.guicursor = "n:block"
+-- opt.guicursor = "n:block"
 
 -- "n-v-c-ci:block,i-ve:ver25,r-cr:hor20,o:block,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 -- opt.linebreak = false
@@ -131,7 +146,7 @@ opt.hlsearch = false
 opt.scrolloff = 4 -- Make it so there are always ten lines below my cursor
 
 -- -- these guys make movement slower
--- opt.cursorline = true -- Highlight the current line
+opt.cursorline = true -- Highlight the current line
 -- -- opt.cursorcolumn = true -- Highlight current line
 -- local group = vim.api.nvim_create_augroup("CursorLineControl", { clear = true })
 -- local set_cursorline = function(event, value, pattern)
@@ -209,7 +224,7 @@ vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
--- opt.guifont = "Mono:h16" -- text below applies for VimScript
+opt.guifont = "Menlo:h16"
 
 -- -- yt settings
 -- vim.cmd([[set guifont=Fantasque\ Sans\ Mono:h36]])

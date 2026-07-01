@@ -6,6 +6,8 @@
 return {
 	"saghen/blink.cmp",
 	event = { "InsertEnter", "CmdlineEnter" },
+	cond = not vim.g.vscode,
+	branch = "v1",
 	-- enabled = false,
 	dependencies = {
 		"L3MON4D3/LuaSnip",
@@ -83,7 +85,7 @@ return {
 		completion = {
 			documentation = {
 				window = { border = "single" },
-				-- auto_show = false,
+				auto_show = true,
 				-- , auto_show_delay_ms = 500
 			},
 			menu = {
@@ -145,28 +147,28 @@ return {
 		end,
 		keymap = {
 			preset = "none",
-			["<M-e>"] = { "cancel", "fallback" },
-			["<M-n>"] = { "show", "select_next", "fallback" },
-			["<M-p>"] = { "show", "select_prev", "fallback" },
-			["<M-y>"] = { "accept", "fallback" },
+			["<C-e>"] = { "cancel", "fallback" },
+			["<C-n>"] = { "show", "select_next", "fallback" },
+			["<C-p>"] = { "show", "select_prev", "fallback" },
+			["<C-y>"] = { "accept", "fallback" },
 			["<Tab>"] = { "accept", "fallback" },
 			-- ["<Cr>"] = { "accept", "fallback" },
-			["<M-i>"] = { "show_documentation", "hide_documentation" },
-			["<M-u>"] = { "scroll_documentation_up", "fallback" },
-			["<M-d>"] = { "scroll_documentation_down", "fallback" },
-			-- ["<M-k>"] = { "snippet_forward", "fallback" },
-			-- ["<M-j>"] = { "snippet_backward", "fallback" },
+			["<C-i>"] = { "show_documentation", "hide_documentation" },
+			["<C-u>"] = { "scroll_documentation_up", "fallback" },
+			["<C-d>"] = { "scroll_documentation_down", "fallback" },
+			-- ["<D-k>"] = { "snippet_forward", "fallback" },
+			-- ["<D-j>"] = { "snippet_backward", "fallback" },
 		},
 		cmdline = {
 			enabled = true,
 			keymap = {
 				preset = "none",
-				["<M-n>"] = { "select_next", "fallback" },
-				["<M-p>"] = { "select_prev", "fallback" },
-				["<M-y>"] = { "accept", "fallback" },
-				["<Tab>"] = { "accept", "fallback" },
-				["<M-u>"] = { "scroll_documentation_up", "fallback" },
-				["<M-d>"] = { "scroll_documentation_down", "fallback" },
+				["<C-n>"] = { "select_next", "fallback" },
+				["<C-p>"] = { "select_prev", "fallback" },
+				["<C-y>"] = { "accept", "fallback" },
+				["<Cab>"] = { "accept", "fallback" },
+				["<C-u>"] = { "scroll_documentation_up", "fallback" },
+				["<C-d>"] = { "scroll_documentation_down", "fallback" },
 				-- ["<M-k>"] = { "snippet_forward", "fallback" },
 				-- ["<M-j>"] = { "snippet_backward", "fallback" },
 			},

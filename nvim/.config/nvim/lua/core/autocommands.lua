@@ -1,5 +1,7 @@
 -- local utils = require("utils")
 
+-- vim.cmd("autocmd FileType gitcommit startinsert")
+
 vim.cmd([[
 " Return to last edit position when opening files
 autocmd BufReadPost *
@@ -12,7 +14,7 @@ autocmd BufReadPost *
 vim.api.nvim_create_autocmd({ "TextYankPost" }, {
 	pattern = { "*" },
 	callback = function()
-		vim.highlight.on_yank({
+		vim.hl.hl_op({
 			higroup = "IncSearch",
 			timeout = 150,
 			on_macro = true,
@@ -176,3 +178,11 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
 -- 	pattern = { "*.go", "*.lua", "*.cpp", "*.sh", "*.html", "*.css", "*.jsx", "*.tsx" },
 -- 	command = "Format",
 -- })
+
+-- fix vue indentation
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "vue",
+	callback = function()
+		vim.opt_local.indentexpr = ""
+	end,
+})

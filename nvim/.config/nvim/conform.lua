@@ -5,9 +5,10 @@ local prettier = "prettierd"
 -- }
 
 --- @param client vim.lsp.Client
--- local function formatter_filter(client)
--- 	return not vim.list_contains(ignored_servers, client.name)
--- end
+local function formatter_filter(client)
+	-- return not vim.list_contains(ignored_servers, client.name)
+	return true
+end
 
 -- selene: allow(mixed_table)
 --- @type LazyPluginSpec
@@ -19,8 +20,10 @@ return {
 			astro = { prettier },
 			-- cs = { "csharpier", "trim_newlines" },
 			css = { prettier },
+			graphql = { prettier },
+			handlebars = { prettier },
 			html = { prettier },
-			go = { "goimports", "gofumpt", "golines", "gomodifytags", "gotests" }, -- "gofmt"
+			go = { "goimports", "gofumpt", "golines" }, -- "gofmt"
 			javascript = { prettier },
 			javascriptreact = { prettier },
 			jq = { "jq" },
@@ -29,6 +32,7 @@ return {
 			less = { prettier },
 			lua = { "stylua" },
 			markdown = { "injected", "markdownlint" },
+			mdx = { prettier },
 			python = { "isort", "black" },
 			-- ocaml = { "ocamlformat" },
 			query = { "format-queries" },
@@ -56,17 +60,16 @@ return {
 				prepend_args = { "--indent", "4" },
 			},
 		},
-		format_on_save = function(bufnr)
+		format_after_save = function(bufnr)
 			if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
 				return
 			end
-
-			return { filter = formatter_filter, timeout_ms = 10000 }
+			return { filter = formatter_filter }
 		end,
+		notify_on_error = false,
+		quiet = true,
+		notify_no_formatters = true,
 	},
-	notify_on_error = false, -- Conform will notify you when a formatter errors.
-	quiet = true, -- Conform will suppress all output if quiet is true.
-	notify_no_formatters = true, -- Conform will notify you when no formatters are available for the buffer.
 	init = function()
 		vim.api.nvim_create_user_command("Format", function(args)
 			local range = nil
