@@ -19,7 +19,7 @@ end
 -- config.color_scheme = "Solarized (dark) (terminal.sexy)"
 -- config.color_scheme = "GruvboxDark"
 -- config.color_scheme = "Borland"
-config.font = wezterm.font("DejaVu Sans Mono")
+config.font = wezterm.font("Menlo")
 -- config.cursor_blink_rate = 800
 -- config.default_cursor_style = "BlinkingBlock"
 config.line_height = 0.95

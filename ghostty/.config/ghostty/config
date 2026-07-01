@@ -1,9 +1,8 @@
-theme = 3024 Night
-font-family = "Menlo"
-font-size = 15
-
-cursor-shape = block
-cursor-blink = true
+font-family = "Fantasque Sans Mono"
+font-size = 25
 
 window-decoration = none
 macos-option-as-alt = true
+
+cursor-style = block
+window-start-maximized = true
