@@ -75,6 +75,7 @@ local function activateOrLaunch(bundleID)
 end
 
 local previousApp = nil
+
 local function activateOrToggle(bundleID)
 	local frontmostApp = hs.application.frontmostApplication()
 
@@ -88,9 +89,9 @@ local function activateOrToggle(bundleID)
 	end
 end
 
-hs.hotkey.bind({ "alt" }, "f", function()
-	activateOrToggle("com.apple.finder")
-end)
+-- hs.hotkey.bind({ "alt" }, "f", function()
+-- 	activateOrToggle("com.apple.finder")
+-- end)
 
 hs.hotkey.bind({ "alt" }, "s", function()
 	activateOrToggle("com.apple.systempreferences")
@@ -100,27 +101,34 @@ hs.hotkey.bind({ "alt" }, "g", function()
 	activateOrToggle("com.apple.QuickTimePlayerX")
 end)
 
-hs.hotkey.bind({ "alt" }, "w", function()
-	activateOrToggle("org.mozilla.firefox")
+-- hs.hotkey.bind({ "alt" }, "w", function()
+-- 	activateOrToggle("org.mozilla.firefox")
+-- end)
+
+hs.hotkey.bind({ "alt" }, "e", function()
+	activateOrToggle("org.gnu.Emacs")
 end)
 
 hs.hotkey.bind({ "alt" }, "v", function()
-	activateOrToggle("com.microsoft.VSCode")
+	-- activateOrToggle("com.vscodium")
+	-- activateOrToggle("com.neovide.neovide")
+	-- activateOrToggle("org.alacritty")
+	activateOrToggleKitty("/opt/homebrew/bin/tmux a", "custom-tmux-window")
 end)
 
 hs.hotkey.bind({ "alt" }, "n", function()
 	activateOrToggle("md.obsidian")
 end)
 
--- hs.hotkey.bind({ "alt" }, "z", function()
+-- hs.hotkey.bind({ "alt" }, "v", function()
 -- 	activateOrToggle("dev.zed.Zed")
 -- end)
 
-hs.hotkey.bind({ "alt", "cmd" }, "c", function()
-	activateOrToggle("org.hammerspoon.Hammerspoon")
-end)
+-- hs.hotkey.bind({ "alt", "cmd" }, "c", function()
+-- 	activateOrToggle("org.hammerspoon.Hammerspoon")
+-- end)
 
-hs.hotkey.bind({ "alt", "shift" }, "o", function()
+hs.hotkey.bind({ "alt", "shift" }, "v", function()
 	activateOrToggle("com.obsproject.obs-studio")
 end)
 
@@ -128,7 +136,8 @@ hs.hotkey.bind({ "alt", "shift" }, "d", function()
 	activateOrToggle("com.hnc.Discord")
 end)
 
-hs.hotkey.bind({ "alt", "shift" }, "w", function()
+hs.hotkey.bind({ "alt" }, "w", function()
+	-- activateOrToggle("org.mozilla.firefox")
 	activateOrToggle("com.brave.Browser")
 end)
 
@@ -141,12 +150,12 @@ end)
 -- 	activateOrToggle("org.gnu.Emacs")
 -- end)
 
--- Switch to Messages by pressing Option+Enter
-hs.hotkey.bind({ "alt" }, "t", function()
-	activateOrToggle("net.kovidgoyal.kitty")
-	-- activateOrToggle("com.github.wez.wezterm")
-	-- activateOrToggle("org.alacritty")
-end)
+-- -- Switch to Messages by pressing Option+Enter
+-- hs.hotkey.bind({ "alt" }, "t", function()
+-- 	activateOrToggle("net.kovidgoyal.kitty")
+-- 	-- activateOrToggle("com.github.wez.wezterm")
+-- 	-- activateOrToggle("org.alacritty")
+-- end)
 
 -- com.apple.MobileSMS
 
@@ -165,4 +174,83 @@ hs.hotkey.bind({ "alt", "shift" }, "c", function()
 	-- copy it from clipboard
 	hs.pasteboard.setContents(hs.application.frontmostApplication():bundleID())
 	hs.alert.show(hs.application.frontmostApplication():bundleID())
+end)
+
+local function openKittyWith(cmd, title)
+	local full = string.format(
+		[[nohup /opt/homebrew/bin/kitty --directory ~ --title "%s" zsh -c '%s' >/dev/null 2>&1 &]],
+		title,
+		cmd
+	)
+	hs.execute(full)
+end
+
+local function findKittyWindow(title)
+	for _, w in ipairs(hs.window.allWindows()) do
+		local app = w:application()
+		if app and app:name() == "kitty" and w:title() == title then
+			return w
+		end
+	end
+	return nil
+end
+
+local previousWindow = nil
+
+local function activateOrToggleKitty(cmd, title)
+	local frontmost = hs.application.frontmostApplication()
+	local frontWin = hs.window.focusedWindow()
+	local kittyWin = findKittyWindow(title)
+
+	if frontWin and frontWin:title() == title then
+		-- already on this kitty window, toggle back
+		if previousWindow then
+			previousWindow:focus()
+		end
+	elseif kittyWin then
+		-- window exists but not focused
+		previousWindow = frontWin
+		kittyWin:focus()
+	else
+		-- doesn't exist, spawn it
+		previousWindow = frontWin
+		openKittyWith(cmd, title)
+		hs.timer.doAfter(0.2, function()
+			local w = findKittyWindow(title)
+			if w then
+				w:focus()
+			end
+		end)
+	end
+end
+
+hs.hotkey.bind({ "alt" }, "r", function()
+	activateOrToggleKitty("source /Users/mahdi/.zshrc; /Users/mahdi/bin/lfrun /Users/mahdi", "custom-lf-window")
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "g", function()
+	activateOrToggleKitty("/opt/homebrew/bin/htop", "custom-htop-window")
+end)
+
+hs.hotkey.bind({ "alt" }, "g", function()
+	activateOrToggleKitty("zsh; source /Users/mahdi/.zshrc/", "custom-git-window")
+end)
+
+hs.hotkey.bind({ "alt" }, "t", function()
+	activateOrToggleKitty("/opt/homebrew/bin/tmux a", "custom-tmux-window")
+end)
+hs.hotkey.bind({ "alt" }, "v", function()
+	activateOrToggleKitty("/opt/homebrew/bin/tmux a", "custom-tmux-window")
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "n", function()
+	activateOrToggleKitty("source /Users/mahdi/.zshrc; zsh", "custom-notes-window")
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "c", function()
+	local pos = hs.mouse.absolutePosition()
+	local text = string.format("%d,%d", math.floor(pos.x), math.floor(pos.y))
+
+	hs.pasteboard.setContents(text)
+	hs.alert.show("Copied: " .. text)
 end)

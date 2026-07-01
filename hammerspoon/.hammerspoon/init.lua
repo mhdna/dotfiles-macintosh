@@ -65,6 +65,21 @@ hs.hotkey.bind({ "cmd", "alt" }, "T", function()
 	end
 end)
 
+hs.hotkey.bind({ "cmd" }, "`", function()
+	local app = hs.application.frontmostApplication()
+	local windows = app:allWindows()
+
+	if #windows > 1 then
+		local focused = hs.window.focusedWindow()
+		for i, w in ipairs(windows) do
+			if w == focused then
+				windows[(i % #windows) + 1]:focus()
+				return
+			end
+		end
+	end
+end)
+
 -- show mission control
 hs.hotkey.bind({ "alt" }, "tab", function()
 	hs.spaces.toggleMissionControl()
@@ -80,6 +95,7 @@ end)
 
 -- -- wait for internet
 -- hs.hotkey.bind({ "alt" }, "i", function()
+-- 	hs.alert.show("🐻Waiting...", 1)
 -- 	hs.timer.doUntil(
 -- 		function() -- condition: internet is back
 -- 			local result = hs.execute("ping -c 1 -t 1 8.8.8.8 > /dev/null 2>&1")
@@ -153,4 +169,59 @@ end)
 -- 	hs.image.imageFromPath("~/Pictures/hammer-spoon-image.jpg"):setSize({ w = 100, h = 100 })
 -- )
 --
+
+-- hs.hotkey.bind({ "alt" }, "m", function()
+-- 	local wins = hs.window.visibleWindows()
+-- 	for _, win in ipairs(wins) do
+-- 		if win:isStandard() then
+-- 			win:maximize()
+-- 		end
+-- 	end
+-- end)
+hs.hotkey.bind({ "alt" }, "m", function()
+	local win = hs.window.focusedWindow()
+	if win and win:isStandard() then
+		win:maximize()
+	end
+end)
+
 hs.alert.show("configuration reloaded", 0.3)
+
+local isRunning = false
+local timer = nil
+
+local isRunning = false
+local timer = nil
+
+function pressFX()
+	local fDown = hs.eventtap.event.newKeyEvent({}, "f", true)
+	local xDown = hs.eventtap.event.newKeyEvent({}, "x", true)
+
+	local fUp = hs.eventtap.event.newKeyEvent({}, "f", false)
+	local xUp = hs.eventtap.event.newKeyEvent({}, "x", false)
+
+	-- press both keys down
+	fDown:post()
+	xDown:post()
+
+	-- release shortly after
+	hs.timer.doAfter(0.02, function()
+		fUp:post()
+		xUp:post()
+	end)
+end
+
+hs.hotkey.bind({ "cmd", "alt" }, "R", function()
+	if isRunning then
+		if timer then
+			timer:stop()
+			timer = nil
+		end
+		isRunning = false
+		hs.alert.show("stopped", 0.3)
+	else
+		timer = hs.timer.doEvery(0.05, pressFX)
+		isRunning = true
+		hs.alert.show("started", 0.3)
+	end
+end)
