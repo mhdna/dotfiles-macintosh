@@ -1,39 +1,45 @@
-set bg=light
 filetype plugin indent on
 syntax on
-set laststatus=0
+set laststatus=2
+set number
+set relativenumber
+
+set guifont=Menlo:h16
 
 " TODO ultisnips
 
 call plug#begin()
     Plug 'https://github.com/mattn/calendar-vim'
     Plug 'https://github.com/lilydjwg/colorizer'
-    " Plug 'https://github.com/morhetz/gruvbox'
+    Plug 'https://github.com/morhetz/gruvbox'
     Plug 'https://github.com/mbbill/undotree'
-    " Plug 'https://github.com/python-mode/python-mode'
+    Plug 'https://github.com/powerline/powerline'
+    Plug 'https://github.com/python-mode/python-mode'
     Plug 'https://github.com/fatih/vim-go'
-    "Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
-    " Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-    " Plug 'junegunn/fzf.vim'
+    " Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
+    Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+    Plug 'junegunn/fzf.vim'
 	Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-dispatch'             "| Optional
     Plug 'tpope/vim-projectionist'        
     "Plug 'noahfrederick/vim-composer'     
-    "Plug 'SirVer/ultisnips'
-    "Plug 'honza/vim-snippets'
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
     "Plug 'noahfrederick/vim-laravel'
     " Use release branch (recommended)
 	"Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 	" Or build from source code by using npm
-	"Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'npm ci'}
+	Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'npm ci'}
 	" Plug 'https://github.com/yaegassy/coc-volar'
 	Plug 'https://github.com/vimwiki/vimwiki'
 	Plug 'https://github.com/shawncplus/phpcomplete.vim'
 call plug#end()
 
-" colorscheme gruvbox
+colorscheme gruvbox
+let g:gruvbox_contrast_dark = 'medium'
 set bg=dark
+autocmd ColorScheme * highlight Normal guibg=#1d1d1d
 " set number
 " set relativenumber
 
@@ -72,11 +78,14 @@ let maplocalleader=" "
 
 
 " let $FZF_DEFAULT_COMMAND = 'find .'
-" nnoremap <leader>f :Files<CR>
-" nnoremap <leader>g :Rg<CR>
-nnoremap <leader>f :Leaderf file<CR>
-nnoremap <leader>g :Leaderf rg<CR>
-nnoremap <leader>j :Leaderf function<CR>
+nnoremap <leader>f :Files<CR>
+nnoremap <leader>g :Rg<CR>
+" nnoremap <leader>f :Leaderf file<CR>
+" nnoremap <leader>g :Leaderf rg<CR>
+" nnoremap <leader>j :Leaderf function<CR>
+"
+nnoremap <C-Tab> gt
+nnoremap <C-S-Tab> gT
 
 
 
@@ -283,6 +292,7 @@ set mouse=
  "     " Fix focus events.
  "     " TODO Report this upstream? src/os_unix.c already includes a check
  "     " for st. Should this work without user intervention? The help page
+
  "     " for "xterm-focus-event" mentions, though, that setting this
  "     " manually is sometimes required ...
  "     " There was a similar report here: https://github.com/vim/vim/issues/9296
@@ -614,3 +624,9 @@ set updatetime=300
 "    let &undodir=target_path
 "    set undofile
 "endif
+"
+
+
+" Disable Mac bells
+set belloff=all
+set guicursor=a:block-blinkon0

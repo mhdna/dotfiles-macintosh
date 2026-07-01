@@ -1,4 +1,6 @@
 # set adjust-open "best-fit"
+set window-width 1280
+set window-height 1080
 
 #set zoom-min 10
 
@@ -81,7 +83,7 @@ set render-loading-fg           "#ebdbb2" # fg
 
 set recolor-lightcolor          "#1d2d2d" # bg
 set recolor-darkcolor           "#ebdbb2" # fg
-set recolor                     "true"
+# set recolor                     "true"
 set recolor-keephue             true      # keep original color when recoloring
 
 set default-bg                  "#282828" # bg

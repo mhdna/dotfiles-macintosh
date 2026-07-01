@@ -208,7 +208,7 @@ config.set("fonts.hints", "bold 14pt default_family")
 # config.set('fonts.web.family.sans_serif', 'Sans')
 # config.set('fonts.web.family.serif', 'Serif')
 
-# config.source('gruvbox.py')
+config.source('gruvbox.py')
 
 
 # search current selection

@@ -7,7 +7,74 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "current_line_highlight": "gutter",
+  "proxy": "",
+  "terminal": {
+    "font_family": "Menlo",
+    "font_size": 15.0,
+  },
+  "disable_ai": false,
+  "project_panel": {
+    "dock": "right",
+  },
+  "outline_panel": {
+    "dock": "right",
+  },
+  "collaboration_panel": {
+    "dock": "right",
+  },
+  "agent": {
+    "default_model": {
+      "provider": "opencode",
+      "model": "go/minimax-m2.5",
+      "enable_thinking": false,
+    },
+    "dock": "left",
+    "favorite_models": [
+      {
+        "provider": "opencode",
+        "model": "go/deepseek-v4-flash",
+        "enable_thinking": false,
+        "effort": "medium",
+      },
+      {
+        "provider": "opencode",
+        "model": "go/glm-5",
+        "enable_thinking": false,
+      },
+      {
+        "provider": "opencode",
+        "model": "go/deepseek-v4-pro",
+        "enable_thinking": true,
+        "effort": "max",
+      },
+      {
+        "provider": "opencode",
+        "model": "go/minimax-m2.5",
+        "enable_thinking": false,
+      },
+    ],
+    "model_parameters": [],
+  },
+  "git_panel": {
+    "dock": "right",
+  },
+  "completion_menu_scrollbar": "always",
+  "toolbar": {
+    "selections_menu": false,
+  },
+  "tabs": {
+    "git_status": true,
+  },
+  // "tab_bar": {
+  //   "show": false,
+  // },
+  "scrollbar": {
+    "show": "never",
+  },
+  "indent_guides": {
+    "background_coloring": "indent_aware",
+  },
+  "current_line_highlight": "all",
   "selection_highlight": true,
   "use_autoclose": false,
   "cursor_blink": false,
@@ -20,8 +87,12 @@
   "agent_ui_font_size": 16.0,
   "ui_font_family": "Helvetica",
   "buffer_font_weight": 400.0,
-  "buffer_font_family": "MesloLGM Nerd Font",
-  "icon_theme": "Seti Icon Theme",
+  "buffer_font_family": "Menlo",
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Seti Icon Theme",
+    "dark": "Seti Icon Theme",
+  },
   "telemetry": {
     "diagnostics": true,
     "metrics": false,
@@ -33,5 +104,9 @@
     "mode": "dark",
     "light": "Acme Light",
     "dark": "Gruvbox Dark",
+  },
+  "experimental.theme_overrides": {
+    "panel.background": "#000000",
+    "terminal.background": "#000000",
   },
 }

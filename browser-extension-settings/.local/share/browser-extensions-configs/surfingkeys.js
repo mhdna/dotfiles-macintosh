@@ -25,7 +25,7 @@ const {
 
 // api.unmap("<ctrl-i>");
 settings.defaultSearchEngine = "d";
-settings.smoothScroll = false;
+// settings.smoothScroll = false;
 // Prevent automatic next/previous page loads
 settings.smartPageBoundary = false;
 
@@ -35,9 +35,7 @@ settings.blocklistPattern =
 
 // set theme
 api.Hints.style(
-  "             \
- font-size:10pt;              \
- font-family: Mono;",
+  "font-size:12pt;",
   "hint",
 );
 
@@ -118,8 +116,8 @@ mapkey("<Ctrl-i>", "#7View image in new tab", function () {
 map(">", ">>");
 map("<", "<<");
 // Tab Next/Prev
-map("K", "R");
-map("J", "E");
+// map("K", "R");
+// map("J", "E");
 
 // --- Misc ---
 // Yank URL w/ one press (disables other yx binds)
@@ -185,60 +183,39 @@ addSearchAlias("r", "reddit", "https://reddit.com/r/", "s");
 
 settings.theme = `
 .sk_theme {
-  font-family: Mono;
-  font-size: 11pt;
-  background: #002B36;
-  color: #93A1A1;
-}
-.sk_theme input {
-  color: #93A1A1;
-}
-.sk_theme .url {
-  color: #268BD2;
-}
-.sk_theme .annotation {
-  color: #93A1A1;
-}
-.sk_theme kbd {
-  background: #EEE8D5;
-  color: #111;
-}
-.sk_theme .omnibar_highlight {
-  color: #CB4B16;
-}
-.sk_theme .omnibar_folder {
-  color: #2AA198;
-}
-.sk_theme .omnibar_timestamp {
-  color: #657B83;
-}
-.sk_theme .omnibar_visitcount {
-  color: #B58900;
-}
-.sk_theme .prompt, .sk_theme .resultPage {
-  color: #93A1A1;
-}
-.sk_theme .feature_name {
-  color: #859900;
-}
-.sk_theme .separator {
-  color: #859900;
-}
-.sk_theme #sk_omnibarSearchResult ul li:nth-child(odd) {
-  background: #002F3B;
-}
-.sk_theme #sk_omnibarSearchResult ul li.focused {
-  background: #083D4A;
+  font-size: 16pt;
+	background: #100a14dd;
+	color: #4f97d7;
 }
 #sk_status, #sk_find {
-  font-size: 12pt;
+  font-size: 16pt;
 }
-#sk_keystroke {
-  background: #002B36;
+.sk_theme tbody {
+	color: #292d;
 }
-.expandRichHints span.annotation {
-  color: #93A1A1;
-}`;
+.sk_theme input {
+	color: #d9dce0;
+}
+.sk_theme .url {
+	color: #2d9574;
+}
+.sk_theme .annotation {
+	color: #a31db1;
+}
+.sk_theme .omnibar_highlight {
+	color: #333;
+	background: #ffff00aa;
+}
+.sk_theme #sk_omnibarSearchResult ul li:nth-child(odd) {
+	background: #5d4d7a55;
+}
+.sk_theme #sk_omnibarSearchResult ul li.focused {
+	background: #5d4d7aaa;
+}
+.sk_theme #sk_omnibarSearchResult .omnibar_folder {
+	color: #a31db1;
+}
+`;
 
 // Youtube
 // mapkey(
@@ -264,7 +241,7 @@ unmap("sps");
 unmap("cp");
 unmap(";cp");
 unmap(";ap");
-unmap("R");
-unmap("E");
+// unmap("R");
+// unmap("E");
 unmap("S");
 unmap("D");
