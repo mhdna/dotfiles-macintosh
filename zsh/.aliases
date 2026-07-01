@@ -111,7 +111,8 @@ mg-transparent_image() {
 # alias t="tgpt"
 alias rss="newsboat-wrapper"
 alias f="open -a Finder"
-alias code="open -a \"Visual Studio Code\""
+alias code="open -a \"VSCodium\""
+# alias code="open -a \"Visual Studio Code\""
 alias m="ncmpcpp"
 alias p="pnpm"
 alias a="php artisan"
@@ -128,6 +129,7 @@ alias d="diary"
 
 # alias v="helix"
 alias vim="nvim"
+alias v="nvim"
 
 alias suspend="sudo systemctl suspend"
 alias Hibernate="sudo systemctl hibernate"
@@ -135,7 +137,7 @@ alias Hibernate="sudo systemctl hibernate"
 alias disk="ncdu"
 alias ch="cht.sh"
 alias nonet="firejail --net=none --noprofile" # open apps into a sandbox with no internet access for them
-alias http="miniserve -p 8877 --enable-zip" # --upload-files --mkdir
+alias http="miniserve -p 8877 --enable-zip --upload-files --mkdir"
 
 alias P="sudo pacman"
 # alias su="surf -z 1.5"

@@ -1,225 +1,190 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-# fi
+# ── Homebrew must be initialised FIRST so all tools are available ─────────────
+# This must come before sourcing zprofile (which may call brew/gdircolors/etc.)
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
-# random-quote
+source "$HOME/.zprofile"
 
-source $HOME/.zprofile
+# ── Shell options ──────────────────────────────────────────────────────────────
+unset MAILCHECK          # disable "you have new mail" noise
+unset LD_LIBRARY_PATH    # avoid nix conflicts
 
-# disable annoying "you have a new mail" messages
-unset MAILCHECK
-# fix nix package manager conflict with local packages' libraries
-unset LD_LIBRARY_PATH
+setopt prompt_subst
+setopt interactive_comments
+# setopt autocd
 
-# Prompt color settings
+# ── Colours ───────────────────────────────────────────────────────────────────
 autoload -U colors && colors
 
-# setprompt() {
+# ── Prompt ────────────────────────────────────────────────────────────────────
+git_prompt_info() {
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    [[ -n "$branch" ]] && echo " ($branch)"
+}
 
-  git_prompt_info() {
-        local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-        if [ -n "$branch" ]; then
-                echo " ($branch)"
-        fi
-  }
-#   setopt prompt_subst
-
-#   if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
-#     p_host='%F{yellow}%M%f'
-#   else
-#     p_host='%F{green}%M%f'
-#   fi
-
-#   PS1=${(j::Q)${(Z:Cn:):-$'
-# 	%(!.%F{red}%n%f.%F{green}%n%f)
-#     @%f
-#     ${p_host}
-# 	:
-#     %F{blue}%~%f
-#     %F{magenta}$(git_prompt_info)
-#     %(!.%F{red}%#%f.%F{green}%#%f)
-#     " "
-#   '}}
-
-#   PS2=$'%_>'
-#   RPROMPT=$'${vcs_info_msg_0_}'
-# }
-
-# # setprompt
-# git_prompt_info() {
-#     local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-#     if [ -n "$branch" ]; then
-#         # echo "%{$fg[magenta]%} ($branch)"
-#         echo " ($branch)"
-#     fi
-# }
-
-# PS1='%{$fg[green]%}[%n@%m]%{$reset_color%} %1~%b %# '
-# PS1='%n@%m %1~%b$(git_prompt_info) $ '
 PS1='%1~ %# '
-zstyle ':completion:*' completer _expand_alias _complete _ignored # expand aliases on tab (default is C-x a)
 
-# # I cannot handle two lines for prompt, it's ridiculous and hirts my feelings. I always think that something went wrong with my previous command when saying two lines come out
-# # PS1='%{$fg[green]%}%n@%m:%{$fg[yellow]%}%~$(git_prompt_info) %{$fg[cyan]%}%D{%H:%M:%S}'$'\n''%{$reset_color%}%#%b '
-# # PS1='%n@%m:%~$(git_prompt_info) %D{%H:%M:%S}'$'\n''%#%b '
-# # PS1='%{$fg[yellow]%}%n (at) %m:%{$reset_color%}%~$(git_prompt_info) $ '
-# PS1='%B%{$fg[green]%}%n@%m:%{$fg[yellow]%}%B%~$(git_prompt_info) %{$fg[cyan]%}%D{%L:%M:%S}%{$reset_color%}%#%b '
-# # PS1='%B%{$fg[green]%}%n@%m:%{$fg[yellow]%}%B%~$(git_prompt_info) %{$fg[cyan]%}%D{%L:%M:%S}'$'\n''%{$reset_color%}%#%b '
-# # precmd() {
-#   RIGHT="$(date +'%H:%M:%S') "
-#   RIGHTWIDTH=$(($COLUMNS-${#LEFT}))
-#   print $LEFT${(l:$RIGHTWIDTH::_:)RIGHT}
-# }
-# PS1='%n@%m %1~%b%# '
-# PS1='%1~%b%# '
-# PS1='%m:%1~%b%# '
-# PS1='%B$ '
-# zle_highlight=(default:bold)
-# PS1='[%B%{$fg[green]%}%n@%m:%{$fg[yellow]%}%B%~$(git_prompt_info)%{$reset_color%}] %{$fg[cyan]%}%D{%L:%M:%S}'$'\n''%#%b '
-# RPS1="bar"
-# PS1='---------------------'$'\n''%{$fg[reset_color]%}%n@%m:%{$fg[reset_color]%}%~$(git_prompt_info) %{$fg[reset_color]%}%D{%L:%M:%S}%{$reset_color%}$%B '
-# PS1='%{$fg[reset_color]%}%n@%m:%{$fg[reset_color]%} %1~$(git_prompt_info)%{$fg[reset_color]%}%{$reset_color%} $%b '
-
-
-
-# Enable substitution in the prompt.
-setopt prompt_subst
-
-# setopt autocd		# Automatically cd into typed directory.
-# stty stop undef		# Disable ctrl-s to freeze terminal. (causes errors with power10ktheme)
-setopt interactive_comments
-
-
-# Load aliases and shortcuts if existent.
-for f in "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc" "$HOME/.aliases"; do
-    [ -f "$f" ] && source "$f"
-done
-
-# Basic auto/tab complete:
+# ── Completion ────────────────────────────────────────────────────────────────
 autoload -Uz compinit
 zstyle ':completion:*' menu select
+zstyle ':completion:*' completer _expand_alias _complete _ignored
 zmodload zsh/complist
 compinit
+_comp_options+=(globdots)    # include hidden files in completion
 
-_comp_options+=(globdots)		# Include hidden files.
 autoload -U select-word-style
-select-word-style bash # So C-w does not delete whole words in things like a path
+select-word-style bash       # C-w stops at slashes, not whole path
 
-# History in cache directory:
+# ── History ───────────────────────────────────────────────────────────────────
 HISTFILESIZE=1000000
 HISTSIZE=1000000
 SAVEHIST=1000000
 HISTFILE="$HOME/.history"
-setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-# If a new command line being added to the history list duplicates an older one, the older command is removed from the list (even if it is not the previous event).
+setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
-# TODO
-# HISORY_IGNORE="^_ .*"
-# Do not save commands starting with a space to history
-# Super annoying, don't toggle on. It doesn't remember recent commands (I guess because I'm saving history on each prompt or something).
-# setopt HIST_IGNORE_SPACE
 
+# ── Key bindings ──────────────────────────────────────────────────────────────
 bindkey -e
-bindkey \^U backward-kill-line
+bindkey '^U' backward-kill-line
 
-# # Edit line in vim with alt-e:
-autoload edit-command-line; zle -N edit-command-line
+autoload edit-command-line
+zle -N edit-command-line
 bindkey '^[e' edit-command-line
+
 bindkey -s '^[p' '^Uedit-file\n'
-# bindkey -s '^[o' '^Ulfcd\n'
 bindkey -s '^[o' '^Ulfcd\n'
 bindkey -s '^[g' '^Urgfzf\n'
 bindkey -s '^[m' '^Umusic-search\n'
 bindkey -s '^[j' '^Ujump\n'
 bindkey -s '^[J' '^Ubdjump\n'
-# Make zsh autocomplete with up arrow
+
+# Up/down arrow searches history by prefix
 autoload -Uz history-search-end
 zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end history-search-end
 bindkey "$terminfo[kcuu1]" history-beginning-search-backward-end
 bindkey "$terminfo[kcud1]" history-beginning-search-forward-end
 
-bdjump(){
-    cd $(cat ${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs | fzf --height=100%)
+# ── Aliases / shortcuts ───────────────────────────────────────────────────────
+for f in "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc" "$HOME/.aliases"; do
+    [[ -f "$f" ]] && source "$f"
+done
+
+# ── Functions ─────────────────────────────────────────────────────────────────
+
+bdjump() {
+    local dest
+    dest=$(cat "${XDG_CONFIG_HOME:-$HOME/.config}/bm/all-dirs" | fzf --height=100%)
+    [[ -n "$dest" ]] && cd "$dest"
 }
 
 jump() {
-	location="$(find * | fzf --prompt 'All> ' \
-             --header 'CTRL-D: Directories / CTRL-F: Files' \
-             --bind 'ctrl-d:change-prompt(Directories> )+reload(find * -type d)' \
-			 --bind 'ctrl-f:change-prompt(Files> )+reload(find * -type f)')"
-	if [ ! -z "$location" ]; then
-	 [ -d "$location" ] && cd "$location" || "$EDITOR" "$location"
-	fi
- }
-
-edit-file () {
-	file=$(find . -type f | fzf --ansi --preview 'bat --style=plain --color=always {}' --height=100% --preview-window="up:70%")
-	[ -f "$file" ] && $EDITOR "$file"
+    local location
+    location=$(find * | fzf --prompt 'All> ' \
+        --header 'CTRL-D: Directories / CTRL-F: Files' \
+        --bind 'ctrl-d:change-prompt(Directories> )+reload(find * -type d)' \
+        --bind 'ctrl-f:change-prompt(Files> )+reload(find * -type f)')
+    if [[ -n "$location" ]]; then
+        [[ -d "$location" ]] && cd "$location" || "$EDITOR" "$location"
+    fi
 }
 
-lfcd () {
-   # set -e
-   tmp="$(mktemp)"
-   trap 'rm -f $tmp >/dev/null 2>&1 && trap - HUP INT QUIT TERM EXIT' HUP INT QUIT TERM EXIT
-   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-       lf -last-dir-path="$tmp" "$@"
-   else
-       [ ! -d "$HOME/.cache/lf" ] && mkdir --parents "$HOME/.cache/lf"
-       lf -last-dir-path="$tmp" "$@" 3>&-
-   fi
-   if [ -f "$tmp" ]; then
-       dir="$(cat "$tmp")"
-       rm -f "$tmp" >/dev/null
-       [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
-   fi
+edit-file() {
+    local file
+    file=$(find . -type f | fzf --ansi \
+        --preview 'bat --style=plain --color=always {}' \
+        --height=100% --preview-window="up:70%")
+    [[ -f "$file" ]] && "$EDITOR" "$file"
 }
 
-yazicd () {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp" >/dev/null 2>&1
+lfcd() {
+    local tmp
+    tmp=$(mktemp)
+    trap 'rm -f "$tmp" 2>/dev/null; trap - HUP INT QUIT TERM EXIT' HUP INT QUIT TERM EXIT
+    if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+        lf -last-dir-path="$tmp" "$@"
+    else
+        mkdir -p "$HOME/.cache/lf"
+        lf -last-dir-path="$tmp" "$@" 3>&-
+    fi
+    if [[ -f "$tmp" ]]; then
+        local dir
+        dir=$(cat "$tmp")
+        rm -f "$tmp"
+        [[ -d "$dir" && "$dir" != "$(pwd)" ]] && cd "$dir"
+    fi
 }
 
-# Plugins
-# source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh 2>/dev/null
-# debian
-# source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
-# source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh 2>/dev/null
-source /usr/share/zsh/plugins/pnpm-shell-completion/pnpm-shell-completion.zsh 2>/dev/null
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 2>/dev/null
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.config/zsh/zsh-artisan/artisan.plugin.zsh 2>/dev/null
-source ~/.config/zsh/zsh-wakatime/zsh-wakatime.plugin.zsh 2>/dev/null
+yazicd() {
+    local tmp cwd
+    tmp=$(mktemp -t "yazi-cwd.XXXXXX")
+    yazi "$@" --cwd-file="$tmp"
+    if cwd=$(cat -- "$tmp") && [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+        builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}
 
-# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-# source /usr/share/zsh/scripts/git-prompt.zsh
-# source /usr/share/git-prompt.zsh/examples/ascii.zsh 2>/dev/null
-# eval "$(atuin init zsh)"
-# [[ -s /etc/profile.d/autojump.sh ]] && source /etc/profile.d/autojump.sh
+# ── SSH agent (reuse existing, don't spawn a new one every shell) ─────────────
+if [[ -z "$SSH_AUTH_SOCK" ]]; then
+    # Try to connect to a running agent via a known socket
+    local _agent_sock="$HOME/.ssh/agent.sock"
+    if [[ -S "$_agent_sock" ]]; then
+        export SSH_AUTH_SOCK="$_agent_sock"
+    else
+        eval "$(ssh-agent -s -a "$_agent_sock")" >/dev/null 2>&1
+    fi
+fi
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-#  typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
+# ── Plugins ───────────────────────────────────────────────────────────────────
+# zsh-autosuggestions via Homebrew
+_autosug="$(brew --prefix 2>/dev/null)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -f "$_autosug" ]] && source "$_autosug"
+unset _autosug
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+source "$HOME/.config/zsh/zsh-artisan/artisan.plugin.zsh"    2>/dev/null
+source "$HOME/.config/zsh/zsh-wakatime/zsh-wakatime.plugin.zsh" 2>/dev/null
+
+# ── Powerlevel10k ─────────────────────────────────────────────────────────────
+# Uncomment the instant-prompt block if you use p10k:
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
+[[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+
+# ── Tool initialisations ──────────────────────────────────────────────────────
 eval "$(atuin init zsh)"
 eval "$(zoxide init zsh)"
-eval "$(ssh-agent -s)" > /dev/null 2>&1
 
-# pnpm
+# ── pnpm ──────────────────────────────────────────────────────────────────────
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+[[ ":$PATH:" != *":$PNPM_HOME:"* ]] && export PATH="$PNPM_HOME:$PATH"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# ── fzf ───────────────────────────────────────────────────────────────────────
+[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+
+# ── PATH (personal bins — Homebrew bins come from brew shellenv above) ─────────
+# Only add dirs that exist and aren't already in PATH
+_prepend_path() {
+    local d
+    for d in "$@"; do
+        [[ -d "$d" && ":$PATH:" != *":$d:"* ]] && export PATH="$d:$PATH"
+    done
+}
+_prepend_path \
+    "/usr/local/go/bin" \
+    "$HOME/flutter/bin" \
+    "$HOME/bin" \
+    "$HOME/bin/audio" \
+    "$HOME/bin/i3" \
+    "$HOME/bin/i3-statusbar" \
+    "$HOME/.local/share/npm/bin" \
+    "$HOME/.local/share/go/bin" \
+    "$HOME/.local/share/cargo/bin" \
+    "$HOME/.local/share/nvim/mason/bin" \
+    "$HOME/.config/composer/vendor/bin" \
+    "$HOME/.local/share/gem/ruby/3.3.0/bin" \
+    "/Library/TeX/texbin"
+unset -f _prepend_path

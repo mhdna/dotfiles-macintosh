@@ -44,7 +44,8 @@ export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/pythonrc"
 # Other program settings:
 export DICS="$HOME/.stardict/dic/"
 export SDCV_PAGER='less --quit-if-one-screen -RX'
-export SUDO_ASKPASS="$HOME/bin/menus/askpass_menu"
+# export SUDO_ASKPASS="$HOME/bin/menus/askpass_menu"
+export SUDO_ASKPASS=""
 export MOZ_USE_XINPUT2="1"		# Mozilla smooth scrolling/touchpads.
 export AWT_TOOLKIT="MToolkit wmname LG3D"	#May have to install wmname
 export _JAVA_AWT_WM_NONREPARENTING=1	# Fix for Java applications in dwm/bspwm
@@ -63,6 +64,8 @@ export NPM_PATH="$XDG_DATA_HOME/npm"
 export LSP_SERVERS_PATH="$XDG_DATA_HOME/nvim/mason/bin"
 export PHP_COMPOSER_PATH="$XDG_CONFIG_HOME/composer/vendor/bin"
 # export YDOTOOL_SOCKET="$HOME/.ydotool_socket"
+export PATH="/Library/TeX/texbin:$PATH"
+
 
 export SHIORI_HTTP_SECRET_KEY="X43eZvn7++fF9Anhobepd3yMQsXt0e4LCY7kqPkQNGE=" # (openssl rand -base64 32) to gene_rate a new one
 export GEM_HOME="$XDG_DATA_HOME/gem/ruby/3.3.0/bin/"
@@ -93,7 +96,9 @@ fi
 export HOMEBREW_NO_AUTO_UPDATE=1
 
 # -H for it to not treat symlinks as the dst, but the directories that they point to
-export PATH="$PATH:$(gfind -H $HOME/bin $HOME/bin -type d -printf ":%p"):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME"
+export PATH="$PATH:$(gfind -H $HOME/bin $HOME/bin -type d -printf ":%p"):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME:/usr/local/bin/"
+export JAVA_HOME=$(/usr/libexec/java_home)
+export PATH=$JAVA_HOME/bin:$PATH
 # setsid -f mailsync >/dev/null 2>&1&
 
 # Start graphical server on user's current tty if not already running and put the outputs into ~/.local/share/xorg/
