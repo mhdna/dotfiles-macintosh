@@ -102,6 +102,7 @@ return {
 			-- },
 			-- tsserver = {},
 			vue_ls = {},
+			vtsls = {},
 			-- volar = {
 			-- 	--  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
 			-- 	--  init_options = {
@@ -115,18 +116,9 @@ return {
 			html = {},
 			cssls = {},
 		}
-		local capabilities = require("blink.cmp").get_lsp_capabilities()
 		mason_lspconfig.setup({
 			ensure_installed = vim.tbl_keys(servers),
-			automatic_enable = false,
-			handlers = {
-				function(server_name)
-					require("lspconfig")[server_name].setup({
-						capabilities = capabilities,
-						settings = servers[server_name],
-					})
-				end,
-			},
+			automatic_enable = true,
 		})
 
 		vim.api.nvim_create_user_command("OrganizeImports", function()

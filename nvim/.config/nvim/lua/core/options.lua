@@ -178,7 +178,7 @@ opt.wrap = false
 opt.tabstop = 4
 opt.shiftwidth = 4
 opt.softtabstop = 4
--- opt.expandtab = true
+opt.expandtab = true
 
 opt.breakindent = true
 opt.showbreak = string.rep(" ", 3) -- Make it so that long lines wrap smartly
