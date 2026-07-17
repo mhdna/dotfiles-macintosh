@@ -1,0 +1,2 @@
+# run this for an opencode plugin
+npx @slkiser/opencode-quota init
