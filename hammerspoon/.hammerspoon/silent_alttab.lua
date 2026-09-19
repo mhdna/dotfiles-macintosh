@@ -25,7 +25,3 @@ local function mapAltTab(event)
 end
 tapAltTab = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, mapAltTab)
 tapAltTab:start()
-
-tapAltTab = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, mapAltTab)
-
-tapAltTab:start()

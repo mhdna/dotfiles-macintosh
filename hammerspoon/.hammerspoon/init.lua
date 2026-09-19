@@ -33,6 +33,10 @@ require("app_switcher")
 require("move_windows")
 require("toggle_apps")
 require("per_app_tab_switch")
+require("always_on_top")
+require("kill_window")
+require("app_menu")
+require("quick_shell")
 
 -- require("silent_alttab")
 
@@ -61,7 +65,8 @@ hs.hotkey.bind({ "cmd", "alt" }, "T", function()
         return thePath
     ]])
 	if finderPath then
-		hs.execute("open -a Terminal " .. finderPath)
+		local quotedPath = "'" .. finderPath:gsub("'", "'\\''") .. "'"
+		hs.execute("open -a Terminal " .. quotedPath)
 	end
 end)
 
@@ -90,7 +95,7 @@ hs.hotkey.bind({ "alt" }, "]", function()
 end)
 
 hs.hotkey.bind({ "alt" }, "[", function()
-	hs.spaces.goRight()
+	hs.spaces.goLeft()
 end)
 
 -- -- wait for internet
@@ -186,9 +191,6 @@ hs.hotkey.bind({ "alt" }, "m", function()
 end)
 
 hs.alert.show("configuration reloaded", 0.3)
-
-local isRunning = false
-local timer = nil
 
 local isRunning = false
 local timer = nil
