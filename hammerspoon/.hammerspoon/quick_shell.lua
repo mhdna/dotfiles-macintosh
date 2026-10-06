@@ -1,9 +1,11 @@
--- ctrl+space: a bare, borderless input box (no dropdown/list underneath).
--- Type a command, hit enter -> runs via zsh (aliases loaded), shows output
--- as a brief alert, box disappears immediately. Escape or losing focus
--- dismisses it without running anything.
-local WIDTH = 480
-local HEIGHT = 44
+-- ctrl+space / cmd+shift+space: a bare, borderless input box (no dropdown/list
+-- underneath). Type a command, hit enter -> runs via zsh (aliases loaded),
+-- shows output as a brief alert, box disappears immediately. Escape or
+-- losing focus dismisses it without running anything.
+local menuPosition = require("menu_position")
+
+local WIDTH = 680
+local HEIGHT = 64
 
 local HTML = [[
 <!doctype html>
@@ -24,13 +26,13 @@ local HTML = [[
 		box-sizing: border-box;
 		border: none;
 		outline: none;
-		background: rgba(30, 30, 30, 0.92);
-		color: #f0f0f0;
-		font: 18px Menlo, monospace;
-		padding: 0 14px;
-		border-radius: 10px;
+		background: rgba(255, 105, 180, 0.92);
+		color: #2b0a1a;
+		font: 24px Menlo, monospace;
+		padding: 0 20px;
+		border-radius: 12px;
 	}
-	input::placeholder { color: #888; }
+	input::placeholder { color: #7a3350; }
 </style>
 </head>
 <body>
@@ -51,7 +53,7 @@ local HTML = [[
 		});
 
 		window.addEventListener("blur", function () {
-			webkit.messageHandlers.quickShell.postMessage({ action: "cancel" });
+			webkit.messageHandlers.quickShell.postMessage({ action: "blur" });
 		});
 	</script>
 </body>
@@ -59,10 +61,10 @@ local HTML = [[
 ]]
 
 local function centeredFrame()
-	local screen = hs.screen.mainScreen():frame()
+	local point = menuPosition.point(WIDTH, HEIGHT)
 	return {
-		x = screen.x + (screen.w - WIDTH) / 2,
-		y = screen.y + (screen.h - HEIGHT) / 2 - 100,
+		x = point.x,
+		y = point.y,
 		w = WIDTH,
 		h = HEIGHT,
 	}
@@ -108,8 +110,26 @@ box:level(hs.drawing.windowLevels.modalPanel)
 box:closeOnEscape(true)
 box:html(HTML)
 
+-- whatever window was focused before the box was summoned, so we can give
+-- focus back to it once the box goes away (but not on a plain blur, since
+-- that means focus already moved somewhere the user chose on purpose)
+local previousWindow = nil
+
+local function restoreFocus()
+	if previousWindow then
+		previousWindow:focus()
+		previousWindow = nil
+	end
+end
+
 userContent:setCallback(function(message)
 	local body = message.body
+
+	if body.action == "blur" then
+		box:hide()
+		return
+	end
+
 	box:hide()
 
 	if body.action == "run" then
@@ -124,9 +144,13 @@ userContent:setCallback(function(message)
 			end, { "-i", "-c", body.cmd })
 			:start()
 	end
+
+	restoreFocus()
 end)
 
-hs.hotkey.bind({ "ctrl" }, "space", function()
+local function showQuickShell()
+	previousWindow = hs.window.focusedWindow()
+
 	box:frame(centeredFrame())
 	box:show()
 	box:bringToFront(true)
@@ -137,4 +161,7 @@ hs.hotkey.bind({ "ctrl" }, "space", function()
 	end
 
 	box:evaluateJavaScript([[document.getElementById("cmd").value = ""; document.getElementById("cmd").focus();]])
-end)
+end
+
+hs.hotkey.bind({ "ctrl" }, "space", showQuickShell)
+hs.hotkey.bind({ "cmd", "shift" }, "space", showQuickShell)

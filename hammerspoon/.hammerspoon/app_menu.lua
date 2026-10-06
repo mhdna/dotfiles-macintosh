@@ -1,4 +1,6 @@
 -- cmd+space: small centered, searchable app launcher (Spotlight-style)
+local menuPosition = require("menu_position")
+
 local appDirs = {
 	"/Applications",
 	"/System/Applications",
@@ -64,12 +66,16 @@ local function chooserSelected(choice)
 	end
 end
 
+local CHOOSER_WIDTH_PERCENT = 20
+
 local appChooser = hs.chooser.new(chooserSelected)
 appChooser:searchSubText(false)
-appChooser:width(20)
+appChooser:width(CHOOSER_WIDTH_PERCENT)
 appChooser:placeholderText("Open application...")
 
 hs.hotkey.bind({ "cmd" }, "space", function()
 	appChooser:choices(cachedApps)
-	appChooser:show()
+	local screen = hs.screen.mainScreen():frame()
+	local widthPx = screen.w * (CHOOSER_WIDTH_PERCENT / 100)
+	appChooser:show(menuPosition.point(widthPx))
 end)

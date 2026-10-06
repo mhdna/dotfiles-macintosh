@@ -108,17 +108,28 @@ end)
 -- 	activateOrToggle("org.mozilla.firefox")
 -- end)
 
-hs.hotkey.bind({ "alt" }, "e", function()
-	activateOrToggle("org.gnu.Emacs")
-end)
+-- hs.hotkey.bind({ "alt" }, "e", function()
+-- 	local frontmostApp = hs.application.frontmostApplication()
+--
+-- 	if frontmostApp and frontmostApp:bundleID() == "org.gnu.Emacs" then
+-- 		local previousApp = previousApps["org.gnu.Emacs"]
+-- 		if previousApp then
+-- 			previousApp:activate()
+-- 		end
+-- 	else
+-- 		previousApps["org.gnu.Emacs"] = frontmostApp
+-- 		hs.execute("/opt/homebrew/bin/emacsclient -c -n -a '' &")
+-- 	end
+-- end)
 
-hs.hotkey.bind({ "alt" }, "v", function()
-	activateOrToggle("dev.zed.Zed")
-	-- activateOrToggle("com.vscodium")
-	-- activateOrToggle("com.neovide.neovide")
-	-- activateOrToggle("org.alacritty")
-	-- activateOrToggleKitty("/opt/homebrew/bin/tmux a", "custom-tmux-window")
-end)
+-- disabled per user request
+-- hs.hotkey.bind({ "alt" }, "v", function()
+-- 	activateOrToggle("dev.zed.Zed")
+-- 	-- activateOrToggle("com.vscodium")
+-- 	-- activateOrToggle("com.neovide.neovide")
+-- 	-- activateOrToggle("org.alacritty")
+-- 	-- activateOrToggleKitty("/opt/homebrew/bin/tmux a", "custom-tmux-window")
+-- end)
 
 hs.hotkey.bind({ "alt" }, "n", function()
 	activateOrToggle("md.obsidian")
@@ -159,10 +170,6 @@ end)
 --
 hs.hotkey.bind({ "alt" }, "c", function()
 	activateOrToggle("com.anthropic.claudefordesktop")
-end)
-
-hs.hotkey.bind({ "alt" }, "p", function()
-	activateOrToggle("com.microsoft.Powerpoint")
 end)
 
 -- Switch to Messages by pressing Option+Enter
