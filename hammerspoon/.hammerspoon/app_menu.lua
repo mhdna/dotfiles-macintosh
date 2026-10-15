@@ -4,41 +4,59 @@ local menuPosition = require("menu_position")
 local appDirs = {
 	"/Applications",
 	"/System/Applications",
-	"/System/Applications/Utilities",
 	os.getenv("HOME") .. "/Applications",
 }
 
 local cachedApps = nil
 
+local MAX_DEPTH = 3 -- e.g. /Applications/DaVinci Resolve/DaVinci Resolve.app
+
 local function buildAppList()
 	local apps = {}
 	local seen = {}
 
-	for _, dir in ipairs(appDirs) do
+	local function addApp(path)
+		if seen[path] then
+			return
+		end
+		seen[path] = true
+		local name = path:match("([^/]+)%.app$")
+		local image = nil
+		local info = hs.application.infoForBundlePath(path)
+		if info and info.CFBundleIdentifier then
+			image = hs.image.imageFromAppBundle(info.CFBundleIdentifier)
+		end
+		table.insert(apps, {
+			text = name,
+			subText = path,
+			path = path,
+			image = image,
+		})
+	end
+
+	-- walk subfolders too (Utilities, vendor folders, Chrome/Steam app folders),
+	-- but never descend into .app bundles themselves
+	local function scan(dir, depth)
 		local iterFn, dirObj = hs.fs.dir(dir)
-		if iterFn then
-			for file in iterFn, dirObj do
+		if not iterFn then
+			return
+		end
+		for file in iterFn, dirObj do
+			if file:sub(1, 1) ~= "." then
+				local path = dir .. "/" .. file
 				if file:match("%.app$") then
-					local path = dir .. "/" .. file
-					if not seen[path] then
-						seen[path] = true
-						local name = file:gsub("%.app$", "")
-						local image = nil
-						local info = hs.application.infoForBundlePath(path)
-						if info and info.CFBundleIdentifier then
-							image = hs.image.imageFromAppBundle(info.CFBundleIdentifier)
-						end
-						table.insert(apps, {
-							text = name,
-							subText = path,
-							path = path,
-							image = image,
-						})
-					end
+					addApp(path)
+				elseif depth < MAX_DEPTH and not file:match("%.bundle$") and hs.fs.attributes(path, "mode") == "directory" then
+					scan(path, depth + 1)
 				end
 			end
 		end
 	end
+
+	for _, dir in ipairs(appDirs) do
+		scan(dir, 1)
+	end
+	addApp("/System/Library/CoreServices/Finder.app")
 
 	table.sort(apps, function(a, b)
 		return a.text:lower() < b.text:lower()

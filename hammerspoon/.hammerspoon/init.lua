@@ -44,6 +44,9 @@ require("always_on_top")
 require("kill_window")
 require("app_menu")
 require("quick_shell")
+require("script_launcher")
+require("time_tracker")
+require("finder_redirect")
 
 -- require("silent_alttab")
 
@@ -100,6 +103,11 @@ end)
 
 -- show mission control
 hs.hotkey.bind({ "alt" }, "tab", function()
+	hs.spaces.toggleMissionControl()
+end)
+
+-- opt+`: the same, all open windows at a glance
+hs.hotkey.bind({ "alt" }, "`", function()
 	hs.spaces.toggleMissionControl()
 end)
 
@@ -563,11 +571,59 @@ hs.hotkey.bind({ "alt" }, "r", function()
 	toggleApp("com.mahdi.lf-gui")
 end)
 
-hs.hotkey.bind({ "alt" }, "m", function()
+-- disabled for now in favour of the vertical/horizontal toggles below
+-- hs.hotkey.bind({ "alt" }, "m", function()
+-- 	local win = hs.window.focusedWindow()
+-- 	if win and win:isStandard() then
+-- 		win:maximize()
+-- 	end
+-- end)
+
+-- opt+m: toggle filling the screen's height; opt+shift+m: its width.
+-- The other dimension stays put, and a second press restores the window.
+local savedFrames = { vertical = {}, horizontal = {} }
+
+local function toggleStretch(direction)
 	local win = hs.window.focusedWindow()
-	if win and win:isStandard() then
-		win:maximize()
+	if not win or not win:isStandard() then
+		return
 	end
+	local id = win:id()
+	local frame = win:frame()
+	local screen = win:screen():frame() -- excludes the menu bar and Dock
+	-- Decide from the window's actual size, not from memory: resizing it by
+	-- hand after stretching means the next press should stretch again.
+	local close = function(a, b) return math.abs(a - b) <= 2 end
+	local stretched
+	if direction == "vertical" then
+		stretched = close(frame.y, screen.y) and close(frame.h, screen.h)
+	else
+		stretched = close(frame.x, screen.x) and close(frame.w, screen.w)
+	end
+
+	local saved = savedFrames[direction][id]
+	if stretched then
+		if saved then
+			win:setFrame(saved, 0)
+		end
+		savedFrames[direction][id] = nil
+		return
+	end
+	savedFrames[direction][id] = frame:copy()
+	if direction == "vertical" then
+		frame.y, frame.h = screen.y, screen.h
+	else
+		frame.x, frame.w = screen.x, screen.w
+	end
+	win:setFrame(frame, 0)
+end
+
+hs.hotkey.bind({ "alt" }, "m", function()
+	toggleStretch("vertical")
+end)
+
+hs.hotkey.bind({ "alt", "shift" }, "m", function()
+	toggleStretch("horizontal")
 end)
 
 hs.alert.show("configuration reloaded", 0.3)
@@ -610,6 +666,11 @@ hs.hotkey.bind({ "alt" }, "b", function()
 	hs.task.new("/usr/bin/pkill", nil, { "-SIGINFO", "-x", "PopDefine" }):start()
 end)
 
+-- open the "add word" popup (type a word/phrase and pick a category)
+hs.hotkey.bind({ "alt", "shift" }, "b", function()
+	hs.task.new("/usr/bin/pkill", nil, { "-SIGURG", "-x", "PopDefine" }):start()
+end)
+
 hs.hotkey.bind({ "cmd", "alt" }, "R", function()
 	if isRunning then
 		if timer then
@@ -639,3 +700,44 @@ tildeKeyTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
 	return false
 end)
 tildeKeyTap:start()
+
+-- ctrl+opt+cmd+r: reload the Hammerspoon config. If Hammerspoon itself stops, the
+-- LaunchAgent com.mahdi.hammerspoon-keepalive starts it again within ~10 s.
+hs.hotkey.bind({ "ctrl", "alt", "cmd" }, "r", function()
+	hs.reload()
+end)
+
+-- open or focus lf-gui (~/Code/mac-utils/lf-gui)
+hs.hotkey.bind({ "alt" }, "f", function()
+	hs.application.launchOrFocusByBundleID("com.mahdi.lf-gui")
+end)
+
+-- open or focus mxiv (~/Code/mac-utils/mxiv); launched bare it shows ~/Pictures
+hs.hotkey.bind({ "alt" }, "p", function()
+	hs.application.launchOrFocusByBundleID("com.mahdi.mxiv")
+end)
+
+-- open or focus VED, the vim-style text editor (~/Code/mac-utils/ved)
+hs.hotkey.bind({ "alt" }, "v", function()
+	hs.application.launchOrFocusByBundleID("com.mahdi.ved")
+end)
+
+-- bring every open mpv window to the front (never launches mpv)
+hs.hotkey.bind({ "alt", "shift" }, "p", function()
+	local mpv = hs.application.get("mpv")
+	if not mpv then
+		hs.alert.show("mpv isn't running", 0.6)
+		return
+	end
+	for _, win in ipairs(mpv:allWindows()) do
+		if win:isMinimized() then
+			win:unminimize()
+		end
+	end
+	mpv:activate(true) -- true: raise all of its windows, not just the main one
+end)
+
+-- cmd+shift+q: put the Mac to sleep (replaces macOS's Log Out shortcut)
+hs.hotkey.bind({ "cmd", "shift" }, "q", function()
+	hs.caffeinate.systemSleep()
+end)
