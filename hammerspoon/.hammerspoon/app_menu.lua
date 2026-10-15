@@ -78,9 +78,11 @@ for _, dir in ipairs(appDirs) do
 	table.insert(appDirWatchers, watcher)
 end
 
+-- Launched in the background with `open -a` (launchOrFocus blocks until the
+-- app finishes launching, which kept the menu on screen for slow apps).
 local function chooserSelected(choice)
 	if choice then
-		hs.application.launchOrFocus(choice.path)
+		hs.task.new("/usr/bin/open", nil, { "-a", choice.path }):start()
 	end
 end
 

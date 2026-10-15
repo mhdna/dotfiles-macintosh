@@ -12,16 +12,18 @@ local function run(choice)
 		return
 	end
 	hs.alert.show(choice.text .. "…", 1)
-	hs.task
-		.new("/bin/zsh", function(exitCode, stdOut, stdErr)
-			if exitCode == 0 then
-				hs.alert.show(choice.text .. ": ready", 1.5)
-			else
-				local err = ((stdErr or "") .. (stdOut or "")):gsub("%s+$", "")
-				hs.alert.show(choice.text .. " failed:\n" .. err:sub(-300), 6)
-			end
-		end, { "-i", "-c", choice.cmd })
-		:start()
+	hs.timer.doAfter(0, function() -- let the menu close first
+		hs.task
+			.new("/bin/zsh", function(exitCode, stdOut, stdErr)
+				if exitCode == 0 then
+					hs.alert.show(choice.text .. ": ready", 1.5)
+				else
+					local err = ((stdErr or "") .. (stdOut or "")):gsub("%s+$", "")
+					hs.alert.show(choice.text .. " failed:\n" .. err:sub(-300), 6)
+				end
+			end, { "-i", "-c", choice.cmd })
+			:start()
+	end)
 end
 
 local chooser = hs.chooser.new(run)

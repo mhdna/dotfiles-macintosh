@@ -484,7 +484,9 @@ end)
 -- switch default input (microphone) via a Spotlight-like chooser
 local micChooser = hs.chooser.new(function(choice)
 	if choice then
-		hs.audiodevice.findInputByName(choice.text):setDefaultInputDevice()
+		hs.timer.doAfter(0, function() -- let the menu close first
+			hs.audiodevice.findInputByName(choice.text):setDefaultInputDevice()
+		end)
 	end
 end)
 micChooser:width(20)
@@ -516,7 +518,9 @@ end)
 -- switch default output (speakers/headphones) via a Spotlight-like chooser
 local outputChooser = hs.chooser.new(function(choice)
 	if choice then
-		hs.audiodevice.findOutputByName(choice.text):setDefaultOutputDevice()
+		hs.timer.doAfter(0, function() -- let the menu close first
+			hs.audiodevice.findOutputByName(choice.text):setDefaultOutputDevice()
+		end)
 	end
 end)
 outputChooser:width(20)
