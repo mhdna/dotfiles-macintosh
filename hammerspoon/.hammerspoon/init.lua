@@ -9,10 +9,15 @@ end
 configFileWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig)
 configFileWatcher:start()
 
--- all hs.alert.show(...) notifications: magenta background, black text
-hs.alert.defaultStyle.fillColor = { red = 1, green = 0, blue = 1, alpha = 0.9 }
-hs.alert.defaultStyle.strokeColor = { white = 0, alpha = 1 }
-hs.alert.defaultStyle.textColor = { white = 0, alpha = 1 }
+-- all hs.alert.show(...) notifications: dark warm gray-brown (matches the
+-- Driftwood browser theme), soft taupe border, warm off-white text
+hs.alert.defaultStyle.fillColor = { red = 46 / 255, green = 41 / 255, blue = 37 / 255, alpha = 0.95 }
+hs.alert.defaultStyle.strokeColor = { red = 120 / 255, green = 106 / 255, blue = 92 / 255, alpha = 0.9 }
+hs.alert.defaultStyle.strokeWidth = 1.5
+hs.alert.defaultStyle.textColor = { red = 232 / 255, green = 223 / 255, blue = 211 / 255, alpha = 1 }
+hs.alert.defaultStyle.textSize = 20
+hs.alert.defaultStyle.radius = 12
+hs.alert.defaultStyle.padding = 18
 
 -- ---------------------------------------------------------
 -- KEYBOARD SHORTCUTS SECTION
@@ -101,15 +106,21 @@ hs.hotkey.bind({ "cmd" }, "`", function()
 	end
 end)
 
+-- Mission Control opened while a modifier is still held acts as "press and
+-- hold to peek" and closes again as soon as the modifier is released, so a
+-- quick tap aborts it mid-animation. Wait for the modifiers to come up first.
+local function toggleMissionControlAfterRelease()
+	hs.timer.waitUntil(function()
+		local m = hs.eventtap.checkKeyboardModifiers()
+		return not (m.alt or m.cmd or m.ctrl or m.shift)
+	end, hs.spaces.toggleMissionControl, 0.01)
+end
+
 -- show mission control
-hs.hotkey.bind({ "alt" }, "tab", function()
-	hs.spaces.toggleMissionControl()
-end)
+hs.hotkey.bind({ "alt" }, "tab", toggleMissionControlAfterRelease)
 
 -- opt+`: the same, all open windows at a glance
-hs.hotkey.bind({ "alt" }, "`", function()
-	hs.spaces.toggleMissionControl()
-end)
+hs.hotkey.bind({ "alt" }, "`", toggleMissionControlAfterRelease)
 
 hs.hotkey.bind({ "alt" }, "]", function()
 	hs.spaces.goRight()
@@ -687,23 +698,37 @@ hs.hotkey.bind({ "cmd", "alt" }, "R", function()
 end)
 
 -- Remap § key (ISO keycode 10) to ` (backtick); shift+§ to ~ (tilde).
--- Replaces the Karabiner rule that is no longer active.
-tildeKeyTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
-	if e:getKeyCode() == 10 then
-		if e:getFlags().shift then
-			hs.eventtap.keyStroke({ "shift" }, "`", 0)
-		else
-			hs.eventtap.keyStroke({}, "`", 0)
-		end
+-- Replaces the Karabiner rule that is no longer active. Keyboards like the
+-- MX Keys Mini send keycode 10 for the key left of 1, so the down and up
+-- events are mirrored one-for-one as ` with the held modifiers. A stray
+-- keyUp (or a full keystroke fired on keyDown) makes cmd+` / opt+` hotkeys
+-- misbehave, e.g. Mission Control starting to open and then aborting.
+local eventTypes = hs.eventtap.event.types
+tildeKeyTap = hs.eventtap.new({ eventTypes.keyDown, eventTypes.keyUp }, function(e)
+	if e:getKeyCode() ~= 10 then
+		return false
+	end
+	local flags = e:getFlags()
+	local isDown = e:getType() == eventTypes.keyDown
+	local isRepeat = e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat) ~= 0
+	-- Held hotkey combos shouldn't fire again on repeat; plain typing keeps it.
+	if isDown and isRepeat and (flags.cmd or flags.alt or flags.ctrl) then
 		return true
 	end
-	return false
+	local mods = {}
+	for _, m in ipairs({ "cmd", "alt", "ctrl", "shift", "fn" }) do
+		if flags[m] then
+			table.insert(mods, m)
+		end
+	end
+	hs.eventtap.event.newKeyEvent(mods, "`", isDown):post()
+	return true
 end)
 tildeKeyTap:start()
 
--- ctrl+opt+cmd+r: reload the Hammerspoon config. If Hammerspoon itself stops, the
+-- ctrl+opt+r: reload the Hammerspoon config. If Hammerspoon itself stops, the
 -- LaunchAgent com.mahdi.hammerspoon-keepalive starts it again within ~10 s.
-hs.hotkey.bind({ "ctrl", "alt", "cmd" }, "r", function()
+hs.hotkey.bind({ "ctrl", "alt" }, "r", function()
 	hs.reload()
 end)
 
