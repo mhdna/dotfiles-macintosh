@@ -1,0 +1,103 @@
+#!/bin/sh
+# Close panes in this window, three ways (the keys are in tmux.conf):
+#
+#   alt+shift+c        Each pane gets a number, in a yellow label on its top
+#                      border, that it keeps until you're done: press one to
+#                      close that pane, the others keep theirs. esc (or any
+#                      other key) stops, and so does getting down to one pane.
+#                      The keys come from the close-panes key table.
+#   ctrl+alt+shift+c   After a y/n, close every pane but this one.
+#   ctrl+alt+shift+o   After a y/n, close the panes sitting at a bare shell
+#                      prompt (zsh, bash, sh, fish), but not this one.
+#
+# A Claude Code pane (its command is its version, 2.1.308) is never closed
+# while its folder has uncommitted git changes: it's asked to commit instead,
+# and you close it once it has.
+#
+#   tmux-close-panes <client> <window>                 number the panes, wait for a key
+#   tmux-close-panes <client> <window> <number>        close that pane, wait for the next
+#   tmux-close-panes <client> <window> --done          take the numbers off
+#   tmux-close-panes <client> <window> --others <pane> ask, then close all but <pane>
+#   tmux-close-panes <client> <window> --idle <pane>   ask, then close idle shells but <pane>
+#   (--others-now / --idle-now: the same, once you've said y)
+
+client=$1 window=$2
+shift
+
+COMMIT_PROMPT="commit your changes"
+
+done_() {
+	set -- set -wu -t "$window" pane-border-status \; set -wu -t "$window" pane-border-format
+	for pane in $(tmux list-panes -t "$window" -F '#{pane_id}'); do
+		set -- "$@" \; set -pu -t "$pane" @close-num
+	done
+	tmux "$@"
+}
+
+# Closes a pane, or, for a Claude pane with uncommitted work, asks it to
+# commit and fails.
+close() {
+	info=$(tmux display-message -p -t "$1" '#{pane_current_command}	#{pane_current_path}')
+	cmd=${info%%	*} dir=${info#*	}
+	if printf '%s\n' "$cmd" | grep -qE '^([0-9]+\.){2}[0-9]+$|^claude$' &&
+		[ -n "$(git -C "$dir" status --porcelain 2>/dev/null | head -n 1)" ]; then
+		tmux send-keys -t "$1" -l "$COMMIT_PROMPT" \; send-keys -t "$1" Enter
+		return 1
+	fi
+	tmux kill-pane -t "$1"
+}
+
+# The panes --others / --idle would close.
+pick() {
+	tmux list-panes -t "$window" -F '#{pane_id} #{pane_current_command}' |
+		awk -v keep="$2" -v idle="$1" '$1 != keep && (idle != "--idle" || $2 ~ /^-?(zsh|bash|sh|fish)$/) { print $1 }'
+}
+
+plural() { if [ "$1" = 1 ]; then echo "$1 $2"; else echo "$1 $2s"; fi; }
+
+case $2 in
+--done)
+	done_
+	;;
+--others | --idle)
+	n=$(pick "$2" "$3" | wc -l | tr -d ' ')
+	if [ "$n" = 0 ]; then
+		tmux display-message -c "$client" "No panes to close"
+		exit 0
+	fi
+	[ "$2" = --idle ] && what="idle $(plural "$n" pane)" || what="$(plural "$n" other\ pane)"
+	tmux confirm-before -t "$client" -p "Close $what? (y/n)" \
+		"run-shell \"'$0' '$client' '$window' $2-now '$3'\""
+	;;
+--others-now | --idle-now)
+	closed=0 kept=0
+	for pane in $(pick "${2%-now}" "$3"); do
+		if close "$pane"; then closed=$((closed + 1)); else kept=$((kept + 1)); fi
+	done
+	msg="Closed $(plural "$closed" pane)"
+	[ "$kept" -gt 0 ] && msg="$msg; asked $kept Claude to commit first"
+	tmux display-message -c "$client" "$msg"
+	;;
+[1-9])
+	pane=$(tmux list-panes -t "$window" -F '#{@close-num} #{pane_id}' | awk -v n="$2" '$1 == n { print $2 }')
+	if [ -n "$pane" ] && ! close "$pane"; then
+		tmux display-message -c "$client" "$2 has uncommitted work: asked Claude to commit first"
+	fi
+	if [ "$(tmux list-panes -t "$window" | wc -l)" -gt 1 ]; then
+		tmux switch-client -c "$client" -T close-panes
+	else
+		done_
+	fi
+	;;
+*)
+	[ "$(tmux list-panes -t "$window" | wc -l)" -gt 1 ] || exit 0
+	set -- set -w -t "$window" pane-border-status top \; \
+		set -w -t "$window" pane-border-format '#[fg=#1c1c1c,bg=#f0c049,bold] #{@close-num} #[default]'
+	n=0
+	for pane in $(tmux list-panes -t "$window" -F '#{pane_id}'); do
+		n=$((n + 1))
+		[ "$n" -le 9 ] && set -- "$@" \; set -p -t "$pane" @close-num "$n"
+	done
+	tmux "$@" \; switch-client -c "$client" -T close-panes
+	;;
+esac

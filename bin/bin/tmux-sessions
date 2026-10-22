@@ -1,0 +1,69 @@
+#!/bin/sh
+# Jump to another window (tab) in this tmux session: alt+u.
+#
+# A centred fzf popup lists every window, the ones you were in most recently
+# first (so alt+u, enter flips between two; tmux.conf's hooks keep
+# count), with the one you're in greyed out on top, where it can't be picked.
+# Type to match the window name or its folder. popup-*
+# sessions (tmux-popup's scratch terminals) are left out.
+#
+#   enter        switch (a name that matches nothing opens a new window)
+#   ctrl-x       close the selected window
+#   esc, alt-u   close
+#
+#   tmux-sessions                                  show the popup
+#   tmux-sessions --pick <client> <dir> <window>   the picker (inside the popup)
+#   tmux-sessions --list <window>                  the list, for the picker
+
+if [ "$1" = --list ]; then
+	# window id<TAB>what's shown: index:name, folder (yellow, blue, green); the
+	# current window first, all dimmed, for fzf's --header-lines
+	tmux list-windows -a -F '#{?@used,#{@used},0}	#{window_id}	#{session_name}	#{window_index}	#{window_name}	#{pane_current_path}' |
+		sort -s -t '	' -k1,1nr |
+		awk -F '\t' -v cur="$2" -v home="$HOME" '{
+			path = $6; if (index(path, home) == 1) path = "~" substr(path, length(home) + 1)
+			pad = 25 - length($4 ":" $5); if (pad < 1) pad = 1
+			line = sprintf("%s\t\033[38;2;240;192;73m%s\033[0m:\033[38;2;122;162;247m%s\033[0m%*s\033[38;2;158;206;106m%s\033[0m", $2, $4, $5, pad, "", path)
+			if ($2 == cur) print $2 "\t\033[38;5;239m" sprintf("%-24s %s", $4 ":" $5, path) "\033[0m"
+			else if ($3 !~ /^popup-/) rest = rest line "\n"
+		} END { printf "%s", rest }'
+	exit 0
+fi
+
+if [ "$1" = --pick ]; then
+	client=$2 dir=$3 current=$4
+	out=$("$0" --list "$current" | fzf --ansi --print-query --no-sort --cycle --reverse \
+		--no-scrollbar --delimiter='\t' --with-nth=2.. --header-lines=1 \
+		--prompt='  ' --pointer='▶' --info=inline-right \
+		--header='enter switch · ctrl-x close window · esc close' \
+		--color='bg+:#283457,fg+:#ffffff:bold,hl:#ff9e64:bold,hl+:#ff9e64:bold,pointer:#bb9af7,prompt:#7dcfff,query:#ffffff,header:#bb9af7,info:#7dcfff,gutter:-1,separator:#3b4261,spinner:#bb9af7' \
+		--bind='alt-u:abort' \
+		--bind="ctrl-x:execute-silent(tmux kill-window -t \"\$(printf %s {} | cut -f1)\")+reload('$0' --list '$current')")
+	[ $? -eq 130 ] && exit 0 # esc / alt-u
+	query=$(printf '%s\n' "$out" | head -n 1)
+	target=$(printf '%s\n' "$out" | sed -n 2p | cut -f1)
+	if [ -z "$target" ]; then
+		[ -z "$query" ] && exit 0
+		tmux new-window -t "$current" -n "$query" -c "$dir"
+		exit 0
+	fi
+	tmux switch-client -c "$client" -t "$target"
+	exit 0
+fi
+
+info=$(tmux display-message -p '#{client_name}	#{pane_current_path}	#{window_id}')
+client=${info%%	*}
+rest=${info#*	}
+dir=${rest%%	*}
+current=${rest#*	}
+
+# As tall as the list, within the window.
+count=$("$0" --list "$current" | wc -l | tr -d ' ')
+ch=$(tmux display-message -p '#{client_height}')
+h=$((count + 5))
+[ "$h" -gt $((ch * 7 / 10)) ] && h=$((ch * 7 / 10))
+[ "$h" -lt 8 ] && h=8
+
+tmux display-popup -E -x C -y C -w 80 -h "$h" -b rounded -T '#[fg=#bb9af7,bold] windows ' \
+	-S 'fg=#7aa2f7,bg=#000000' \
+	"'$0' --pick '$client' '$dir' '$current'"

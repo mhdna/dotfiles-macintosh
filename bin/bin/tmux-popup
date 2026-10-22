@@ -1,19 +1,28 @@
 #!/bin/sh
+# A toggleable popup terminal: opt+i opens session <name> in a centred popup,
+# opt+i inside it closes the popup (the session keeps running).
+#
+#   tmux-popup <name> [command…]
+#
+# A new session starts in the folder of the pane you opened it from.
 
-set -e
+name=$1
+[ -z "$name" ] && { tmux display-message "tmux-popup: needs a session name"; exit 1; }
+shift
 
-CURRENT_PANE="$(tmux display-message -p -F "#{session_name}")"
-popup_name="$1"
-[ "$popup_name" = "" ] && echo "You must provide a name."
-shift 1
-command="$@"
+# One query for both: the current session, and the pane's folder.
+info=$(tmux display-message -p '#{session_name}	#{pane_current_path}')
+session=${info%%	*}
+dir=${info#*	}
 
-if echo "$CURRENT_PANE" | grep -q "^$popup_name"; then
-	tmux detach-client
-else
-	# if [ "$1" = "single" ]; then
-	# 	tmux popup -d '#{pane_current_path}' -x50% -y50% -w50% -h50% -E "tmux attach -t 'p-$CURRENT_PANE' || tmux new -s 'p-$CURRENT_PANE'" || true
-	# else
-	tmux popup -xC -y0 -w70% -h80% -E "tmux attach -t $popup_name || tmux new -s $popup_name $command" || true
-	# fi
+if [ "$session" = "$name" ]; then
+	tmux detach-client # we're inside the popup: close it
+	exit 0
 fi
+
+# Attach straight away if the session exists (the fast path, nothing else
+# runs); only a new session also gets its status bar hidden.
+tmux display-popup -E -x C -y C -w 75% -h 75% -d "$dir" \
+	-b simple -S 'fg=#8a8a8a,bg=#000000' \
+	"env -u TMUX tmux attach-session -t '$name' 2>/dev/null ||
+	 env -u TMUX tmux new-session -s '$name' -c '$dir' $* \\; set-option status off" || true

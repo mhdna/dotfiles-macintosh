@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Gathers a tmux session's panes into one window per project, named after it.
 
-    tmux-organize [session] [--dry-run]
+    tmux-organize [session] [--dry-run | --confirm]
+
+--confirm shows the plan in a centred popup first and only goes ahead on y.
 
 A pane's project comes from its folder:
   - a line in ~/.config/tmux/projects ("<folder> <window name>") wins, longest folder first;
@@ -11,7 +13,7 @@ A project whose name starts with another's and a dash goes in with it: kashi-pos
 join kashi when there is a kashi.
 
 Each project keeps the window that already holds most of its panes; the others are moved in and
-the window is tiled. Windows left empty close. Bound to alt+shift+o in tmux.conf.
+the window is tiled. Windows left empty close. Bound to alt+shift+o (with --confirm) in tmux.conf.
 """
 
 import os
@@ -72,9 +74,22 @@ def merge_families(groups):
     return {pane: family[name] for pane, name in groups.items()}
 
 
+def read_key():
+    """One keypress, without waiting for enter."""
+    import termios
+    import tty
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        return sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+
 def main():
     args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
-    dry = "--dry-run" in sys.argv
+    dry = "--dry-run" in sys.argv or "--ask" in sys.argv
     session = args[0] if args else tmux("display-message", "-p", "#{session_name}").strip()
 
     fields = "#{pane_id}\t#{window_id}\t#{window_index}\t#{window_name}\t#{pane_active}\t#{window_active}\t#{pane_current_path}"
@@ -103,6 +118,16 @@ def main():
 
     moves = [p for p in panes if target.get(groups[p["pane"]]) != p["window"]]
     homeless = sorted({groups[p["pane"]] for p in panes} - set(target))
+    if "--confirm" in sys.argv:
+        if not moves:
+            tmux("display-message", "Already organized")
+            return
+        # The plan's lines, the prompt and the popup's border and padding.
+        height = len({*target, *homeless}) + len(moves) + 5
+        tmux("display-popup", "-E", "-x", "C", "-y", "C", "-w", "90", "-h", str(height),
+             "-b", "rounded", "-T", " organize ", "-S", "fg=#8a8a8a,bg=#000000",
+             f"'{os.path.abspath(__file__)}' '{session}' --ask", check=False)
+        return
     if dry:
         for name in sorted({*target, *homeless}):
             members = [p for p in panes if groups[p["pane"]] == name]
@@ -111,6 +136,10 @@ def main():
             for p in members:
                 if p in moves:
                     print(f"{'':20}    move {p['pane']} from window {p['index']} ({p['path'].replace(HOME, '~')})")
+        if "--ask" in sys.argv:
+            print("\nOrganize? [y/n] ", end="", flush=True)
+            if read_key().lower() == "y":
+                subprocess.Popen([os.path.abspath(__file__), session], start_new_session=True)
         return
 
     focused = next((p["pane"] for p in panes if p["focused"]), None)

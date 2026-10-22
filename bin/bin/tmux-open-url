@@ -1,0 +1,70 @@
+#!/bin/sh
+# Open (or copy) a link from a tmux pane: prefix u.
+#
+# tmux runs this with the pane's id. It collects the links in that pane and
+# its scrollback; with none it just says so, otherwise it opens a centred
+# popup sized to fit them and runs itself again inside it as the picker.
+#
+#   enter   open (tab marks several, enter opens them all)
+#   ctrl-y  copy
+#   esc     close
+#
+#   tmux-open-url [pane-id]          collect, then show the popup
+#   tmux-open-url --pick <file>      the picker (inside the popup)
+
+if [ "$1" = --pick ]; then
+	list=$2
+	out=$(fzf <"$list" --multi --no-sort --cycle --reverse --no-scrollbar \
+		--prompt='  ' --pointer='▶' --marker='+' --info=inline-right \
+		--header='enter open · tab mark · ctrl-y copy · esc close' \
+		--color='bg+:#3c3836,fg+:#ebdbb2,hl:#fabd2f,hl+:#fabd2f,pointer:#fabd2f,marker:#b8bb26,prompt:#fabd2f,header:#928374,info:#928374' \
+		--expect=ctrl-y)
+	rm -f "$list"
+	key=$(printf '%s\n' "$out" | head -n 1)
+	urls=$(printf '%s\n' "$out" | tail -n +2 | sed '/^$/d')
+	[ -z "$urls" ] && exit 0
+	if [ "$key" = ctrl-y ]; then
+		printf '%s' "$urls" | pbcopy
+		n=$(printf '%s\n' "$urls" | wc -l | tr -d ' ')
+		if [ "$n" = 1 ]; then msg="copied $urls"; else msg="copied $n links"; fi
+		tmux display-message "$msg"
+	else
+		printf '%s\n' "$urls" | while IFS= read -r url; do open "$url"; done
+	fi
+	exit 0
+fi
+
+pane=${1:-$(tmux display-message -p '#{pane_id}')}
+list=$(mktemp "${TMPDIR:-/tmp}/tmux-urls.XXXXXX")
+
+# Wrapped lines joined (-J), so long links come out whole; bare www. links
+# get http://; trailing punctuation is trimmed; newest first, no repeats.
+tmux capture-pane -t "$pane" -J -p -S -5000 |
+	grep -oE '((https?|ftp|file|ssh|git|mailto|magnet):|www\.)[^][[:space:]<>"`'"'"'(){}|\\^]+' |
+	sed -E 's/[.,;:!?*_~]+$//; s#^www\.#http://www.#' |
+	awk '!seen[$0]++' |
+	awk '{ l[NR] = $0 } END { for (i = NR; i > 0; i--) print l[i] }' >"$list"
+
+count=$(wc -l <"$list" | tr -d ' ')
+if [ "$count" -eq 0 ]; then
+	rm -f "$list"
+	tmux display-message -d 1500 "no links in this pane"
+	exit 0
+fi
+
+# Fit the popup to the list: as wide as the longest link (or the help line),
+# as tall as the list, within the window.
+cw=$(tmux display-message -p '#{client_width}')
+ch=$(tmux display-message -p '#{client_height}')
+longest=$(awk '{ if (length > m) m = length } END { print m }' "$list")
+w=$((longest + 8))
+[ "$w" -lt 56 ] && w=56
+[ "$w" -gt $((cw * 9 / 10)) ] && w=$((cw * 9 / 10))
+h=$((count + 5))
+[ "$h" -gt $((ch * 7 / 10)) ] && h=$((ch * 7 / 10))
+[ "$h" -lt 8 ] && h=8
+if [ "$count" = 1 ]; then title=" 1 link "; else title=" $count links "; fi
+
+tmux display-popup -E -x C -y C -w "$w" -h "$h" -b rounded -T "$title" \
+	-S 'fg=#665c54,bg=#000000' -s 'bg=#1d1d1d' \
+	"'$0' --pick '$list'"
