@@ -7,6 +7,8 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "format_on_save": "on",
+  "relative_line_numbers": "wrapped",
   "proxy": "",
   "terminal": {
     "font_family": "Menlo",
@@ -23,10 +25,12 @@
     "dock": "right",
   },
   "agent": {
+    "default_profile": "write",
     "default_model": {
-      "provider": "opencode",
-      "model": "go/minimax-m2.5",
-      "enable_thinking": false,
+      "effort": "medium",
+      "provider": "openai-subscribed",
+      "model": "gpt-5.6-luna",
+      "enable_thinking": true,
     },
     "dock": "left",
     "favorite_models": [
@@ -45,7 +49,7 @@
         "provider": "opencode",
         "model": "go/deepseek-v4-pro",
         "enable_thinking": true,
-        "effort": "max",
+        "effort": "high",
       },
       {
         "provider": "opencode",
@@ -102,11 +106,11 @@
   "buffer_font_size": 15.0,
   "theme": {
     "mode": "dark",
-    "light": "Acme Light",
-    "dark": "Gruvbox Dark",
+    "light": "Gruvbox Light",
+    "dark": "One Dark",
   },
-  "experimental.theme_overrides": {
-    "panel.background": "#000000",
-    "terminal.background": "#000000",
-  },
+  // "experimental.theme_overrides": {
+  //   "panel.background": "#000000",
+  //   "terminal.background": "#000000",
+  // },
 }
