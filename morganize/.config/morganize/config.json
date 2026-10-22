@@ -9,6 +9,7 @@
         "dev.zed.Zed",
         "com.neovide.neovide",
         "org.gnu.Emacs",
+        "org.gnu.EmacsClient",
         "org.vim.MacVim",
         "com.vscodium",
         "md.obsidian",
@@ -18,11 +19,43 @@
         "com.microsoft.Excel",
         "com.microsoft.Powerpoint",
         "com.microsoft.onenote.mac",
+        "com.google.drivefs.shortcuts.docs",
+        "com.google.drivefs.shortcuts.sheets",
+        "com.google.drivefs.shortcuts.slides",
         "at.eggerapps.Postico",
+        "at.eggerapps.mdbviewer",
         "rest.chapar.app",
-        "com.docker.docker"
+        "com.docker.docker",
+        "info.filesmanager.Files",
+        "com.anthropic.claudefordesktop",
+        "com.openai.codex",
+        "org.learningequality.Kolibri",
+        "com.amazon.Lassen",
+        "com.cheesebanana.PaperFuse"
       ],
       "name" : "Productivity",
+      "times" : [
+        {
+          "days" : "every day",
+          "from" : "00:00",
+          "to" : "24:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.blackmagic-design.DaVinciResolve",
+        "com.adobe.AfterEffects.application",
+        "com.obsproject.obs-studio",
+        "com.timpler.screenstudio",
+        "org.audacityteam.audacity",
+        "no.mifi.losslesscut-mac",
+        "com.blackmagic-design.BlackmagicProxyGeneratorStudio",
+        "com.canva.canvaeditor",
+        "com.muse.musehub",
+        "net.voicemod.desktop"
+      ],
+      "name" : "Creative",
       "times" : [
         {
           "days" : "every day",
@@ -42,6 +75,63 @@
           "days" : "every day",
           "from" : "21:00",
           "to" : "21:30"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "net.whatsapp.WhatsApp",
+        "com.tinyspeck.slackmacgap",
+        "com.microsoft.Outlook"
+      ],
+      "name" : "Messaging",
+      "times" : [
+        {
+          "days" : "every day",
+          "from" : "08:00",
+          "to" : "22:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.colliderli.iina",
+        "org.videolan.vlc",
+        "com.ranchero.NetNewsWire-Evergreen",
+        "org.qbittorrent.qBittorrent",
+        "org.nicotine_plus.Nicotine"
+      ],
+      "name" : "Entertainment",
+      "times" : [
+        {
+          "days" : "weekdays",
+          "from" : "18:00",
+          "to" : "24:00"
+        },
+        {
+          "days" : "weekends",
+          "from" : "10:00",
+          "to" : "24:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.neowiz.game.lop.steam",
+        "com.isaacmarovitz.Whisky",
+        "com.paulthetall.portingkit"
+      ],
+      "name" : "Games",
+      "times" : [
+        {
+          "days" : "weekdays",
+          "from" : "19:00",
+          "to" : "24:00"
+        },
+        {
+          "days" : "weekends",
+          "from" : "10:00",
+          "to" : "24:00"
         }
       ]
     }
@@ -66,6 +156,26 @@
       "wikimedia.org",
       "wikipedia.org"
     ],
-    "enabled" : false
+    "enabled" : true,
+    "timed" : [
+      {
+        "name" : "YouTube",
+        "sites" : [
+          "youtube.com",
+          "youtu.be",
+          "ytimg.com",
+          "googlevideo.com",
+          "ggpht.com",
+          "youtube-nocookie.com"
+        ],
+        "times" : [
+          {
+            "days" : "Sun",
+            "from" : "00:00",
+            "to" : "24:00"
+          }
+        ]
+      }
+    ]
   }
 }
