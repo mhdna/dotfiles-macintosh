@@ -1,7 +1,159 @@
 {
   "about" : "Morganize's rules (apps by bundle id). Edits here are read back by the app; anything that gives apps or sites more time waits like it does in the window.",
   "groups" : [
-
+    {
+      "apps" : [
+        "org.alacritty",
+        "com.mitchellh.ghostty",
+        "net.kovidgoyal.kitty",
+        "dev.zed.Zed",
+        "com.neovide.neovide",
+        "org.gnu.Emacs",
+        "org.gnu.EmacsClient",
+        "org.vim.MacVim",
+        "com.vscodium",
+        "md.obsidian",
+        "net.ankiweb.launcher",
+        "org.libreoffice.script",
+        "com.microsoft.Word",
+        "com.microsoft.Excel",
+        "com.microsoft.Powerpoint",
+        "com.microsoft.onenote.mac",
+        "com.google.drivefs.shortcuts.docs",
+        "com.google.drivefs.shortcuts.sheets",
+        "com.google.drivefs.shortcuts.slides",
+        "at.eggerapps.Postico",
+        "at.eggerapps.mdbviewer",
+        "rest.chapar.app",
+        "com.docker.docker",
+        "info.filesmanager.Files",
+        "com.anthropic.claudefordesktop",
+        "com.openai.codex",
+        "org.learningequality.Kolibri",
+        "com.amazon.Lassen",
+        "com.cheesebanana.PaperFuse",
+        "com.anthropic.claude"
+      ],
+      "name" : "Productivity",
+      "times" : [
+        {
+          "days" : "every day",
+          "from" : "00:00",
+          "to" : "24:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.blackmagic-design.DaVinciResolve",
+        "com.adobe.AfterEffects.application",
+        "com.obsproject.obs-studio",
+        "com.timpler.screenstudio",
+        "org.audacityteam.audacity",
+        "no.mifi.losslesscut-mac",
+        "com.blackmagic-design.BlackmagicProxyGeneratorStudio",
+        "com.canva.canvaeditor",
+        "com.muse.musehub",
+        "net.voicemod.desktop"
+      ],
+      "name" : "Creative",
+      "times" : [
+        {
+          "days" : "every day",
+          "from" : "00:00",
+          "to" : "24:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.tdesktop.Telegram",
+        "dev.vencord.vesktop",
+        "org.telegram.messenger",
+        "com.discord"
+      ],
+      "name" : "Social media",
+      "times" : [
+        {
+          "days" : "every day",
+          "from" : "21:00",
+          "to" : "21:30"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "net.whatsapp.WhatsApp",
+        "com.tinyspeck.slackmacgap",
+        "com.microsoft.Outlook",
+        "com.whatsapp",
+        "com.Slack",
+        "com.microsoft.office.outlook"
+      ],
+      "name" : "Messaging",
+      "times" : [
+        {
+          "days" : "every day",
+          "from" : "08:00",
+          "to" : "22:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.colliderli.iina",
+        "org.videolan.vlc",
+        "com.ranchero.NetNewsWire-Evergreen",
+        "org.qbittorrent.qBittorrent",
+        "org.nicotine_plus.Nicotine"
+      ],
+      "name" : "Entertainment",
+      "times" : [
+        {
+          "days" : "weekdays",
+          "from" : "18:00",
+          "to" : "24:00"
+        },
+        {
+          "days" : "weekends",
+          "from" : "10:00",
+          "to" : "24:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.neowiz.game.lop.steam",
+        "com.isaacmarovitz.Whisky",
+        "com.paulthetall.portingkit"
+      ],
+      "name" : "Games",
+      "times" : [
+        {
+          "days" : "weekdays",
+          "from" : "19:00",
+          "to" : "24:00"
+        },
+        {
+          "days" : "weekends",
+          "from" : "10:00",
+          "to" : "24:00"
+        }
+      ]
+    },
+    {
+      "apps" : [
+        "com.google.android.youtube"
+      ],
+      "name" : "YouTube app",
+      "times" : [
+        {
+          "days" : "Sun",
+          "from" : "00:00",
+          "to" : "24:00"
+        }
+      ]
+    }
   ],
   "settings" : {
     "loosenDelayHours" : 24,
@@ -11,11 +163,62 @@
   },
   "websites" : {
     "allowed" : [
-
+      "cloud.grandbz.com",
+      "everywearlb.com",
+      "github.com",
+      "githubassets.com",
+      "githubusercontent.com",
+      "google.com",
+      "googleapis.com",
+      "grandbz.com",
+      "gstatic.com",
+      "leevant.com",
+      "macwq.com",
+      "sstatic.net",
+      "stackexchange.com",
+      "stackoverflow.com",
+      "wikimedia.org",
+      "wikipedia.org",
+      "aliyuncsslbintl.com"
     ],
-    "enabled" : false,
+    "enabled" : true,
     "timed" : [
-
+      {
+        "name" : "YouTube",
+        "sites" : [
+          "youtube.com",
+          "youtu.be",
+          "ytimg.com",
+          "googlevideo.com",
+          "ggpht.com",
+          "youtube-nocookie.com"
+        ],
+        "times" : [
+          {
+            "days" : "Sun",
+            "from" : "00:00",
+            "to" : "24:00"
+          }
+        ]
+      },
+      {
+        "name" : "Discord (tonight)",
+        "sites" : [
+          "discord.com",
+          "discord.gg",
+          "discordapp.com",
+          "discordapp.net",
+          "discord.media",
+          "discordcdn.com"
+        ],
+        "times" : [
+          {
+            "days" : "Thu",
+            "from" : "23:00",
+            "to" : "24:00"
+          }
+        ]
+      }
     ]
   }
 }
