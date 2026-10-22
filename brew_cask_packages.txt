@@ -11,3 +11,4 @@ hammerspoon
 # alt-tab
 jellyfin
 pika # colorpicker
+karabiner-elements

@@ -71,3 +71,6 @@ pqiv # image viewer
 
 opencode
 edouard-claude/tap/snip # automatically prefixes shell commands with snip to reduce LLm token consumption
+
+httpie # better curl
+mac-mouse-fix # fix mouse
