@@ -20,6 +20,7 @@ return {
 			astro = { prettierd },
 			cs = { "csharpier", "trim_newlines" },
 			css = { prettierd },
+			dart = { "dart_format" },
 			-- fish = { "fish_indent" },
 			html = { prettierd },
 			-- java = { "google-java-format" },
@@ -44,7 +45,7 @@ return {
 			vue = { prettierd },
 			-- go = { "goimports", "gofumpt", "golines" },
 			python = { "isort", "black" },
-			go = { "goimports", "gofmt" },
+			go = { "goimports" },
 			xml = { "xmllint", "trim_newlines", "trim_whitespace" },
 			yaml = { prettierd },
 			["_"] = { "trim_newlines", "trim_whitespace" },
@@ -53,11 +54,16 @@ return {
 			lsp_format = "fallback",
 		},
 		formatters = {
+			dart_format = {
+				command = "dart",
+				args = { "format" },
+				stdin = true,
+			},
 			shfmt = {
 				prepend_args = { "--indent", "4" },
 			},
 		},
-		format_on_save = function(bufnr)
+		format_after_save = function(bufnr)
 			if vim.g.enable_autoformat then
 				return { filter = formatter_filter, timeout_ms = 10000 }
 			end

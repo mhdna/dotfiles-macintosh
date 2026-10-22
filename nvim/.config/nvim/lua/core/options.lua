@@ -16,7 +16,7 @@ local opt = vim.opt
 
 opt.pumheight = 15
 opt.pumwidth = 15
-opt.laststatus = 3
+opt.laststatus = 0
 opt.cmdheight = 1
 opt.statusline = "%<%f   %h%m%r%= %-14.(%l[%L],%c%V%) %P %y"
 -- opt.number = true
@@ -146,8 +146,8 @@ opt.hlsearch = false
 opt.scrolloff = 4 -- Make it so there are always ten lines below my cursor
 
 -- -- these guys make movement slower
-opt.cursorline = true -- Highlight the current line
--- -- opt.cursorcolumn = true -- Highlight current line
+-- opt.cursorline = true -- Highlight the current line
+-- opt.cursorcolumn = true -- Highlight current line
 -- local group = vim.api.nvim_create_augroup("CursorLineControl", { clear = true })
 -- local set_cursorline = function(event, value, pattern)
 -- 	vim.api.nvim_create_autocmd(event, {
@@ -166,7 +166,7 @@ opt.cursorline = true -- Highlight the current line
 -- opt.colorcolumn = "80"
 
 opt.pumblend = 8
-opt.signcolumn = "yes"
+opt.signcolumn = "no"
 opt.wildmode = "longest:full"
 opt.wildoptions = "pum"
 
@@ -200,16 +200,15 @@ opt.shada = { "!", "'1000", "<50", "s10", "h" }
 --   2. gw{motion} - Put cursor back after formatting motion.
 --
 -- TODO: w, {v, b, l}
-opt.formatoptions = opt.formatoptions
-	- "a" -- Auto formatting is BAD.
-	- "t" -- Don't auto format my code. I got linters for that.
-	+ "c" -- In general, I like it when comments respect textwidth
-	+ "q" -- Allow formatting comments w/ gq
-	- "o" -- O and o, don't continue comments
-	+ "r" -- But do continue when pressing enter.
-	+ "n" -- Indent past the formatlistpat, not underneath it.
-	+ "j" -- Auto-remove comments if possible.
-	- "2" -- I'm not in gradeschool anymore
+opt.formatoptions = opt.formatoptions - "a" -- Auto formatting is BAD.
+opt.formatoptions = opt.formatoptions - "t" -- Don't auto format my code. I got linters for that.
+opt.formatoptions = opt.formatoptions + "c" -- In general, I like it when comments respect textwidth
+opt.formatoptions = opt.formatoptions + "q" -- Allow formatting comments w/ gq
+opt.formatoptions = opt.formatoptions - "o" -- O and o, don't continue comments
+opt.formatoptions = opt.formatoptions + "r" -- But do continue when pressing enter.
+opt.formatoptions = opt.formatoptions + "n" -- Indent past the formatlistpat, not underneath it.
+opt.formatoptions = opt.formatoptions + "j" -- Auto-remove comments if possible.
+opt.formatoptions = opt.formatoptions - "2" -- I'm not in gradeschool anymore
 
 -- set joinspaces
 opt.joinspaces = false -- Two spaces and grade school, we're done
@@ -224,7 +223,7 @@ vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
-opt.guifont = "Menlo:h16"
+opt.guifont = "Comic Mono:h24"
 
 -- -- yt settings
 -- vim.cmd([[set guifont=Fantasque\ Sans\ Mono:h36]])

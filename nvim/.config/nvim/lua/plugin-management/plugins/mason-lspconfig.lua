@@ -6,7 +6,7 @@
 return {
 	"williamboman/mason-lspconfig.nvim",
 	-- event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-	-- enabled = false,
+	enabled = false,
 	-- ft = lsp_filetypes,
 	-- dependencies = { "williamboman/mason.nvim", "saghen/blink.cmp" },
 	dependencies = { "williamboman/mason.nvim" },
@@ -21,6 +21,7 @@ return {
 			},
 			-- ruff = {},
 			gopls = {},
+			buf_ls = {}, -- protobuf
 			-- solidity = {},
 			-- solidity_ls_nomicfoundation = {},
 			pyright = {},
@@ -101,7 +102,7 @@ return {
 			-- 	},
 			-- },
 			-- tsserver = {},
-			vue_ls = {},
+			-- vue_ls = {},
 			vtsls = {},
 			-- volar = {
 			-- 	--  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
@@ -170,7 +171,7 @@ return {
 			callback = function(args)
 				local client = vim.lsp.get_client_by_id(args.data.client_id)
 				client.server_capabilities.semanticTokensProvider = nil
-				vim.opt_local.signcolumn = "yes"
+				vim.opt_local.signcolumn = "no"
 
 				local nmap = function(keys, func)
 					vim.keymap.set("n", keys, func, { silent = true, buffer = bufnr, noremap = true })
@@ -193,8 +194,8 @@ return {
 				nmap("<S-k>", vim.lsp.buf.hover)
 
 				vim.diagnostic.config({
-					virtual_text = true,
-					-- signs = false,
+					virtual_text = false,
+					signs = false,
 					underline = true,
 					-- update_in_insert = true, -- otherwise it updates on insertLeave
 					-- severity_sort = false,
@@ -213,6 +214,5 @@ return {
 				-- end)
 			end,
 		})
-
 	end,
 }

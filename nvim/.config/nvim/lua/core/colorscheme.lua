@@ -6,7 +6,7 @@ function modify_hl(ns, name, changes)
 	vim.api.nvim_set_hl(ns, name, vim.tbl_deep_extend("force", def, changes))
 end
 
-vim.opt.termguicolors = true -- Enable 24-bit RGB colors
+vim.opt.termguicolors = false -- Enable 24-bit RGB colors
 
 function RemoveBackground()
 	vim.cmd("highlight Normal guibg=None ctermbg=None")
@@ -139,10 +139,12 @@ function Default_Dark()
 	local colors = {
 		darkgray = "#222222",
 		gray = "#999999",
-		brown = "#65411f",
+		-- brown = "#65411f",
+		brown = "#000000",
 		darkbrown = "#2B1E08",
 		yellow = "#ffff00",
-		brownish_gray = "#332821",
+		-- brownish_gray = "#332821",
+		brownish_gray = "#000000",
 		beige = "#fbf1c7",
 	}
 
@@ -384,7 +386,7 @@ function Boring()
 	highlight! link DiagnosticSignWarn SignColumn
 	highlight! link DiagnosticSignInfo SignColumn
 	highlight! link DiagnosticSignOk SignColumn
-	highlight! String ctermfg=lightgreen guifg=lightgreen
+	" highlight! String ctermfg=lightgreen guifg=lightgreen
 ]])
 end
 
@@ -490,8 +492,8 @@ function M.Dark()
 	-- matrix()
 	-- solarized()
 	Gruvbox()
-	-- vim.cmd('colorscheme vim')
-	-- RemoveBackground()
+	-- vim.cmd("colorscheme vim")
+	RemoveBackground()
 end
 
 -- causes arabic text to disappear in comments with certain fonts
