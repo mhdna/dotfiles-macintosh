@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# lf preview script with Kitty image protocol support
+# lf preview script with Kitty image protocol support.
+#
+# Strategy: fast, purpose-built previews for the common cases (images, video,
+# pdf, audio, archives, code/text, json, csv, markdown, sqlite, plists,
+# notebooks, html, torrents), then macOS QuickLook (qlmanage) as a universal
+# fallback that renders a real thumbnail for almost anything else it knows
+# about (Office/iWork docs, fonts, ebooks, icons, 3D models, app bundles,
+# unknown binary formats, ...), and finally a hexdump as the last resort.
 
 FILE="$1"
 WIDTH="$2"
@@ -7,61 +14,126 @@ HEIGHT="$3"
 X="$4"
 Y="$5"
 
-# Kitty image display helper
+if [ -n "$TMUX" ]; then
+    printf '\033Ptmux;\033\033_Ga=d,d=A\033\033\\\033\\' >/dev/tty
+else
+    printf '\033_Ga=d,d=A\033\\' >/dev/tty
+fi
+
 kitty_display_image() {
+    exit 1
     local img="$1"
     kitty +kitten icat \
         --silent \
         --stdin no \
-        --transfer-mode file \
+        --transfer-mode memory \
         --place "${WIDTH}x${HEIGHT}@${X}x${Y}" \
         "$img" </dev/null >/dev/tty
-    exit 1
 }
 
-# Mime type
+# Universal fallback: ask macOS QuickLook to render a thumbnail for
+# practically any file type it (or an installed app's QL plugin) knows
+# about. Returns 1 on success (image already shown), 0 on failure.
+quicklook_preview() {
+    local target="$1"
+    [ -e "$target" ] || return 0
+    local qldir
+    qldir=$(mktemp -d "${TMPDIR:-/tmp}/lf-ql-XXXXXX") || return 0
+    timeout 5 qlmanage -t -s 1600 -o "$qldir" "$target" >/dev/null 2>&1
+    local thumb
+    thumb=$(find "$qldir" -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) -print -quit 2>/dev/null)
+    if [ -n "$thumb" ]; then
+        kitty_display_image "$thumb"
+        rm -rf "$qldir"
+        return 1
+    fi
+    rm -rf "$qldir"
+    return 0
+}
+
 MIME=$(file --brief --mime-type "$FILE")
 EXT="${FILE##*.}"
-EXT="${EXT,,}" # lowercase
+EXT="${EXT,,}"
+
+# ── Extension-based overrides (MIME sniffing is wrong or too generic here) ──
+case "$EXT" in
+plist)
+    plutil -p "$FILE" 2>/dev/null | bat --color=always --style=plain --language=json && exit 0
+    ;;
+db | sqlite | sqlite3)
+    if sqlite3 "$FILE" ".tables" >/dev/null 2>&1; then
+        {
+            echo "-- tables --"
+            sqlite3 "$FILE" ".tables" 2>/dev/null
+            echo
+            echo "-- schema --"
+            sqlite3 "$FILE" ".schema" 2>/dev/null
+        } | bat --color=always --style=plain --language=sql
+        exit 0
+    fi
+    ;;
+md | markdown)
+    glow -s dark -w "$WIDTH" "$FILE" 2>/dev/null && exit 0
+    ;;
+csv | tsv)
+    column -s, -t "$FILE" 2>/dev/null | bat --color=always --style=plain --language=csv && exit 0
+    ;;
+ipynb)
+    jq -r '.cells[] | .source | if type == "array" then join("") else . end, "\n---\n"' "$FILE" 2>/dev/null |
+        bat --color=always --style=plain --language=python && exit 0
+    ;;
+html | htm)
+    lynx -dump -nolist "$FILE" 2>/dev/null | bat --color=always --style=plain --language=text && exit 0
+    ;;
+torrent)
+    transmission-show "$FILE" 2>/dev/null | bat --color=always --style=plain --language=yaml && exit 0
+    ;;
+esac
 
 case "$MIME" in
 
-# ── Images ─────────────────────────────────────────────────────────────
 image/*)
-    kitty_display_image "$FILE"
+    if ! kitty_display_image "$FILE" 2>/dev/null; then
+        TMPIMG=$(mktemp "${TMPDIR:-/tmp}/lf-preview-XXXXXX.png")
+        if magick "${FILE}[0]" "$TMPIMG" 2>/dev/null || convert "${FILE}[0]" "$TMPIMG" 2>/dev/null; then
+            kitty_display_image "$TMPIMG"
+        else
+            quicklook_preview "$FILE"
+        fi
+        rm -f "$TMPIMG"
+    fi
+    exit 1
     ;;
 
-# ── Videos ─────────────────────────────────────────────────────────────
 video/*)
-    TMPIMG=$(mktemp /tmp/lf-preview-XXXXXX.jpg)
-    # Extract frame at 10% into the video
+    TMPIMG=$(mktemp "${TMPDIR:-/tmp}/lf-preview-XXXXXX.jpg")
     ffmpegthumbnailer -i "$FILE" -o "$TMPIMG" -s 0 -q 10 2>/dev/null ||
         ffmpeg -y -ss 00:00:03 -i "$FILE" -frames:v 1 \
             -vf "scale=iw:ih" "$TMPIMG" 2>/dev/null
     if [[ -f "$TMPIMG" ]]; then
         kitty_display_image "$TMPIMG"
         rm -f "$TMPIMG"
-    else
-        echo "⚠ Could not generate video thumbnail"
+        exit 1
     fi
+    rm -f "$TMPIMG"
+    quicklook_preview "$FILE" && echo "⚠ Could not generate video thumbnail"
+    exit 1
     ;;
 
-# ── PDFs ────────────────────────────────────────────────────────────────
 application/pdf)
-    TMPIMG=$(mktemp /tmp/lf-preview-XXXXXX.png)
+    TMPIMG=$(mktemp "${TMPDIR:-/tmp}/lf-preview-XXXXXX.png")
     pdftoppm -r 150 -f 1 -l 1 -png "$FILE" "${TMPIMG%.png}" 2>/dev/null &&
         mv "${TMPIMG%.png}-1.png" "$TMPIMG"
     if [[ -f "$TMPIMG" ]]; then
         kitty_display_image "$TMPIMG"
         rm -f "$TMPIMG"
+        exit 1
     else
-        # Fallback: text extraction
         pdftotext "$FILE" - 2>/dev/null | head -100 |
             bat --color=always --style=plain --language=text
     fi
     ;;
 
-# ── Audio ────────────────────────────────────────────────────────────────
 audio/*)
     exiftool "$FILE" 2>/dev/null |
         grep -E "^(Title|Artist|Album|Year|Genre|Duration|Bit Rate|Sample Rate)" |
@@ -69,7 +141,19 @@ audio/*)
         mediainfo "$FILE" 2>/dev/null | head -40
     ;;
 
-# ── Archives ─────────────────────────────────────────────────────────────
+font/* | application/font-sfnt | application/vnd.ms-fontobject | \
+    application/vnd.ms-opentype | application/x-font-ttf | application/x-font-otf)
+    quicklook_preview "$FILE" && exiftool "$FILE" 2>/dev/null | head -40 |
+        bat --color=always --style=plain --language=yaml
+    exit 1
+    ;;
+
+application/epub+zip)
+    quicklook_preview "$FILE" && exiftool "$FILE" 2>/dev/null | head -40 |
+        bat --color=always --style=plain --language=yaml
+    exit 1
+    ;;
+
 application/zip | application/x-zip*)
     unzip -l "$FILE" 2>/dev/null | head -100 |
         bat --color=always --style=plain --language=text
@@ -88,46 +172,53 @@ application/vnd.rar | application/x-rar*)
         bat --color=always --style=plain --language=text
     ;;
 
-# ── Office / Docs ─────────────────────────────────────────────────────────
+# ── Office / iWork documents ────────────────────────────────────────────────
 application/vnd.openxmlformats-officedocument.wordprocessingml.document | \
-    application/msword)
-    docx2txt "$FILE" - 2>/dev/null | head -200 |
-        bat --color=always --style=plain --language=text ||
-        strings "$FILE" | head -100 | bat --color=always --style=plain
+    application/msword | \
+    application/vnd.openxmlformats-officedocument.presentationml.presentation | \
+    application/vnd.ms-powerpoint | \
+    application/vnd.oasis.opendocument.text | \
+    application/vnd.oasis.opendocument.presentation | \
+    application/vnd.oasis.opendocument.spreadsheet | \
+    application/rtf | text/rtf)
+    quicklook_preview "$FILE" && strings "$FILE" 2>/dev/null | head -100 |
+        bat --color=always --style=plain
+    exit 1
     ;;
 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet | \
     application/vnd.ms-excel)
-    xlsx2csv "$FILE" 2>/dev/null | head -200 |
-        bat --color=always --style=plain --language=csv ||
-        echo "Install xlsx2csv to preview spreadsheets"
+    quicklook_preview "$FILE" && strings "$FILE" 2>/dev/null | head -100 |
+        bat --color=always --style=plain
+    exit 1
     ;;
 
 # ── JSON ──────────────────────────────────────────────────────────────────
 application/json | */json)
-    bat --color=always --style=numbers,changes --language=json "$FILE"
+    bat --color=always --style=changes --language=json "$FILE"
     ;;
 
 # ── Text / source code ────────────────────────────────────────────────────
 text/* | application/javascript | application/x-sh | \
     application/x-python | application/xml | application/toml)
     bat --color=always \
-        --style=numbers,changes,header \
+        --style=changes,header \
         --wrap=character \
         --terminal-width="$WIDTH" \
         "$FILE"
     ;;
 
-# ── Catch-all: try bat, then strings ─────────────────────────────────────
+# ── Catch-all ────────────────────────────────────────────────────────────
 *)
-    # Try bat first (it detects many formats by extension)
     if bat --color=always \
-        --style=numbers,changes,header \
+        --style=changes,header \
         --wrap=character \
         --terminal-width="$WIDTH" \
         "$FILE" 2>/dev/null; then
         exit 0
     fi
-    # Binary fallback: hex dump first 256 bytes
+    if quicklook_preview "$FILE"; then
+        exit 1
+    fi
     echo "Binary file — hex preview:"
     xxd "$FILE" | head -20 | bat --color=always --style=plain --language=hexdump
     ;;

@@ -37,7 +37,7 @@ set info size
 
 # # no colors
 set promptfmt "%u@%h:%d%f"
-set statfmt "%p| %c| %u| %g| %S| %t| -> %l"
+# set statfmt "%p| %c| %u| %g| %S| %t| -> %l"
 # set borderfmt        "\033[0m"
 # set cursoractivefmt  "\033[7m"
 # set cursorparentfmt  "\033[7m"
@@ -545,6 +545,7 @@ cmd compressvideo ${{
     fi
 }}
 
+map O &open -a "IINA" "$fx"
 map DD trash-put
 map DL delete
 map TT cd ~/.local/share/Trash/
@@ -583,7 +584,7 @@ map gs :fzf_search
 map <c-space> :toggle; up
 
 # map o &mimeopen "$f"
-# map o &open "$f"
+map o &open "$f"
 # map O &mimeopen-menu "$f"
 # map O & open -a IINA "$f"
 map <c-o> $clear; mimeopen --ask-default "$f"
@@ -649,6 +650,22 @@ map dr &dragon-drop -k --and-exit -a $fx
 map dm %mvdragon
 map dc %cpdragon
 map dl %dlfile
+
+cmd dropin ${{
+	dragon-drop -t | while IFS= read -r path; do
+		[ -e "$path" ] && cp -Rn -- "$path" .
+	done
+	lf -remote "send $id reload"
+}}
+map dI dropin
+
+cmd dropin_once ${{
+	dragon-drop -t -x | while IFS= read -r path; do
+		[ -e "$path" ] && cp -Rn -- "$path" .
+	done
+	lf -remote "send $id reload"
+}}
+map di dropin_once
 
 # Source Bookmarks
 source "~/.config/lf/shortcutrc"
