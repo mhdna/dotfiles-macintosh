@@ -157,25 +157,41 @@ local function tilde(path)
 	return path
 end
 
-local function escapeForSpotlight(word)
-	return (word:gsub('[\\"]', "\\%0"))
+-- The mdfind query when nothing is typed: whatever was added or opened lately.
+local RECENT_PREDICATE = string.format(
+	'(kMDItemDateAdded >= $time.today(-%d) || kMDItemLastUsedDate >= $time.today(-%d)) && kMDItemContentType != "public.folder"',
+	RECENT_DAYS, RECENT_DAYS
+)
+
+-- With words typed, Spotlight is asked for the longest one with `-name`, which
+-- is about four times faster than a `kMDItemFSName == "*word*"` predicate (70 ms
+-- against 300 ms here: a leading wildcard can't use the index well). The
+-- other words are then checked against the name in Lua.
+local function longest(wordList)
+	local best = wordList[1]
+	for _, word in ipairs(wordList) do
+		if #word > #best then
+			best = word
+		end
+	end
+	return best
 end
 
--- The mdfind predicate: every word somewhere in the file name (case and
--- diacritics ignored), or, with nothing typed, whatever was added or opened
--- lately.
-function M.predicate(words)
-	if #words == 0 then
-		return string.format(
-			'(kMDItemDateAdded >= $time.today(-%d) || kMDItemLastUsedDate >= $time.today(-%d)) && kMDItemContentType != "public.folder"',
-			RECENT_DAYS, RECENT_DAYS
-		)
+-- Spotlight already matched the longest word (ignoring case and accents, e.g.
+-- Arabic hamza forms), so only the other words are checked here; a plain-text
+-- check of that one would throw out matches Spotlight rightly found.
+local function hasAllWords(name, wordList)
+	local lower = name:lower()
+	local matchedBySpotlight = #wordList > 0 and longest(wordList)
+	local skipped = false
+	for _, word in ipairs(wordList) do
+		if word == matchedBySpotlight and not skipped then
+			skipped = true
+		elseif not lower:find(word:lower(), 1, true) then
+			return false
+		end
 	end
-	local parts = {}
-	for _, word in ipairs(words) do
-		parts[#parts + 1] = string.format('kMDItemFSName == "*%s*"cd', escapeForSpotlight(word))
-	end
-	return table.concat(parts, " && ")
+	return true
 end
 
 local function words(query)
@@ -199,7 +215,12 @@ local function searchArgs(wordList)
 		args[#args + 1] = "-attr"
 		args[#args + 1] = attribute
 	end
-	args[#args + 1] = M.predicate(wordList)
+	if #wordList == 0 then
+		args[#args + 1] = RECENT_PREDICATE
+	else
+		args[#args + 1] = "-name"
+		args[#args + 1] = longest(wordList)
+	end
 	return args
 end
 
@@ -208,7 +229,7 @@ function M.choicesFrom(output, wordList)
 	M.refreshUtcOffset()
 	for line in (output or ""):gmatch("[^\n]+") do
 		local path = line:match("^(.-)%s+kMDItemDateAdded = ")
-		if path and not isSkipped(path) then
+		if path and not isSkipped(path) and hasAllWords(path:match("([^/]+)$") or path, wordList) then
 			files[#files + 1] = M.parseLine(line)
 		end
 	end
@@ -240,6 +261,19 @@ local generation = 0
 local task = nil
 local debounce = nil
 
+-- A broad search ("a") prints far more than a pipe holds, and a task that is
+-- only read from when it exits would stall on a full pipe. So mdfind writes to
+-- a temp file (capped at MAX_LINES) and the file is read once it's done.
+local MAX_LINES = 2000
+
+-- The file's own icon; a demo file isn't on disk, so use its type's.
+local function iconFor(path)
+	if hs.fs.attributes(path) then
+		return hs.image.iconForFile(path)
+	end
+	return hs.image.iconForFileType(path:match("%.([^./]+)$") or "")
+end
+
 local function search(query)
 	generation = generation + 1
 	local mine = generation
@@ -247,16 +281,38 @@ local function search(query)
 		task:terminate()
 	end
 	local wordList = words(query)
-	task = hs.task.new("/usr/bin/mdfind", function(_, stdout)
+	if M.demo then
+		local choices = M.choicesFrom(M.demo(wordList), wordList)
+		for _, choice in ipairs(choices) do
+			choice.image = iconFor(choice.path)
+		end
+		M.chooser:choices(choices)
+		return
+	end
+	local outFile = os.tmpname()
+	local args = {
+		"-c", 'out=$1; shift; /usr/bin/mdfind "$@" 2>/dev/null | /usr/bin/head -n ' .. MAX_LINES .. ' > "$out"',
+		"sh", outFile,
+	}
+	for _, arg in ipairs(searchArgs(wordList)) do
+		args[#args + 1] = arg
+	end
+	task = hs.task.new("/bin/sh", function()
+		local f = io.open(outFile, "r")
+		local output = f and f:read("a") or ""
+		if f then
+			f:close()
+		end
+		os.remove(outFile)
 		if mine ~= generation then
 			return -- a newer search has started
 		end
-		local choices = M.choicesFrom(stdout, wordList)
+		local choices = M.choicesFrom(output, wordList)
 		for _, choice in ipairs(choices) do
-			choice.image = hs.image.iconForFile(choice.path)
+			choice.image = iconFor(choice.path)
 		end
 		M.chooser:choices(choices)
-	end, searchArgs(wordList))
+	end, args)
 	task:start()
 end
 
@@ -289,20 +345,45 @@ M.chooser:queryChangedCallback(function(query)
 	end)
 end)
 
-local function show(initialQuery)
-	initialQuery = initialQuery or ""
+local function showNow(initialQuery)
 	M.chooser:query(initialQuery)
 	M.chooser:choices({})
 	menuPosition.showChooser(M.chooser, CHOOSER_WIDTH_PERCENT)
-	search(initialQuery)
+	-- setting a non-empty query already starts a search (the query-changed
+	-- callback); an empty one doesn't, so start the recent-files list here
+	if initialQuery == "" then
+		search("")
+	end
 end
 
+local function show(initialQuery)
+	initialQuery = initialQuery or ""
+	-- a window left open (on another desktop, say) would swallow the next show;
+	-- give the hide a moment to finish first
+	if M.chooser:isVisible() then
+		M.chooser:hide()
+		hs.timer.doAfter(0.15, function()
+			showNow(initialQuery)
+		end)
+	else
+		showNow(initialQuery)
+	end
+end
+
+-- the shortcut closes the window when it's already open
 hs.hotkey.bind({ "cmd", "shift" }, "space", function()
-	show("")
+	if M.chooser:isVisible() then
+		M.chooser:hide()
+	else
+		M.demo = nil
+		show("")
+	end
 end)
 
 -- open hammerspoon://file-search (or ...?q=invoice) from a script or a link
 hs.urlevent.bind("file-search", function(_, params)
+	-- ?demo=1 lists made-up files instead of searching (for screenshots)
+	M.demo = params and params.demo == "1" and require("file_search_demo") or nil
 	show(params and params.q or "")
 end)
 
