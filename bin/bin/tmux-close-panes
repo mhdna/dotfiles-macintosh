@@ -67,7 +67,8 @@ case $2 in
 	fi
 	[ "$2" = --idle ] && what="idle $(plural "$n" pane)" || what="$(plural "$n" other\ pane)"
 	tmux confirm-before -t "$client" -p "Close $what? (y/n)" \
-		"run-shell \"'$0' '$client' '$window' $2-now '$3'\""
+		"run-shell \"'$0' '$client' '$window' $2-now '$3'\"" ||
+		true # n fails the prompt; that's not an error
 	;;
 --others-now | --idle-now)
 	closed=0 kept=0
