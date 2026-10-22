@@ -1,0 +1,70 @@
+# Claude Code's terminal look: neutral dark grey, white text, and its vivid
+# syntax colours, pushed a bit more saturated. Orange is the accent.
+
+[colors.primary]
+background = "#1c1c1c"
+foreground = "#ffffff"
+dim_foreground = "#b0b0b0"
+bright_foreground = "#ffffff"
+
+[colors.cursor]
+text = "#1a1a1a"
+cursor = "#ffffff"
+
+[colors.vi_mode_cursor]
+text = "#1a1a1a"
+cursor = "#00d0ff"
+
+[colors.selection]
+text = "CellForeground"
+background = "#4a4a4a"
+
+[colors.search.matches]
+foreground = "#1c1c1c"
+background = "#d4ff00"
+
+[colors.search.focused_match]
+foreground = "#1a1a1a"
+background = "#ff8a00"
+
+[colors.hints.start]
+foreground = "#1a1a1a"
+background = "#ff8a00"
+
+[colors.hints.end]
+foreground = "#ff8a00"
+background = "#1c1c1c"
+
+[colors.footer_bar]
+foreground = "#ffffff"
+background = "#3a3a3a"
+
+[colors.normal]
+black = "#3a3a3a"
+red = "#ff0040"
+green = "#00e000"
+yellow = "#d79921"
+blue = "#1e90ff"
+magenta = "#9d4dff"
+cyan = "#00d0ff"
+white = "#d0d0d0"
+
+[colors.bright]
+black = "#6c6c6c"
+red = "#ff4070"
+green = "#3dff3d"
+yellow = "#fabd2f"
+blue = "#5cb0ff"
+magenta = "#b880ff"
+cyan = "#40e0ff"
+white = "#ffffff"
+
+[colors.dim]
+black = "#2e2e2e"
+red = "#b0002e"
+green = "#00a000"
+yellow = "#9a6b16"
+blue = "#1468c0"
+magenta = "#7030c0"
+cyan = "#0098bc"
+white = "#9a9a9a"

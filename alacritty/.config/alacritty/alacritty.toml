@@ -1,27 +1,40 @@
 # general.import = ["~/.config/alacritty/themes/light-xterm.toml"]
-general.import = ["~/.config/alacritty/themes/gruvbox-dark.toml"]
+# general.import = ["~/.config/alacritty/themes/gruvbox-dark.toml"]
+general.import = ["~/.config/alacritty/themes/claude.toml"]
 # general.import = ["~/.config/alacritty/themes/xterm.toml"]
 
-# [colors.primary]
-# # background = '#ffffff'
-# # foreground = '#000000'
+[colors.primary]
+# tmux's status bar brown: the sliver left under the bar when the window isn't
+# a whole number of rows tall is this colour, so it blends in. tmux paints the
+# panes black itself (window-style in tmux.conf).
 # background = '#000000'
-# foreground = '#ffffff'
+background = '#2e2924'
 
+# Colours come from the theme above; these overrides are kept for later.
+# [colors.primary]
+# background = '#111111'
+# foreground = '#ffffff'
+#
 # [colors.cursor]
 # cursor = "#000000"
 # text = "CellBackground"
 
-[colors.hints.end]
-background = "#1d1f21"
-foreground = "#fabd2f"
+# [colors.hints.end]
+# background = "#1d1f21"
+# foreground = "#fabd2f"
 
-[colors.hints.start]
-background = "#fabd2f"
-foreground = "#1d1f21"
+# [colors.hints.start]
+# background = "#fabd2f"
+# foreground = "#1d1f21"
+
+# "Always" blinks even when tmux or nvim ask for a steady cursor; no
+# timeout, so it keeps blinking while idle.
+[cursor]
+blink_interval = 350
+blink_timeout = 0
 
 [cursor.style]
-blinking = "never"
+blinking = "Always"
 
 # [cursor]
 # blink_interval = 500
@@ -38,31 +51,44 @@ blinking = "never"
 TERM = "xterm-256color"
 
 [font]
-size = 19
+size = 16
 
 [font.bold]
-family = "fantasque Sans Mono"
+family = "Comic Mono"
 style = "Bold"
 
 [font.bold_italic]
-family = "fantasque Sans Mono"
+family = "Comic Mono"
 style = "Bold Italic"
 
 [font.italic]
-family = "fantasque Sans Mono"
+family = "Comic Mono"
 style = "Italic"
 
 [font.normal]
-family = "fantasque Sans Mono"
-style = "Regular"
+family = "Comic Mono"
+style = "Normal"
+
+# style = "Regular"
+
+# Links: cmd+l shows a letter on every link on screen (works inside tmux and
+# nvim too, it reads the screen), type the letters to open it. cmd+shift+l
+# copies it instead. (Option stays free for Hammerspoon.) Cmd+click opens one with the mouse (inside tmux, with
+# tmux's mouse mode on: cmd+shift+click).
+[[hints.enabled]]
+command = "open"
+hyperlinks = true
+post_processing = true
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini:|gopher:|https:|http:|news:|file:|git:|ssh:|ftp:)[^\u0000-\u001F\u007F-<>\"\\s{-}\\^⟨⟩`]+"
+mouse = { enabled = true, mods = "Command" }
+binding = { key = "L", mods = "Command" }
 
 [[hints.enabled]]
-command = "xdg-open"
+action = "Copy"
+hyperlinks = true
+post_processing = true
 regex = "(ipfs:|ipns:|magnet:|mailto:|gemini:|gopher:|https:|http:|news:|file:|git:|ssh:|ftp:)[^\u0000-\u001F\u007F-<>\"\\s{-}\\^⟨⟩`]+"
-
-[hints.enabled.binding]
-key = "L"
-mods = "Alt"
+binding = { key = "L", mods = "Command|Shift" }
 
 [keyboard]
 bindings = [
@@ -72,13 +98,21 @@ bindings = [
 { key= "Y", mods= "Alt", action=  "PasteSelection"},
 ]
 
-[mouse]
-hide_when_typing = true
+# [mouse]
+# hide_when_typing = true
 
-[window.dimensions]
-columns = 73
-lines = 28
+
+# columns = 73
+# lines = 28
 
 [window]
-# opacity = 0.7
+# resize in whole character cells: far fewer size changes reach tmux and the
+# programs in it while dragging, so less redrawing
+resize_increments = true
+opacity = 1.0
 option_as_alt = "Both"
+
+# Clipboard writes that macOS refuses (e.g. an empty copy) showed a yellow
+# warning bar; only show errors there.
+[debug]
+log_level = "Error"
