@@ -1,0 +1,6 @@
+# tmux-organize (alt+shift+o): which window a folder's panes go to, when the
+# folder's own name isn't the one you want. "<folder> <window name>", longest
+# folder wins. Without a line here, ~/Code/<project> goes to <project> and
+# anything else under ~ to the folder right below ~.
+~/yt      yt-channel
+~/Movies  downloads

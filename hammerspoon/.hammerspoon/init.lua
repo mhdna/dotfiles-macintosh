@@ -43,6 +43,7 @@ local menuPosition = require("menu_position")
 
 require("app_switcher")
 require("move_windows")
+require("mclaude")
 require("toggle_apps")
 require("per_app_tab_switch")
 require("always_on_top")

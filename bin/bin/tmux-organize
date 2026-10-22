@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""Gathers a tmux session's panes into one window per project, named after it.
+
+    tmux-organize [session] [--dry-run]
+
+A pane's project comes from its folder:
+  - a line in ~/.config/tmux/projects ("<folder> <window name>") wins, longest folder first;
+  - under ~/Code, the folder right below it (~/Code/kashi/src -> kashi);
+  - elsewhere under ~, the folder right below ~ (~/yt/music -> yt).
+A project whose name starts with another's and a dash goes in with it: kashi-pos and kashi-data
+join kashi when there is a kashi.
+
+Each project keeps the window that already holds most of its panes; the others are moved in and
+the window is tiled. Windows left empty close. Bound to alt+shift+o in tmux.conf.
+"""
+
+import os
+import subprocess
+import sys
+
+HOME = os.path.expanduser("~")
+ROOTS = [os.path.join(HOME, "Code"), os.path.join(HOME, "code")]
+CONFIG = os.path.join(HOME, ".config/tmux/projects")
+
+
+def tmux(*args, check=True):
+    result = subprocess.run(["tmux", *args], capture_output=True, text=True)
+    if check and result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or f"tmux {args[0]} failed")
+    return result.stdout
+
+
+def read_config():
+    names = []
+    try:
+        with open(CONFIG) as file:
+            for line in file:
+                line = line.split("#", 1)[0].strip()
+                if not line:
+                    continue
+                folder, _, name = line.partition(" ")
+                if name.strip():
+                    names.append((os.path.expanduser(folder).rstrip("/"), name.strip()))
+    except FileNotFoundError:
+        pass
+    return sorted(names, key=lambda entry: -len(entry[0]))
+
+
+def inside(path, folder):
+    return path == folder or path.startswith(folder + "/")
+
+
+def project(path, config):
+    for folder, name in config:
+        if inside(path, folder):
+            return name
+    for root in ROOTS:
+        if path.startswith(root + "/"):
+            return path[len(root) + 1:].split("/")[0]
+    if path.startswith(HOME + "/"):
+        return path[len(HOME) + 1:].split("/")[0]
+    return os.path.basename(path) or "/"
+
+
+def merge_families(groups):
+    """kashi-pos -> kashi, when kashi is itself a project; the shortest such base wins."""
+    names = set(groups.values())
+    family = {}
+    for name in names:
+        bases = [base for base in names if base != name and name.startswith(base + "-")]
+        family[name] = min(bases, key=len) if bases else name
+    return {pane: family[name] for pane, name in groups.items()}
+
+
+def main():
+    args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
+    dry = "--dry-run" in sys.argv
+    session = args[0] if args else tmux("display-message", "-p", "#{session_name}").strip()
+
+    fields = "#{pane_id}\t#{window_id}\t#{window_index}\t#{window_name}\t#{pane_active}\t#{window_active}\t#{pane_current_path}"
+    panes = []
+    for line in tmux("list-panes", "-s", "-t", session, "-F", fields).splitlines():
+        pane, window, index, name, pane_active, window_active, path = line.split("\t", 6)
+        panes.append(dict(pane=pane, window=window, index=int(index), name=name, path=path,
+                          focused=pane_active == "1" and window_active == "1"))
+    if not panes:
+        return
+
+    config = read_config()
+    groups = merge_families({p["pane"]: project(p["path"], config) for p in panes})
+
+    # Each project keeps the window holding most of its panes; a window serves one project.
+    counts = {}
+    for p in panes:
+        key = (groups[p["pane"]], p["window"])
+        counts[key] = counts.get(key, 0) + 1
+    index_of = {p["window"]: p["index"] for p in panes}
+    target, taken = {}, set()
+    for (name, window), _ in sorted(counts.items(), key=lambda kv: (-kv[1], index_of[kv[0][1]], kv[0][0])):
+        if name not in target and window not in taken:
+            target[name] = window
+            taken.add(window)
+
+    moves = [p for p in panes if target.get(groups[p["pane"]]) != p["window"]]
+    homeless = sorted({groups[p["pane"]] for p in panes} - set(target))
+    if dry:
+        for name in sorted({*target, *homeless}):
+            members = [p for p in panes if groups[p["pane"]] == name]
+            where = f"window {index_of[target[name]]}" if name in target else "a new window"
+            print(f"{name:20} {len(members):2} pane{"s" if len(members) != 1 else ""} -> {where}")
+            for p in members:
+                if p in moves:
+                    print(f"{'':20}    move {p['pane']} from window {p['index']} ({p['path'].replace(HOME, '~')})")
+        return
+
+    focused = next((p["pane"] for p in panes if p["focused"]), None)
+    # A project with no window of its own starts one from its first pane.
+    for name in homeless:
+        first = next(p for p in moves if groups[p["pane"]] == name)
+        target[name] = tmux("break-pane", "-d", "-s", first["pane"], "-n", name, "-P", "-F", "#{window_id}").strip()
+        moves.remove(first)
+
+    for p in moves:
+        name = groups[p["pane"]]
+        window = target[name]
+        try:
+            tmux("join-pane", "-d", "-s", p["pane"], "-t", window)
+        except RuntimeError:
+            # No room left to split: carry on in another window of the same name.
+            window = tmux("break-pane", "-d", "-s", p["pane"], "-n", name, "-P", "-F", "#{window_id}").strip()
+            target[name] = window
+        tmux("select-layout", "-t", window, "tiled")
+
+    for name, window in target.items():
+        tmux("rename-window", "-t", window, name, check=False)
+    tmux("move-window", "-r", "-t", session, check=False)
+    if focused:
+        tmux("select-window", "-t", focused, check=False)
+        tmux("select-pane", "-t", focused, check=False)
+    windows = len(tmux("list-windows", "-t", session).splitlines())
+    tmux("display-message", f"Organized {len(panes)} panes into {windows} windows, {len(moves)} moved")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except RuntimeError as error:
+        tmux("display-message", f"tmux-organize: {error}", check=False)
+        sys.exit(1)
