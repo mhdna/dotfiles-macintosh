@@ -1,4 +1,4 @@
 #!/bin/sh
 
-yt-dlp-wrapper --remux-video ogg -f bestaudio/best --no-write-thumbnail --embed-thumbnail \
+yt-dlp-wrapper -f bestaudio/best --no-write-thumbnail \
     --add-metadata -ic $@

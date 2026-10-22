@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /Applications/VED.app/Contents/MacOS/Ved "$@"

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /Applications/MXIV.app/Contents/MacOS/Mxiv "$@"
