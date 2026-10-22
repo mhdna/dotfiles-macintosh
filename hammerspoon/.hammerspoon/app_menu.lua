@@ -95,7 +95,5 @@ appChooser:placeholderText("Open application...")
 
 hs.hotkey.bind({ "cmd" }, "space", function()
 	appChooser:choices(cachedApps)
-	local screen = hs.screen.mainScreen():frame()
-	local widthPx = screen.w * (CHOOSER_WIDTH_PERCENT / 100)
-	appChooser:show(menuPosition.point(widthPx))
+	menuPosition.showChooser(appChooser, CHOOSER_WIDTH_PERCENT)
 end)

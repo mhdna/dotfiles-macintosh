@@ -151,7 +151,7 @@ hs.hotkey.bind({ "alt" }, "t", function()
 	activateOrToggle("org.alacritty")
 end)
 
-hs.hotkey.bind({ "alt", "shift" }, "d", function()
+hs.hotkey.bind({ "alt", "shift" }, "i", function()
 	activateOrToggle("com.hnc.Discord")
 end)
 
@@ -196,12 +196,12 @@ hs.hotkey.bind({}, "F3", function()
 	activateOrToggle("com.apple.Passwords")
 end)
 
--- print current window bundle id
-hs.hotkey.bind({ "alt", "shift" }, "c", function()
-	-- copy it from clipboard
-	hs.pasteboard.setContents(hs.application.frontmostApplication():bundleID())
-	hs.alert.show(hs.application.frontmostApplication():bundleID())
-end)
+-- -- print current window bundle id
+-- hs.hotkey.bind({ "alt", "shift" }, "c", function()
+-- 	-- copy it from clipboard
+-- 	hs.pasteboard.setContents(hs.application.frontmostApplication():bundleID())
+-- 	hs.alert.show(hs.application.frontmostApplication():bundleID())
+-- end)
 
 local function openKittyWith(cmd, title)
 	local full = string.format(

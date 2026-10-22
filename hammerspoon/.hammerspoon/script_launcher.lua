@@ -33,6 +33,5 @@ chooser:choices(SCRIPTS)
 
 hs.hotkey.bind({ "alt", "shift" }, "s", function()
 	chooser:query("")
-	local screen = hs.screen.mainScreen():frame()
-	chooser:show(menuPosition.point(screen.w * 0.30))
+	menuPosition.showChooser(chooser, 30)
 end)

@@ -9,6 +9,9 @@ end
 configFileWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig)
 configFileWatcher:start()
 
+-- opt+/ help window; loaded before anything binds a hotkey, so it sees them all
+require("keys_help")
+
 -- all hs.alert.show(...) notifications: dark warm gray-brown (matches the
 -- Driftwood browser theme), soft taupe border, warm off-white text
 hs.alert.defaultStyle.fillColor = { red = 46 / 255, green = 41 / 255, blue = 37 / 255, alpha = 0.95 }
@@ -43,18 +46,21 @@ local menuPosition = require("menu_position")
 
 require("app_switcher")
 require("move_windows")
-require("mclaude")
-require("morganize")
 require("toggle_apps")
 require("per_app_tab_switch")
 require("always_on_top")
 require("kill_window")
 require("app_menu")
 require("quick_shell")
+require("file_search")
 require("script_launcher")
 require("time_tracker")
 require("finder_redirect")
-require("file_search")
+require("mrec")
+require("mmix")
+require("mcam")
+require("mclaude")
+require("morganize")
 
 -- require("silent_alttab")
 
@@ -133,6 +139,22 @@ hs.hotkey.bind({ "alt" }, "[", function()
 	hs.spaces.goLeft()
 end)
 
+-- opt+shift+d: show desktop
+hs.hotkey.bind({ "alt", "shift" }, "d", function()
+	hs.spaces.toggleShowDesktop()
+end)
+
+-- -- opt+1..4: jump straight to that space on the screen being used
+-- for n = 1, 4 do
+-- 	hs.hotkey.bind({ "alt" }, tostring(n), function()
+-- 		local screen = hs.mouse.getCurrentScreen() or hs.screen.mainScreen()
+-- 		local space = (hs.spaces.spacesForScreen(screen) or {})[n]
+-- 		if space then
+-- 			hs.spaces.gotoSpace(space)
+-- 		end
+-- 	end)
+-- end
+
 -- -- wait for internet
 -- hs.hotkey.bind({ "alt" }, "i", function()
 -- 	hs.alert.show("🐻Waiting...", 1)
@@ -182,16 +204,10 @@ hs.hotkey.bind({ "alt" }, "=", function()
 	pressSystemKey("SOUND_UP")
 end)
 
--- -- mute toggle
--- hs.hotkey.bind({ "alt", "shift" }, "-", function()
--- 	local device = hs.audiodevice.defaultOutputDevice()
--- 	device:setMuted(not device:muted())
--- 	if device:muted() then
--- 		hs.alert.show("Muted")
--- 	else
--- 		hs.alert.show("Unmuted")
--- 	end
--- end)
+-- mute toggle (the media key, so the native HUD shows)
+hs.hotkey.bind({ "alt", "shift" }, "-", function()
+	pressSystemKey("MUTE")
+end)
 
 -- brightness controls (simulated media keys; BetterDisplay intercepts these
 -- system-wide and adjusts the external display via DDC/CI)
@@ -457,8 +473,7 @@ hs.hotkey.bind({ "cmd", "shift" }, "\\", function()
 	local initial = appChoices()
 	currentMediaChoices = #initial == 0 and { { text = "Loading…", kind = "none" } } or initial
 	mediaChooser:choices(currentMediaChoices)
-	local screen = hs.screen.mainScreen():frame()
-	mediaChooser:show(menuPosition.point(screen.w * 0.30))
+	menuPosition.showChooser(mediaChooser, 30)
 
 	buildMediaChoicesAsync(function(choices)
 		currentMediaChoices = #choices == 0 and { { text = "Nothing playing", kind = "none" } } or choices
@@ -494,8 +509,10 @@ local micChooser = hs.chooser.new(function(choice)
 end)
 micChooser:width(20)
 micChooser:rows(4)
+micChooser:placeholderText("Select INPUT (microphone)...")
 
-hs.hotkey.bind({ "alt", "shift" }, "-", function()
+-- opt+ctrl+- opens it (opt+shift+- is mute)
+local function showMicChooser()
 	local currentUID = hs.audiodevice.defaultInputDevice():uid()
 	local choices = {}
 	local currentChoice = nil
@@ -514,9 +531,10 @@ hs.hotkey.bind({ "alt", "shift" }, "-", function()
 		table.insert(choices, 1, currentChoice)
 	end
 	micChooser:choices(choices)
-	local screen = hs.screen.mainScreen():frame()
-	micChooser:show(menuPosition.point(screen.w * 0.20))
-end)
+	menuPosition.showChooser(micChooser, 20)
+end
+
+hs.hotkey.bind({ "ctrl", "alt" }, "-", showMicChooser)
 
 -- switch default output (speakers/headphones) via a Spotlight-like chooser
 local outputChooser = hs.chooser.new(function(choice)
@@ -528,8 +546,9 @@ local outputChooser = hs.chooser.new(function(choice)
 end)
 outputChooser:width(20)
 outputChooser:rows(4)
+outputChooser:placeholderText("Select OUTPUT (speakers / headphones)...")
 
-hs.hotkey.bind({ "alt", "shift" }, "=", function()
+hs.hotkey.bind({ "ctrl", "alt" }, "=", function()
 	local currentUID = hs.audiodevice.defaultOutputDevice():uid()
 	local choices = {}
 	local currentChoice = nil
@@ -548,8 +567,7 @@ hs.hotkey.bind({ "alt", "shift" }, "=", function()
 		table.insert(choices, 1, currentChoice)
 	end
 	outputChooser:choices(choices)
-	local screen = hs.screen.mainScreen():frame()
-	outputChooser:show(menuPosition.point(screen.w * 0.20))
+	menuPosition.showChooser(outputChooser, 20)
 end)
 
 -- simple_switcher = require("simple_switcher")
@@ -670,17 +688,18 @@ end
 -- offline dictionary/translation popup for the selected word or sentence
 -- (PopDefine runs as a resident background daemon via LaunchAgent; this just
 -- signals it, avoiding the ~1s cold-start cost of relaunching the process)
-hs.hotkey.bind({ "alt" }, "d", function()
+hs.hotkey.bind({ "alt" }, "e", function()
 	hs.task.new("/usr/bin/pkill", nil, { "-SIGUSR1", "-x", "PopDefine" }):start()
 end)
 
 -- live search mode: opens a search box, definitions update on every keystroke
-hs.hotkey.bind({ "alt", "shift" }, "d", function()
+hs.hotkey.bind({ "alt", "shift" }, "e", function()
 	hs.task.new("/usr/bin/pkill", nil, { "-SIGUSR2", "-x", "PopDefine" }):start()
 end)
 
--- toggle the saved-words browser window
-hs.hotkey.bind({ "alt" }, "b", function()
+-- toggle the saved-words browser window (opt+shift+w: opt+b is the shell's
+-- back-one-word)
+hs.hotkey.bind({ "alt", "shift" }, "w", function()
 	hs.task.new("/usr/bin/pkill", nil, { "-SIGINFO", "-x", "PopDefine" }):start()
 end)
 
@@ -739,10 +758,7 @@ hs.hotkey.bind({ "ctrl", "alt" }, "r", function()
 	hs.reload()
 end)
 
--- open or focus lf-gui (~/Code/mac-utils/lf-gui)
-hs.hotkey.bind({ "alt" }, "f", function()
-	hs.application.launchOrFocusByBundleID("com.mahdi.lf-gui")
-end)
+-- lf-gui is on opt+r (above); opt+f stays free for the shell's forward-word
 
 -- open or focus mxiv (~/Code/mac-utils/mxiv); launched bare it shows ~/Pictures
 hs.hotkey.bind({ "alt" }, "p", function()
