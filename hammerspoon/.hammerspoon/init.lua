@@ -52,6 +52,7 @@ require("quick_shell")
 require("script_launcher")
 require("time_tracker")
 require("finder_redirect")
+require("file_search")
 
 -- require("silent_alttab")
 
