@@ -95,8 +95,10 @@ fi
 
 export HOMEBREW_NO_AUTO_UPDATE=1
 
+export WAKA_PATH="$HOME/.wakatime"
+
 # -H for it to not treat symlinks as the dst, but the directories that they point to
-export PATH="$PATH:$(gfind -H $HOME/bin $HOME/bin -type d -printf ":%p"):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME:/usr/local/bin/"
+export PATH="$PATH:$(gfind -H $HOME/bin $HOME/bin -type d -printf ":%p"):$NPM_PATH/bin:$GOPATH/bin:$CARGO_HOME/bin:$JAVA_HOME/bin:$LSP_SERVERS_PATH:$PHP_COMPOSER_PATH:$GEM_HOME:/usr/local/bin/:$WAKA_PATH"
 export JAVA_HOME=$(/usr/libexec/java_home)
 export PATH=$JAVA_HOME/bin:$PATH
 # setsid -f mailsync >/dev/null 2>&1&
@@ -111,3 +113,6 @@ export PATH=$JAVA_HOME/bin:$PATH
 # Switch escape and caps if tty and no passwd required and keyd isn't installed:
 # ! command -v keyd > /dev/null 2>&1 && sudo -n loadkeys ${XDG_CONFIG_HOME:-$HOME}/.ttymaps.kmap 2> /dev/null
 sudo -n loadkeys ${XDG_CONFIG_HOME:-$HOME}/.ttymaps.kmap 2> /dev/null
+
+# Created by `pipx` on 2026-07-04 15:47:14
+export PATH="$PATH:/Users/mahdi/.local/bin"

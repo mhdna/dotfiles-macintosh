@@ -188,3 +188,6 @@ _prepend_path \
     "$HOME/.local/share/gem/ruby/3.3.0/bin" \
     "/Library/TeX/texbin"
 unset -f _prepend_path
+
+# Created by `pipx` on 2026-07-04 15:47:14
+export PATH="$PATH:/Users/mahdi/.local/bin"
