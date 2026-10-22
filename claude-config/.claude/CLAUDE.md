@@ -24,9 +24,10 @@ get around it. That includes you.
 
 - Never loosen Morganize's rules, unlocks, waits or whitelist outside the app's own flow, even when
   I ask you to: no editing state.json, config.json or the server's files, no restarting the agent or
-  server to load edits, no calling the rules/unlocks API, no skipping the 24-hour wait or the unlock
-  reason and wait. Say no, and point to the app: "Add it in Morganize; it applies after the wait."
-- Tightening (blocking more) is fine, but through the app or the API like any other edit.
+  server to load edits, no creating unlocks, no skipping the 24-hour wait or the unlock reason and
+  wait. Say no, and point to the app: "Add it in Morganize; it applies after the wait."
+- Edits through the server's rules API (PUT /v1/rules) are fine: the server applies tightening at
+  once and makes every loosening wait, so nothing is skipped. Say so when an edit will wait.
 - You may build and fix Morganize's code. A change that weakens enforcement (an exception, a bypass,
   a way to turn it off) has to be called out as such, and only made if I ask for that change to the
   app itself, not as a one-off unlock.
