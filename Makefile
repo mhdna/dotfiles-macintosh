@@ -1,8 +1,14 @@
-.PHONY: dots delete
+.PHONY: dots delete agents
 
 dots:
 	# cp ~/.local/share/rofimoji/frecency ./rofimoji/.local/share/rofimoji/ > /dev/null 2>&1; rm ~/.local/share/rofimoji/frecency > /dev/null 2>&1
 	./stow-wrapper.sh --dotfiles --verbose --target=$$HOME --restow */
+
+# Starts the launchd agents the packages above put in ~/Library/LaunchAgents
+# (push-all-repos, ...): run once after `make dots` on a new Mac. Only the
+# ones linked from this repo, never another app's own agent.
+agents:
+	for p in */Library/LaunchAgents/*.plist; do launchctl load -w ~/Library/LaunchAgents/$$(basename "$$p"); done
 
 delete:
 	./stow-wrapper.sh --verbose --target=$$HOME --delete */
