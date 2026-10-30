@@ -58,6 +58,7 @@ local GROUPS = {
 		{ { "cmd" }, "space", "app launcher" },
 		{ { "ctrl" }, "space", "quick shell command" },
 		{ { "cmd", "shift" }, "space", "find files (recent first)" },
+		{ { "ctrl", "cmd" }, "space", "emoji picker (ctrl+c inserts)" },
 		{ { "alt", "shift" }, "s", "run a script" },
 		{ { "cmd", "shift" }, "\\", "now playing (space toggles)" },
 		{ { "ctrl", "alt" }, "-", "pick microphone" },

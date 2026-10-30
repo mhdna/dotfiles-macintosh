@@ -61,6 +61,7 @@ require("mmix")
 require("mcam")
 require("mclaude")
 require("morganize")
+require("moji")
 
 -- require("silent_alttab")
 
