@@ -1,7 +1,7 @@
 -- ctrl+cmd+space: Moji (~/Code/mac-utils/moji), a fast emoji picker in place of macOS's own.
 -- Moji stays running in the background so it opens instantly; this just pokes it with a
 -- distributed notification (with the caret's position, so it opens under the text you're
--- typing), and types back whatever it hands over when it closes.
+-- typing), and pastes back whatever it hands over when it closes.
 --
 --   type to search (forgiving), ctrl+n/p/f/b to move, return adds an emoji,
 --   ctrl+c closes and inserts them all, esc closes without inserting.
@@ -66,8 +66,22 @@ hs.hotkey.bind({ "ctrl", "cmd" }, "space", function()
 	hs.distributednotifications.post("com.mahdi.moji.toggle", where)
 end)
 
--- Moji closes on ctrl+c: wait for ctrl to come up (or the emoji would arrive as ctrl+a in a
--- terminal) and for focus to settle back in the field, then type it.
+-- Moji closes on ctrl+c: wait for ctrl to come up and focus to settle back in the field, then
+-- paste the emojis (keystrokes with emoji in them are dropped by terminals like Alacritty).
+-- The clipboard is put back afterwards and the paste is marked transient, so clipboard
+-- managers skip it.
+local function paste(text)
+	local saved = hs.pasteboard.readAllData()
+	hs.pasteboard.setContents(text)
+	pcall(hs.pasteboard.writeDataForUTI, "Apple CFPasteboard general", "org.nspasteboard.TransientType", "", true)
+	hs.eventtap.keyStroke({ "cmd" }, "v", 0)
+	hs.timer.doAfter(0.5, function()
+		if saved and next(saved) then
+			hs.pasteboard.writeAllData(saved)
+		end
+	end)
+end
+
 local insertWatcher = hs.distributednotifications.new(function(_, text)
 	if type(text) ~= "string" or text == "" then
 		return
@@ -76,7 +90,7 @@ local insertWatcher = hs.distributednotifications.new(function(_, text)
 		local m = hs.eventtap.checkKeyboardModifiers()
 		return not (m.alt or m.cmd or m.ctrl or m.shift)
 	end, function()
-		hs.eventtap.keyStrokes(text)
+		paste(text)
 	end, 0.01)
 end, "com.mahdi.moji.insert")
 insertWatcher:start()
