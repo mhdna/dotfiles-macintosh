@@ -17,16 +17,34 @@ fi
 
 echo "== $(date '+%F %T') push ($slot)"
 failed=0
+pushed=() broken=()
 while IFS= read -r line; do
   repo=${line%%#*}; repo=${repo//[[:space:]]/}; [[ -z $repo ]] && continue
   repo=${repo/#\~/$HOME}
   remote=$(git -C "$repo" remote 2>/dev/null | head -1)
   if [[ -z $remote ]]; then echo "$repo: no remote, skipped"; continue; fi
-  if out=$(git -C "$repo" push --all "$remote" 2>&1); then
-    echo "$repo: ok"
+  if out=$(git -C "$repo" push --all --porcelain "$remote" 2>&1); then
+    # A ref line flagged other than "=" (up to date) is something sent.
+    if echo "$out" | grep -qE $'^[ *+-]\t'; then pushed+=(${repo:t}); echo "$repo: pushed"
+    else echo "$repo: up to date"; fi
   else
-    failed=1; echo "$repo: push failed"; echo "$out" | sed 's/^/    /'
+    failed=1; broken+=(${repo:t}); echo "$repo: push failed"; echo "$out" | sed 's/^/    /'
   fi
 done < $list
+
+# One notification for the run, with the git logo: what went to GitHub, and
+# what didn't. A failure is told once per slot, not at every hourly retry.
+notified=${state:h}/notified-slot
+logo=~/.local/share/push-all-repos/git-logo.png
+message=""
+(( ${#pushed} )) && message="Pushed ${(j:, :)pushed}"
+if (( ${#broken} )) && [[ "$(cat $notified 2>/dev/null)" != "$slot" ]]; then
+  message="${message:+$message. }Failed: ${(j:, :)broken} (see ~/Library/Logs/push-all-repos.log)"
+  echo "$slot" > $notified
+fi
+if [[ -n $message ]] && command -v terminal-notifier >/dev/null; then
+  terminal-notifier -title "Pushed to GitHub" -message "$message" -contentImage "$logo" \
+    -group push-all-repos -open "file://$HOME/Library/Logs/push-all-repos.log" >/dev/null
+fi
 # A slot with a failure is retried next hour (offline, or a branch to sort out).
 (( failed )) || echo "$slot" > $state

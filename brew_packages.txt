@@ -74,3 +74,4 @@ edouard-claude/tap/snip # automatically prefixes shell commands with snip to red
 
 httpie # better curl
 mac-mouse-fix # fix mouse
+terminal-notifier
