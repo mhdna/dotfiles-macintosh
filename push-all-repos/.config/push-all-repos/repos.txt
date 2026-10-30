@@ -1,0 +1,24 @@
+# Repos pushed twice a day by ~/.local/bin/push-all-repos (one path per line).
+# Only your own main repos: not forks of others' projects, and never a backup
+# copy that shares a remote with the real one (kashi-backup, kashi.~1~, ...).
+~/dotfiles-mac
+~/Code/kashi
+~/Code/kashi-pos
+~/Code/kashi-commerce
+~/Code/aman-lomr
+~/Code/auto-commit
+~/Code/bnc-rewrite
+~/Code/chrome-plugins
+~/Code/distributed-systems-go
+~/Code/dotfiles
+~/Code/glockchain
+~/Code/go-bank
+~/Code/go-bookshop
+~/Code/go-inventory-management
+~/Code/lebanesebookshop
+~/Code/mac-utils
+~/Code/map-ascii
+~/Code/marionette
+~/Code/mhdna-blog
+~/Code/morganize-android
+~/Code/worldmonitor-tui

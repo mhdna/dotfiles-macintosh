@@ -1,0 +1,32 @@
+#!/bin/zsh
+# Pushes every branch of the repos in ~/.config/push-all-repos/repos.txt to
+# their remote, twice a day: once in the midday slot (from 13:00) and once in
+# the evening slot (from 21:00). launchd runs this every hour, so a slot the
+# Mac slept or was off through is pushed at the first hour it is awake.
+# Never forces: a branch the remote has moved past is left alone and logged.
+# Run with --now to push straight away, whatever the slot.
+list=~/.config/push-all-repos/repos.txt
+state=~/.local/state/push-all-repos/last-slot   # kept out of the dotfiles repo
+mkdir -p ${state:h}
+hour=$(date +%H)
+if (( 10#$hour >= 21 )); then slot="$(date +%F) evening"
+elif (( 10#$hour >= 13 )); then slot="$(date +%F) midday"
+else slot="$(date -v-1d +%F) evening"   # before 13:00: yesterday's evening push, if it was missed
+fi
+[[ "$1" != --now && -f $state && "$(cat $state)" == "$slot" ]] && exit 0
+
+echo "== $(date '+%F %T') push ($slot)"
+failed=0
+while IFS= read -r line; do
+  repo=${line%%#*}; repo=${repo//[[:space:]]/}; [[ -z $repo ]] && continue
+  repo=${repo/#\~/$HOME}
+  remote=$(git -C "$repo" remote 2>/dev/null | head -1)
+  if [[ -z $remote ]]; then echo "$repo: no remote, skipped"; continue; fi
+  if out=$(git -C "$repo" push --all "$remote" 2>&1); then
+    echo "$repo: ok"
+  else
+    failed=1; echo "$repo: push failed"; echo "$out" | sed 's/^/    /'
+  fi
+done < $list
+# A slot with a failure is retried next hour (offline, or a branch to sort out).
+(( failed )) || echo "$slot" > $state
