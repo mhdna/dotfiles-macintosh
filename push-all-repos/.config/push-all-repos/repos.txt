@@ -6,13 +6,11 @@
 ~/Code/kashi-pos
 ~/Code/kashi-commerce
 ~/Code/aman-lomr
-~/Code/auto-commit
 ~/Code/bnc-rewrite
 ~/Code/chrome-plugins
 ~/Code/distributed-systems-go
 ~/Code/dotfiles
 ~/Code/glockchain
-~/Code/go-bank
 ~/Code/go-bookshop
 ~/Code/go-inventory-management
 ~/Code/lebanesebookshop
