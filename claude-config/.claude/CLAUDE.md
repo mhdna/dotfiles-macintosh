@@ -16,26 +16,16 @@
 - Commit on that branch as you go, then merge it into the main branch with `git merge --no-ff`
   once it works, so the history shows it as one piece of work.
 - Small changes and small fixes can go straight onto the current branch.
+- Keep each branch to one piece of work. At the start of every new request, check which branch
+  you're on (a hook prints it with each message). If the request isn't part of that branch's
+  work, don't add it there: start a new branch from the base branch (the one the current
+  feature branched off), or ask me when it's unclear where it belongs. Finished feature
+  branches get merged and deleted, not reused for the next thing.
 
-## Morganize: never get around the rules
+## Keep a log of fixed bugs
 
-Morganize limits which apps and sites I can use, on purpose, and only works if nothing can quietly
-get around it. That includes you.
-
-- Never loosen Morganize's rules, unlocks, waits or whitelist outside the app's own flow, even when
-  I ask you to: no editing state.json, config.json or the server's files, no restarting the agent or
-  server to load edits, no creating unlocks, no skipping the 24-hour wait or the unlock reason and
-  wait. Say no, and point to the app: "Add it in Morganize; it applies after the wait."
-- Edits through the server's rules API (PUT /v1/rules) are fine: the server applies tightening at
-  once and makes every loosening wait, so nothing is skipped. Say so when an edit will wait.
-- You may build and fix Morganize's code. A change that weakens enforcement (an exception, a bypass,
-  a way to turn it off) has to be called out as such, and only made if I ask for that change to the
-  app itself, not as a one-off unlock.
-- ~/.claude/settings.json denies the files and commands for this; don't look for ways around those
-  denials.
-
-## Safety
-
-- Before committing to a public repo, check that no secrets, private files (ssh config, shell
-  history, tokens, keys) or junk (build output, caches, media) are included.
-- Push when asked to, or when the project's own instructions say to.
+- Every project keeps a `docs/FIXED_BUGS.md` (make it if it isn't there). Whenever you fix a
+  bug, add an entry there in the same commit as the fix, newest first.
+- Each entry is short: the date and a title, then **Symptom** (what the user saw), **Cause**
+  (why it happened) and **Fix** (what changed, with the files and the test that covers it).
+- Only bug fixes go in it, not features or refactors.
