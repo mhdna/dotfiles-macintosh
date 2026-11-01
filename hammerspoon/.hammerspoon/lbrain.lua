@@ -49,7 +49,8 @@ end
 -- ---------------------------------------------------------------- server
 
 local function request(method, path, body, callback)
-	local headers = { Authorization = "Bearer " .. cfg.token, ["Content-Type"] = "application/json" }
+	local headers = { Authorization = "Bearer " .. cfg.token, ["Content-Type"] = "application/json", ["Cache-Control"] = "no-cache" }
+	-- never from the URL cache: an answer from before the server's route existed (the shop's page) stuck around
 	hs.http.doAsyncRequest(cfg.server .. path, method, body and hs.json.encode(body) or nil, headers, function(status, text)
 		local data = nil
 		if text and text ~= "" then
@@ -57,7 +58,7 @@ local function request(method, path, body, callback)
 			if ok then data = decoded end
 		end
 		callback(status, data, text)
-	end)
+	end, "reloadIgnoringLocalCacheData")
 end
 
 local function newId() return (hs.host.uuid():gsub("-", ""):lower()) end
@@ -107,7 +108,7 @@ end
 -- Fetch a kept recording into the vault; calls back with its file name (or nil) and the bytes.
 local function fetchAudio(item, callback)
 	if not item.audio then return callback(nil, nil) end
-	hs.http.doAsyncRequest(cfg.server .. "/v1/audio/" .. item.id, "GET", nil, { Authorization = "Bearer " .. cfg.token }, function(status, bytes)
+	hs.http.doAsyncRequest(cfg.server .. "/v1/audio/" .. item.id, "GET", nil, { Authorization = "Bearer " .. cfg.token, ["Cache-Control"] = "no-cache" }, function(status, bytes)
 		if status ~= 200 or not bytes then return callback(false) end
 		local name = item.id .. ".m4a"
 		local ok = V.write(cfg.vault .. "/LBrain/audio/" .. name, bytes)
