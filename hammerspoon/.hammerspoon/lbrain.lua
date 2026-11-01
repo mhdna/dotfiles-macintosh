@@ -2,11 +2,10 @@
 -- go to lbrain-server (leevant.com/lbrain, also fed by the phone), and this Mac puts each in the
 -- Obsidian vault and, for what's worth memorizing, in Anki through AnkiConnect.
 --
---   ctrl+cmd+b   add a word, phrase or info (Claude fills the back; you can edit it)
---   ctrl+cmd+n   add a news line to today's heading in Events And News
---   ctrl+cmd+j   add a line to today's journal (cmd+⏎ opens today's note instead)
---   ctrl+cmd+d   add a todo, with an optional due date (→ Calendar/Inbox.md, in Tasks-plugin format)
---   ctrl+cmd+k   the calendar: this month's events (drag-calendar) and dated todos, and the open todos
+--   ctrl+cmd+j   a list of everything: add a word/phrase/info (the back is filled in for you),
+--                a todo (→ Calendar/Inbox.md, Tasks-plugin format), a journal line (⌘⏎ opens today's
+--                note instead), a news line, the month calendar with the open todos, open today's
+--                journal or the news in Obsidian, sync now. Type to filter, ⏎ to pick.
 --
 -- Also the 🧠 menu-bar item. Config: ~/.config/lbrain/config.json {server, token, vault}.
 -- Captures made while the server is out of reach wait in ~/.local/share/lbrain/outbox.json.
@@ -657,11 +656,44 @@ if menu then
 	menu:setMenu(buildMenu)
 end
 
-hs.hotkey.bind({ "ctrl", "cmd" }, "b", function() openPanel("card") end)
-hs.hotkey.bind({ "ctrl", "cmd" }, "n", function() openPanel("news") end)
-hs.hotkey.bind({ "ctrl", "cmd" }, "j", function() openPanel("journal") end)
-hs.hotkey.bind({ "ctrl", "cmd" }, "d", function() openPanel("todo") end)
-hs.hotkey.bind({ "ctrl", "cmd" }, "k", openCalendar)
+-- One shortcut: ctrl+cmd+j opens a list; type to filter, ⏎ to pick.
+local ACTIONS = {
+	{ text = "Word, phrase or info", subText = "a card for Anki + the vault", fn = function() openPanel("card") end },
+	{ text = "Todo", subText = "with an optional due date", fn = function() openPanel("todo") end },
+	{ text = "Journal", subText = "a line in today's note", fn = function() openPanel("journal") end },
+	{ text = "News", subText = "a line under today's date", fn = function() openPanel("news") end },
+	{ text = "Calendar", subText = "this month, events and open todos", fn = openCalendar },
+	{ text = "Open today's journal", subText = "in Obsidian", fn = function()
+		if not cfg then cfg = loadConfig() end
+		if cfg then openTodayInObsidian() end
+	end },
+	{ text = "Open news", subText = "in Obsidian", fn = function()
+		if not cfg then cfg = loadConfig() end
+		if cfg then hs.urlevent.openURL("obsidian://open?vault=" .. hs.http.encodeForQuery(cfg.vault:match("([^/]+)$")) .. "&file=" .. hs.http.encodeForQuery("Journal/Events And News")) end
+	end },
+	{ text = "Sync now", subText = function() return lastSync end, fn = function() M.sync() end },
+}
+
+local chooser = hs.chooser.new(function(choice)
+	if choice then
+		-- after the chooser has closed, so the panel it opens gets the keyboard
+		hs.timer.doAfter(0.05, ACTIONS[choice.index].fn)
+	end
+end)
+chooser:placeholderText("LBrain")
+chooser:rows(#ACTIONS)
+chooser:searchSubText(true)
+
+hs.hotkey.bind({ "ctrl", "cmd" }, "j", function()
+	if chooser:isVisible() then return chooser:hide() end
+	local choices = {}
+	for i, a in ipairs(ACTIONS) do
+		choices[i] = { text = a.text, subText = type(a.subText) == "function" and a.subText() or a.subText, index = i }
+	end
+	chooser:choices(choices)
+	chooser:query("")
+	chooser:show()
+end)
 
 M.timer = hs.timer.doEvery(SYNC_EVERY, M.sync)
 hs.timer.doAfter(3, M.sync)

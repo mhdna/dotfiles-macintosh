@@ -127,11 +127,7 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "o", "open Morganize (vim keys)" },
 	} },
 	{ "Second brain (LBrain)", "#c792ea", {
-		{ { "ctrl", "cmd" }, "b", "add a word, phrase or info (→ vault + Anki)" },
-		{ { "ctrl", "cmd" }, "n", "add news" },
-		{ { "ctrl", "cmd" }, "j", "add to the journal (⌘⏎ opens today's note)" },
-		{ { "ctrl", "cmd" }, "d", "add a todo (optional due date)" },
-		{ { "ctrl", "cmd" }, "k", "calendar: month, events, open todos" },
+		{ { "ctrl", "cmd" }, "j", "LBrain list: word, todo, journal, news, calendar" },
 	} },
 	{ "Hammerspoon & misc", "#d0d0d0", {
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },
