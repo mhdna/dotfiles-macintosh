@@ -278,7 +278,10 @@ local PAGE = [=[
 <!doctype html><meta charset="utf-8">
 <style>
   :root { color-scheme: dark; }
-  body { margin: 0; padding: 16px 18px; background: #2e2925; color: #e8dfd3; font: 15px -apple-system, "SF Pro Text", sans-serif; }
+  body { margin: 0; padding: 16px 18px; background: #2e2925; color: #e8dfd3; font: 15px -apple-system, "SF Pro Text", sans-serif; border: 1px solid #786a5c; border-radius: 12px; min-height: calc(100vh - 34px); }
+  html { background: transparent; }
+  .x { position: absolute; top: 8px; right: 10px; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 13px; cursor: pointer; opacity: .55; font-size: 14px; user-select: none; z-index: 10; }
+  .x:hover { opacity: 1; background: #4a4139; }
   .chips { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
   .chip { padding: 4px 10px; border-radius: 12px; border: 1px solid #786a5c; cursor: pointer; user-select: none; font-size: 13px; }
   .chip.on { background: #d97757; border-color: #d97757; color: #fff; }
@@ -303,6 +306,7 @@ local PAGE = [=[
   #pickGrid div:not(.dow):hover { background: #4a4139; }
   #pickGrid .on:hover { background: #d97757; }
 </style>
+<div class="x" onclick="post({ type: 'close' })">✕</div>
 <div id="chips" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
 <div id="card" class="__CARDCLASS__">
@@ -492,7 +496,9 @@ local function openPanel(mode)
 	local screen = hs.screen.mainScreen():frame()
 	local w, h = 560, card and 360 or (mode == "todo" and 600 or 230)
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, math.min(screen.h * 0.22, screen.h - h - 40)), w = w, h = h }, {}, uc)
-	panel:windowStyle({ "titled", "closable", "utility" })
+	panel:windowStyle({ "borderless" })
+		:transparent(true)
+		:shadow(true)
 		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or (mode == "todo" and "LBrain · todo" or "LBrain · journal")))
 		:level(hs.drawing.windowLevels.floating)
 		:allowTextEntry(true)
@@ -511,7 +517,11 @@ local CAL_PAGE = [=[
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: #2e2925; color: #e8dfd3; font: 13px -apple-system, "SF Pro Text", sans-serif; display: flex; height: 100vh; }
+  body { margin: 0; background: #2e2925; color: #e8dfd3; font: 13px -apple-system, "SF Pro Text", sans-serif; display: flex; height: calc(100vh - 2px); border: 1px solid #786a5c; border-radius: 12px; overflow: hidden; }
+  html { background: transparent; }
+  .x { position: absolute; top: 8px; right: 10px; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 13px; cursor: pointer; opacity: .55; font-size: 14px; user-select: none; z-index: 10; }
+  .x:hover { opacity: 1; background: #4a4139; }
+  #dayTitle { padding-right: 24px; }
   #main { flex: 1; display: flex; flex-direction: column; padding: 12px 14px; min-width: 0; }
   #side { width: 290px; border-left: 1px solid #4a4139; padding: 12px 14px; overflow-y: auto; }
   header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
@@ -540,6 +550,7 @@ local CAL_PAGE = [=[
   #todos { margin-top: 18px; }
   .hint { opacity: .45; font-size: 11px; margin-top: 10px; }
 </style>
+<div class="x" onclick="post({ type: 'close' })">✕</div>
 <div id="main">
   <header><h1 id="title"></h1><button onclick="go(-1)">‹</button><button onclick="today()">Today</button><button onclick="go(1)">›</button></header>
   <div id="grid"></div>
@@ -646,7 +657,9 @@ local function openCalendar()
 	local screen = hs.screen.mainScreen():frame()
 	local w, h = math.min(1180, screen.w - 80), math.min(740, screen.h - 80)
 	calendar = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + (screen.h - h) / 2, w = w, h = h }, {}, uc)
-	calendar:windowStyle({ "titled", "closable", "utility" })
+	calendar:windowStyle({ "borderless" })
+		:transparent(true)
+		:shadow(true)
 		:windowTitle("LBrain · calendar")
 		:level(hs.drawing.windowLevels.floating)
 		:allowTextEntry(true)
