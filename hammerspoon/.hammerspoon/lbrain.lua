@@ -88,7 +88,10 @@ local function epochOf(iso)
 end
 
 local function ankiCall(action, params, callback)
-	local body = hs.json.encode({ action = action, version = 6, params = params })
+	-- an empty Lua table encodes as [], which AnkiConnect rejects as "params": leave params out when there are none
+	local request = { action = action, version = 6 }
+	if next(params) ~= nil then request.params = params end
+	local body = hs.json.encode(request)
 	hs.http.doAsyncRequest(ANKI, "POST", body, { ["Content-Type"] = "application/json" }, function(status, text)
 		if status ~= 200 then return callback(nil, "Anki is not answering (is AnkiConnect installed?)") end
 		local ok, reply = pcall(hs.json.decode, text)
