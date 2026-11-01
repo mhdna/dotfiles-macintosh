@@ -254,9 +254,13 @@ local function flushOutbox(callback)
 	step(1)
 end
 
+-- Items made after this moment (a few seconds early, for clock differences) wake the listener below.
+local sinceMark = os.date("!%Y-%m-%dT%H:%M:%SZ", os.time() - 3)
+
 function M.sync()
 	if not cfg or syncing then return end
 	syncing = true
+	sinceMark = os.date("!%Y-%m-%dT%H:%M:%SZ", os.time() - 3)
 	flushOutbox(function()
 		request("GET", "/v1/items?pending=1", nil, function(status, items)
 			if status ~= 200 or type(items) ~= "table" then
@@ -654,7 +658,24 @@ hs.hotkey.bind({ "ctrl", "cmd" }, "j", function()
 	chooser:show()
 end)
 
+-- The server holds this request open until something is captured (or ~25s pass), so a capture from the
+-- phone is applied at once. The timer below stays as a backstop, and "Sync now" still works.
+local function listen()
+	if not cfg then return end
+	request("GET", "/v1/wait?since=" .. hs.http.encodeForQuery(sinceMark), nil, function(status, data)
+		if status == 200 and type(data) == "table" and data.changed then
+			M.sync()
+			hs.timer.doAfter(1, listen)
+		elseif status == 200 then
+			hs.timer.doAfter(0.2, listen)
+		else
+			hs.timer.doAfter(5, listen) -- offline, asleep, or the server restarting
+		end
+	end)
+end
+
 M.timer = hs.timer.doEvery(SYNC_EVERY, M.sync)
 hs.timer.doAfter(3, M.sync)
+hs.timer.doAfter(4, listen)
 
 return M
