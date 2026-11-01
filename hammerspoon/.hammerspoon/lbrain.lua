@@ -296,15 +296,15 @@ local PAGE = [=[
 <!doctype html><meta charset="utf-8">
 <style>
   :root { color-scheme: dark; }
-  body { margin: 0; padding: 16px 18px; background: #2b2c2e; color: #e4e4e6; font: 15px -apple-system, "SF Pro Text", sans-serif; border: 1px solid #56585c; border-radius: 12px; min-height: calc(100vh - 34px); }
+  body { margin: 0; padding: 16px 18px; background: #2a2a2c; color: #e4e4e6; font: 15px -apple-system, "SF Pro Text", sans-serif; border: 1px solid #58585b; border-radius: 12px; min-height: calc(100vh - 34px); }
   html { background: transparent; }
   .x { position: absolute; top: 8px; right: 10px; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 13px; cursor: pointer; opacity: .55; font-size: 14px; user-select: none; z-index: 10; }
-  .x:hover { opacity: 1; background: #444649; }
+  .x:hover { opacity: 1; background: #3e3e41; }
   .chips { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-  .chip { padding: 4px 10px; border-radius: 12px; border: 1px solid #56585c; cursor: pointer; user-select: none; font-size: 13px; }
-  .chip.on { background: #a1796a; border-color: #a1796a; color: #fff; }
-  textarea, input { width: 100%; box-sizing: border-box; background: #353638; color: inherit; border: 1px solid #56585c; border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 8px; outline: none; }
-  textarea:focus, input:focus { border-color: #a1796a; }
+  .chip { padding: 4px 10px; border-radius: 12px; border: 1px solid #58585b; cursor: pointer; user-select: none; font-size: 13px; }
+  .chip.on { background: #77736f; border-color: #77736f; color: #fff; }
+  textarea, input { width: 100%; box-sizing: border-box; background: #333335; color: inherit; border: 1px solid #58585b; border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 8px; outline: none; }
+  textarea:focus, input:focus { border-color: #77736f; }
   textarea { resize: none; }
   label { font-size: 12px; opacity: .65; display: block; margin: 2px 0 3px; }
   .row { display: flex; gap: 10px; align-items: center; }
@@ -312,17 +312,17 @@ local PAGE = [=[
   .hint { font-size: 12px; opacity: .55; margin-top: 4px; }
   #status { color: #f0c049; font-size: 12px; min-height: 16px; }
   .hide { display: none; }
-  .pick { border: 1px solid #56585c; border-radius: 10px; padding: 8px 10px; background: #353638; }
+  .pick { border: 1px solid #58585b; border-radius: 10px; padding: 8px 10px; background: #333335; }
   .pickhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 15px; }
   .arrow { cursor: pointer; padding: 0 14px; font-size: 22px; line-height: 22px; user-select: none; }
   #pickGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
   #pickGrid div { text-align: center; padding: 9px 0; border-radius: 8px; cursor: pointer; font-size: 15px; }
   #pickGrid .dow { cursor: default; opacity: .5; font-size: 12px; padding: 3px 0; }
   #pickGrid .other { opacity: .35; }
-  #pickGrid .today { box-shadow: inset 0 0 0 1.5px #a1796a; }
-  #pickGrid .on { background: #a1796a; color: #fff; }
-  #pickGrid div:not(.dow):hover { background: #444649; }
-  #pickGrid .on:hover { background: #a1796a; }
+  #pickGrid .today { box-shadow: inset 0 0 0 1.5px #77736f; }
+  #pickGrid .on { background: #77736f; color: #fff; }
+  #pickGrid div:not(.dow):hover { background: #3e3e41; }
+  #pickGrid .on:hover { background: #77736f; }
 </style>
 <div class="x" onclick="post({ type: 'close' })">✕</div>
 <div id="chips" class="chips"></div>
