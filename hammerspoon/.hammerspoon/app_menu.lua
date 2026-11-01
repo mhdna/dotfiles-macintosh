@@ -16,8 +16,8 @@ local appDirs = {
 -- Apps on external drives (/Volumes/<drive>/Applications, /Volumes/<drive>/Games)
 local function volumeDirs()
 	local dirs = {}
-	local iterFn, dirObj = hs.fs.dir("/Volumes")
-	if iterFn then
+	local ok, iterFn, dirObj = pcall(hs.fs.dir, "/Volumes")
+	if ok and iterFn then
 		for vol in iterFn, dirObj do
 			if vol:sub(1, 1) ~= "." then
 				table.insert(dirs, "/Volumes/" .. vol .. "/Applications")
@@ -95,8 +95,13 @@ local function buildAppList()
 	-- walk subfolders too (Utilities, vendor folders, Chrome/Steam app folders),
 	-- but never descend into .app bundles themselves
 	local function scan(dir, depth)
-		local iterFn, dirObj = hs.fs.dir(dir)
-		if not iterFn then
+		-- hs.fs.dir raises an error (it does not return nil) for a folder that
+		-- does not exist, e.g. Steam's or ~/Games on a Mac without them
+		if hs.fs.attributes(dir, "mode") ~= "directory" then
+			return
+		end
+		local okDir, iterFn, dirObj = pcall(hs.fs.dir, dir)
+		if not okDir or not iterFn then
 			return
 		end
 		for file in iterFn, dirObj do
