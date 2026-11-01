@@ -1,20 +1,20 @@
--- Brain: a second brain. Capture words, phrases, info, news and journal lines in one keystroke; they
--- go to brain-server (leevant.com/brain, also fed by the phone), and this Mac puts each in the
+-- LBrain: a second brain. Capture words, phrases, info, news and journal lines in one keystroke; they
+-- go to lbrain-server (leevant.com/lbrain, also fed by the phone), and this Mac puts each in the
 -- Obsidian vault and, for what's worth memorizing, in Anki through AnkiConnect.
 --
 --   ctrl+cmd+b   add a word, phrase or info (Claude fills the back; you can edit it)
 --   ctrl+cmd+n   add a news line to today's heading in Events And News
 --   ctrl+cmd+j   add a line to today's journal (cmd+⏎ opens today's note instead)
 --
--- Also the 🧠 menu-bar item. Config: ~/.config/brain/config.json {server, token, vault}.
--- Captures made while the server is out of reach wait in ~/.local/share/brain/outbox.json.
--- Vault and card formats live in brain_vault.lua (tested by tests/brain_vault_test.lua).
+-- Also the 🧠 menu-bar item. Config: ~/.config/lbrain/config.json {server, token, vault}.
+-- Captures made while the server is out of reach wait in ~/.local/share/lbrain/outbox.json.
+-- Vault and card formats live in lbrain_vault.lua (tested by tests/lbrain_vault_test.lua).
 
-local V = require("brain_vault")
+local V = require("lbrain_vault")
 
 local HOME = os.getenv("HOME")
-local CONFIG = HOME .. "/.config/brain/config.json"
-local OUTBOX = HOME .. "/.local/share/brain/outbox.json"
+local CONFIG = HOME .. "/.config/lbrain/config.json"
+local OUTBOX = HOME .. "/.local/share/lbrain/outbox.json"
 local ANKI = "http://127.0.0.1:8765"
 local SYNC_EVERY = 60
 
@@ -30,15 +30,15 @@ local syncing = false
 local function loadConfig()
 	local c = hs.json.read(CONFIG)
 	if not c then
-		os.execute(string.format("mkdir -p %q", HOME .. "/.config/brain"))
-		hs.json.write({ server = "https://leevant.com/brain", token = "", vault = HOME .. "/personal/notes" }, CONFIG, true, true)
-		hs.alert.show("Brain: put the device token in ~/.config/brain/config.json", 4)
+		os.execute(string.format("mkdir -p %q", HOME .. "/.config/lbrain"))
+		hs.json.write({ server = "https://leevant.com/lbrain", token = "", vault = HOME .. "/personal/notes" }, CONFIG, true, true)
+		hs.alert.show("LBrain: put the device token in ~/.config/lbrain/config.json", 4)
 		return nil
 	end
 	c.server = (c.server or ""):gsub("/+$", "")
 	c.vault = c.vault or (HOME .. "/personal/notes")
 	if (c.token or "") == "" then
-		hs.alert.show("Brain: the token in ~/.config/brain/config.json is empty", 4)
+		hs.alert.show("LBrain: the token in ~/.config/lbrain/config.json is empty", 4)
 		return nil
 	end
 	return c
@@ -65,7 +65,7 @@ local function newId() return (hs.host.uuid():gsub("-", ""):lower()) end
 local function readOutbox() return hs.json.read(OUTBOX) or {} end
 
 local function writeOutbox(list)
-	os.execute(string.format("mkdir -p %q", HOME .. "/.local/share/brain"))
+	os.execute(string.format("mkdir -p %q", HOME .. "/.local/share/lbrain"))
 	hs.json.write(list, OUTBOX, true, true)
 end
 
@@ -108,7 +108,7 @@ local function fetchAudio(item, callback)
 	hs.http.doAsyncRequest(cfg.server .. "/v1/audio/" .. item.id, "GET", nil, { Authorization = "Bearer " .. cfg.token }, function(status, bytes)
 		if status ~= 200 or not bytes then return callback(false) end
 		local name = item.id .. ".m4a"
-		local ok = V.write(cfg.vault .. "/Brain/audio/" .. name, bytes)
+		local ok = V.write(cfg.vault .. "/LBrain/audio/" .. name, bytes)
 		callback(ok and name or false, bytes)
 	end)
 end
@@ -138,12 +138,14 @@ local function apply(item, done)
 		if dest == "card" and item.memorize then
 			local note = V.ankiNote(item, audioName)
 			local function add()
+				ankiCall("createDeck", { deck = note.deckName }, function()
 				ankiCall("addNote", { note = note }, function(_, err)
 					if err and not err:lower():find("duplicate") then
 						startAnki()
 						return done(false, err)
 					end
 					toVault(audioName)
+				end)
 				end)
 			end
 			if audioName then
@@ -200,7 +202,7 @@ local function flushOutbox(callback)
 			if status ~= 200 and status ~= 201 then
 				if status == 400 then
 					-- the server will never take this one; don't let it block the rest
-					hs.printf("brain: dropping an item the server refused: %s", hs.json.encode(item))
+					hs.printf("lbrain: dropping an item the server refused: %s", hs.json.encode(item))
 				else
 					keep[#keep + 1] = item
 				end
@@ -238,9 +240,9 @@ local function submit(item)
 	request("POST", "/v1/items", item, function(status)
 		if status ~= 200 and status ~= 201 then
 			queue(item)
-			hs.alert.show("Brain: server unreachable, saved to send later", 2)
+			hs.alert.show("LBrain: server unreachable, saved to send later", 2)
 		else
-			hs.alert.show("Brain: saved", 0.7)
+			hs.alert.show("LBrain: saved", 0.7)
 		end
 		M.sync()
 	end)
@@ -284,7 +286,7 @@ const MODE = "__MODE__";
 const KINDS = [["en_word","EN word"],["en_phrase","EN phrase"],["ar_word","AR word"],["ar_phrase","AR phrase"],["info","Info"]];
 let kind = "en_word", seq = 0, timer = null, backEdited = false;
 const $ = id => document.getElementById(id);
-const post = m => window.webkit.messageHandlers.brain.postMessage(m);
+const post = m => window.webkit.messageHandlers.lbrain.postMessage(m);
 
 function drawChips() {
   if (MODE !== "card") return;
@@ -365,7 +367,7 @@ local function todayPath() return V.dayPath(cfg.vault, os.date("%Y-%m-%d")) end
 local function openTodayInObsidian()
 	local date = os.date("%Y-%m-%d")
 	local path = V.ensureDay(cfg.vault, date, os.date("%H:%M"))
-	if not path then return hs.alert.show("Brain: could not make today's note", 2) end
+	if not path then return hs.alert.show("LBrain: could not make today's note", 2) end
 	hs.urlevent.openURL("obsidian://open?vault=" .. hs.http.encodeForQuery(cfg.vault:match("([^/]+)$")) .. "&file=" .. hs.http.encodeForQuery("Journal/Days/" .. date))
 end
 
@@ -380,7 +382,7 @@ local function openPanel(mode)
 		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or "journal"))
 		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌥1–5 kind · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
-	local uc = hs.webview.usercontent.new("brain")
+	local uc = hs.webview.usercontent.new("lbrain")
 	uc:setCallback(function(msg)
 		local body = msg.body
 		if body.type == "close" then
@@ -414,7 +416,7 @@ local function openPanel(mode)
 	local w, h = 560, card and 360 or 230
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + screen.h * 0.22, w = w, h = h }, {}, uc)
 	panel:windowStyle({ "titled", "closable", "utility" })
-		:windowTitle(card and "Brain" or (mode == "news" and "Brain · news" or "Brain · journal"))
+		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or "LBrain · journal"))
 		:level(hs.drawing.windowLevels.floating)
 		:allowTextEntry(true)
 		:html(page)

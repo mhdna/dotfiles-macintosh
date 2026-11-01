@@ -126,7 +126,7 @@ local GROUPS = {
 	{ "App time limits (Morganize)", "#e07a4f", {
 		{ { "ctrl", "cmd" }, "o", "open Morganize (vim keys)" },
 	} },
-	{ "Second brain (Brain)", "#c792ea", {
+	{ "Second brain (LBrain)", "#c792ea", {
 		{ { "ctrl", "cmd" }, "b", "add a word, phrase or info (→ vault + Anki)" },
 		{ { "ctrl", "cmd" }, "n", "add news" },
 		{ { "ctrl", "cmd" }, "j", "add to the journal (⌘⏎ opens today's note)" },

@@ -1,5 +1,5 @@
--- brain_vault.lua: where a captured item goes in the Obsidian vault, and what its Anki card looks
--- like. Pure Lua (no hs.*), so tests/brain_vault_test.lua runs it with plain `lua`.
+-- lbrain_vault.lua: where a captured item goes in the Obsidian vault, and what its Anki card looks
+-- like. Pure Lua (no hs.*), so tests/lbrain_vault_test.lua runs it with plain `lua`.
 
 local M = {}
 
@@ -8,15 +8,15 @@ M.DECKS = {
 	en_phrase = "TODO Language::[English] Phrases",
 	ar_word = "TODO Language::[Arabic] Words",
 	ar_phrase = "TODO Language::[Arabic] Phrases",
-	info = "Brain::Info",
+	info = "LBrain::Info",
 }
 
 M.FILES = {
-	en_word = "Brain/English words.md",
-	en_phrase = "Brain/English phrases.md",
-	ar_word = "Brain/Arabic words.md",
-	ar_phrase = "Brain/Arabic phrases.md",
-	info = "Brain/Info.md",
+	en_word = "LBrain/English words.md",
+	en_phrase = "LBrain/English phrases.md",
+	ar_word = "LBrain/Arabic words.md",
+	ar_phrase = "LBrain/Arabic phrases.md",
+	info = "LBrain/Info.md",
 }
 
 M.LABELS = {
@@ -137,9 +137,9 @@ function M.appendCard(root, item, date, audioName)
 	return write(path, text .. M.cardLine(item, date, audioName) .. "\n")
 end
 
--- A voice note aimed at "inbox", or an item with no home of its own, lands in Brain/Inbox.md.
+-- A voice note aimed at "inbox", or an item with no home of its own, lands in LBrain/Inbox.md.
 function M.appendInbox(root, item, date, time, audioName)
-	local path = root .. "/Brain/Inbox.md"
+	local path = root .. "/LBrain/Inbox.md"
 	local text = read(path) or ""
 	if text ~= "" and text:sub(-1) ~= "\n" then text = text .. "\n" end
 	local line = "- " .. date .. " " .. time .. " — " .. trim(item.text):gsub("\n", "\n  ")
@@ -166,7 +166,7 @@ function M.ankiNote(item, audioName)
 		modelName = "Basic",
 		fields = { Front = html(item.text), Back = back },
 		options = { allowDuplicate = false, duplicateScope = "deck" },
-		tags = { "brain", item.kind },
+		tags = { "lbrain", item.kind },
 	}
 end
 
