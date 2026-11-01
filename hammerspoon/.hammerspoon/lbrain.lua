@@ -206,6 +206,84 @@ local function pushCalendar()
 	if ok then request("PUT", "/v1/calendar", snap, function() end) end
 end
 
+-- ---------------------------------------------------------------- done marks and reminders
+
+local reported = {} -- ids ticked in the vault that the server has already been told about
+local lastNag = {}  -- id -> when we last bothered you about it
+local NAG_EVERY = 10 * 60
+local remindersNow = {}
+
+-- A todo marked done on the phone (or by a notification) gets its box ticked in the vault; one you tick in Obsidian is
+-- reported to the server, so every device stops reminding.
+local function reconcileDone(finish)
+	for _, id in ipairs(V.tickedIds(cfg.vault)) do
+		if not reported[id] then
+			reported[id] = true
+			request("POST", "/v1/items/" .. id .. "/done", nil, function(status)
+				if status ~= 200 and status ~= 404 then reported[id] = nil end -- try again next time
+			end)
+		end
+	end
+	request("GET", "/v1/items?done=1", nil, function(status, items)
+		if status == 200 and type(items) == "table" then
+			for _, it in ipairs(items) do
+				V.tickInbox(cfg.vault, it.id, os.date("%Y-%m-%d"))
+				reported[it.id] = true
+				request("POST", "/v1/items/" .. it.id .. "/done-seen", nil, function() end)
+			end
+		end
+		finish()
+	end)
+end
+
+local function markDone(id)
+	reported[id] = true
+	lastNag[id] = nil
+	request("POST", "/v1/items/" .. id .. "/done", nil, function()
+		reconcileDone(function() end)
+		hs.timer.doAfter(0.5, function() M.checkReminders() end)
+	end)
+end
+
+-- When is a reminder due? Its day and time; without a time, 09:00.
+local function dueAt(r)
+	local y, m, d = r.due:match("^(%d+)-(%d+)-(%d+)")
+	local hh, mm = (r.time ~= nil and r.time ~= "" and r.time or "09:00"):match("^(%d+):(%d+)")
+	return os.time({ year = y, month = m, day = d, hour = hh, min = mm, sec = 0 })
+end
+
+local notifications = {} -- kept alive until answered
+
+function M.checkReminders()
+	if not cfg then return end
+	request("GET", "/v1/reminders", nil, function(status, list)
+		if status ~= 200 or type(list) ~= "table" then return end
+		remindersNow = list
+		local now = os.time()
+		for _, r in ipairs(list) do
+			if dueAt(r) <= now and (lastNag[r.id] or 0) + NAG_EVERY <= now then
+				lastNag[r.id] = now
+				local late = now - dueAt(r) > 60
+				local n = hs.notify.new(function(note, how)
+					notifications[r.id] = nil
+					if how == hs.notify.activationTypes.actionButtonClicked then markDone(r.id)
+					elseif how == hs.notify.activationTypes.contentsClicked then markDone(r.id) end
+				end, {
+					title = "Reminder" .. (late and " (still open)" or ""),
+					informativeText = r.text,
+					actionButtonTitle = "Done",
+					otherButtonTitle = "Later",
+					hasActionButton = true,
+					withdrawAfter = 0,
+					soundName = "Glass",
+				})
+				notifications[r.id] = n
+				n:send()
+			end
+		end
+	end)
+end
+
 -- ---------------------------------------------------------------- sync
 
 local function refreshMenu()
@@ -274,7 +352,7 @@ function M.sync()
 				pending = failed + #readOutbox()
 				if failed == 0 then lastSync = "synced " .. os.date("%H:%M") end
 				refreshMenu()
-				pushCalendar()
+				reconcileDone(function() pushCalendar() end)
 			end)
 		end)
 	end)
@@ -356,6 +434,15 @@ local PAGE = [=[
     <div class="chip" onclick="setDue(1)">Tomorrow</div>
     <div class="chip" onclick="setDue(7)">+ week</div>
     <div class="chip" onclick="setDue(null)">None</div>
+  </div>
+  <div class="row" style="margin-bottom:8px">
+    <label style="margin:0;white-space:nowrap">At</label>
+    <input id="when" type="text" placeholder="HH:mm" maxlength="5" style="width:90px;margin:0">
+    <div class="chip" onclick="setTime('09:00')">9:00</div>
+    <div class="chip" onclick="setTime('13:00')">13:00</div>
+    <div class="chip" onclick="setTime('18:00')">18:00</div>
+    <div class="chip" onclick="setTime('')">No time</div>
+    <label style="margin:0 0 0 auto;white-space:nowrap"><input id="remind" type="checkbox" style="width:auto;margin:0 4px 0 0" checked> keep reminding me</label>
   </div>
   <div class="pick">
     <div class="pickhead"><span class="arrow" onclick="pickMonth(-1)">‹</span><b id="pickTitle"></b><span class="arrow" onclick="pickMonth(1)">›</span></div>
@@ -439,7 +526,7 @@ let draft = null, parsedFor = "";
 function describe(d) {
   const kinds = { en_word: "English word", en_phrase: "English phrase", ar_word: "Arabic word", ar_phrase: "Arabic phrase", info: "Info", todo: "Todo", news: "News", journal: "Journal" };
   const cats = { use_more: "Use more", funny: "Funny", slang: "Slang", idiom: "Idioms & proverbs" };
-  let s = "<b>" + (kinds[d.kind] || d.kind) + "</b>" + (d.category ? " · " + cats[d.category] : "") + (d.due ? " · due " + d.due : "") + "\n" + (d.text || "").replace(/</g, "&lt;");
+  let s = "<b>" + (kinds[d.kind] || d.kind) + "</b>" + (d.category ? " · " + cats[d.category] : "") + (d.due ? " · due " + d.due + (d.time ? " " + d.time : "") : "") + (d.remind ? " · keeps reminding" : "") + "\n" + (d.text || "").replace(/</g, "&lt;");
   if (d.back) s += "\n<b>back:</b> " + d.back.replace(/</g, "&lt;");
   if (d.example) s += "\n<b>example:</b> " + d.example.replace(/</g, "&lt;");
   if (d.topic) s += "\n<b>topic:</b> " + d.topic;
@@ -459,6 +546,7 @@ function setDue(days) {
   else { const d = new Date(Date.now() + days * 86400000); dueVal = ymd(d); pickYM = [d.getFullYear(), d.getMonth()]; }
   drawPicker();
 }
+function setTime(t) { $("when").value = t; }
 function pickDay(s) { dueVal = dueVal === s ? "" : s; drawPicker(); }
 function pickMonth(n) { const d = new Date(pickYM[0], pickYM[1] + n, 1); pickYM = [d.getFullYear(), d.getMonth()]; drawPicker(); }
 function drawPicker() {
@@ -485,7 +573,10 @@ function save() {
     return;
   }
   if (MODE === "todo") {
-    post({ type: "save", text, due: dueVal });
+    const when = $("when").value.trim();
+    if (when && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(when)) { $("dueLabel").textContent = "time should look like 09:30"; return; }
+    const hhmm = when ? when.padStart(5, "0") : "";
+    post({ type: "save", text, due: dueVal, time: dueVal ? hhmm : "", remind: $("remind").checked && !!dueVal });
   } else if (MODE === "card") {
     const single = $("single").checked;
     post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
@@ -590,11 +681,12 @@ local function openPanel(mode, preset)
 				local d = body.draft
 				submit({ kind = d.kind, text = d.text, back = d.back ~= "" and d.back or nil, example = d.example ~= "" and d.example or nil,
 					topic = d.topic ~= "" and d.topic or nil, category = d.category ~= "" and d.category or nil, single = d.single or nil,
-					memorize = d.memorize, due = d.due ~= "" and d.due or nil })
+					memorize = d.memorize, due = d.due ~= "" and d.due or nil, time = d.time ~= "" and d.time or nil, remind = d.remind or nil })
 			elseif mode == "card" then
 				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil })
 			elseif mode == "todo" then
-				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, memorize = false })
+				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, time = body.time ~= "" and body.time or nil,
+					remind = body.remind or nil, memorize = false })
 			else
 				submit({ kind = mode, text = body.text, memorize = false })
 			end
@@ -720,6 +812,7 @@ local function listen()
 end
 
 M.timer = hs.timer.doEvery(SYNC_EVERY, M.sync)
+M.nagTimer = hs.timer.doEvery(60, M.checkReminders)
 M.first = hs.timer.doAfter(3, M.sync)
 M.listener = hs.timer.doAfter(4, listen)
 
