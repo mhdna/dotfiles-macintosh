@@ -75,9 +75,12 @@ local function buildAppList()
 		end
 		local image = iconCache[path]
 		if image == nil then
-			local info = hs.application.infoForBundlePath(path)
-			if info and info.CFBundleIdentifier then
-				image = hs.image.imageFromAppBundle(info.CFBundleIdentifier)
+			local ok, info = pcall(hs.application.infoForBundlePath, path)
+			if ok and type(info) == "table" and info.CFBundleIdentifier then
+				local okImage, found = pcall(hs.image.imageFromAppBundle, info.CFBundleIdentifier)
+				if okImage then
+					image = found
+				end
 			end
 			iconCache[path] = image or false
 		end
@@ -154,13 +157,23 @@ local function refreshFromSpotlight()
 end
 
 refreshCache()
-refreshFromSpotlight()
+hs.timer.doAfter(3, refreshFromSpotlight)
 
--- rebuild the cache when an app is installed/removed/updated
+-- Rebuild the cache when an app is installed/removed/updated. Only the three
+-- main folders are watched (Steam's folder and /Users/Shared change constantly
+-- while games update; they are picked up whenever the launcher opens), and a
+-- burst of changes rebuilds once, a second after the last one.
 local appDirWatchers = {}
-for _, dir in ipairs(appDirs) do
+local refreshTimer = nil
+local function refreshSoon()
+	if refreshTimer then
+		refreshTimer:stop()
+	end
+	refreshTimer = hs.timer.doAfter(1, refreshCache)
+end
+for _, dir in ipairs({ "/Applications", "/System/Applications", home .. "/Applications" }) do
 	if hs.fs.attributes(dir, "mode") == "directory" then
-		local watcher = hs.pathwatcher.new(dir, refreshCache)
+		local watcher = hs.pathwatcher.new(dir, refreshSoon)
 		watcher:start()
 		table.insert(appDirWatchers, watcher)
 	end
