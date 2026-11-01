@@ -56,6 +56,8 @@ eq(V.read(V.newsPath(root)), "# Events & News\n\n## 2026-11-01\n- big news\n", "
 assert(V.appendCard(root, { kind = "en_word", text = "solidarity", back = "unity" }, "2026-11-01"))
 assert(V.appendCard(root, { kind = "en_word", text = "bridle", back = "restrain" }, "2026-11-01"))
 eq(V.read(root .. "/LBrain/English words.md"), "- **solidarity** — unity _(2026-11-01)_\n- **bridle** — restrain _(2026-11-01)_\n", "card file appends")
+assert(V.appendCard(root, { kind = "en_word", text = "bridle", back = "restrain", category = "funny" }, "2026-11-01"))
+eq(V.read(root .. "/LBrain/English words - Funny.md"), "- **bridle** — restrain _(2026-11-01)_\n", "a category has its own file")
 assert(V.appendInbox(root, { text = "idea" }, "2026-11-01", "11:00"))
 eq(V.read(root .. "/LBrain/Inbox.md"), "- 2026-11-01 11:00 — idea\n", "inbox")
 os.execute("rm -rf '" .. root .. "'")
