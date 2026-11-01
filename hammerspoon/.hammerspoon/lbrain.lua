@@ -291,7 +291,17 @@ local PAGE = [=[
   .hint { font-size: 12px; opacity: .55; margin-top: 4px; }
   #status { color: #f0c049; font-size: 12px; min-height: 16px; }
   .hide { display: none; }
-  input[type=date] { width: auto; margin: 0; }
+  .pick { border: 1px solid #786a5c; border-radius: 10px; padding: 8px 10px; background: #3a342f; }
+  .pickhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 15px; }
+  .arrow { cursor: pointer; padding: 0 14px; font-size: 22px; line-height: 22px; user-select: none; }
+  #pickGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  #pickGrid div { text-align: center; padding: 9px 0; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  #pickGrid .dow { cursor: default; opacity: .5; font-size: 12px; padding: 3px 0; }
+  #pickGrid .other { opacity: .35; }
+  #pickGrid .today { box-shadow: inset 0 0 0 1.5px #d97757; }
+  #pickGrid .on { background: #d97757; color: #fff; }
+  #pickGrid div:not(.dow):hover { background: #4a4139; }
+  #pickGrid .on:hover { background: #d97757; }
 </style>
 <div id="chips" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
@@ -306,13 +316,16 @@ local PAGE = [=[
   </div>
 </div>
 <div id="todo" class="__TODOCLASS__">
-  <div class="row">
-    <label style="margin:0;white-space:nowrap">Due</label>
-    <input id="due" type="date">
+  <div class="row" style="margin-bottom:8px">
+    <label style="margin:0;white-space:nowrap">Due: <b id="dueLabel">none</b></label>
     <div class="chip" onclick="setDue(0)">Today</div>
     <div class="chip" onclick="setDue(1)">Tomorrow</div>
     <div class="chip" onclick="setDue(7)">+ week</div>
     <div class="chip" onclick="setDue(null)">None</div>
+  </div>
+  <div class="pick">
+    <div class="pickhead"><span class="arrow" onclick="pickMonth(-1)">‹</span><b id="pickTitle"></b><span class="arrow" onclick="pickMonth(1)">›</span></div>
+    <div id="pickGrid"></div>
   </div>
 </div>
 <div class="hint">__HINT__</div>
@@ -360,16 +373,34 @@ window.enriched = (n, e, error) => {
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
 };
+let dueVal = "", pickYM = null;
+const ymd = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 function setDue(days) {
-  if (days === null) { $("due").value = ""; return; }
-  const d = new Date(Date.now() + days * 86400000);
-  $("due").value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  if (days === null) dueVal = "";
+  else { const d = new Date(Date.now() + days * 86400000); dueVal = ymd(d); pickYM = [d.getFullYear(), d.getMonth()]; }
+  drawPicker();
+}
+function pickDay(s) { dueVal = dueVal === s ? "" : s; drawPicker(); }
+function pickMonth(n) { const d = new Date(pickYM[0], pickYM[1] + n, 1); pickYM = [d.getFullYear(), d.getMonth()]; drawPicker(); }
+function drawPicker() {
+  if (MODE !== "todo") return;
+  if (!pickYM) { const n = new Date(); pickYM = [n.getFullYear(), n.getMonth()]; }
+  const [y, m] = pickYM, today = ymd(new Date());
+  $("dueLabel").textContent = dueVal || "none";
+  $("pickTitle").textContent = new Date(y, m, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7; // Monday first
+  let html = ["Mo","Tu","We","Th","Fr","Sa","Su"].map(n => '<div class="dow">' + n + "</div>").join("");
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(y, m, 1 - lead + i), s = ymd(d);
+    html += '<div class="' + (d.getMonth() !== m ? "other " : "") + (s === today ? "today " : "") + (s === dueVal ? "on" : "") + '" onclick="pickDay(\'' + s + '\')">' + d.getDate() + "</div>";
+  }
+  $("pickGrid").innerHTML = html;
 }
 function save() {
   const text = $("text").value.trim();
   if (!text) return;
   if (MODE === "todo") {
-    post({ type: "save", text, due: $("due").value });
+    post({ type: "save", text, due: dueVal });
   } else if (MODE === "card") {
     post({ type: "save", kind, text, back: $("back").value.trim(), example: $("example").value.trim(),
            topic: $("topic").value.trim(), memorize: $("memorize").checked });
@@ -392,6 +423,7 @@ document.addEventListener("keydown", e => {
   }
 });
 drawChips();
+drawPicker();
 </script>
 ]=]
 
@@ -458,8 +490,8 @@ local function openPanel(mode)
 	end)
 
 	local screen = hs.screen.mainScreen():frame()
-	local w, h = 560, card and 360 or (mode == "todo" and 270 or 230)
-	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + screen.h * 0.22, w = w, h = h }, {}, uc)
+	local w, h = 560, card and 360 or (mode == "todo" and 600 or 230)
+	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, math.min(screen.h * 0.22, screen.h - h - 40)), w = w, h = h }, {}, uc)
 	panel:windowStyle({ "titled", "closable", "utility" })
 		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or (mode == "todo" and "LBrain · todo" or "LBrain · journal")))
 		:level(hs.drawing.windowLevels.floating)
