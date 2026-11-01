@@ -5,6 +5,8 @@
 --   ctrl+cmd+b   add a word, phrase or info (Claude fills the back; you can edit it)
 --   ctrl+cmd+n   add a news line to today's heading in Events And News
 --   ctrl+cmd+j   add a line to today's journal (cmd+⏎ opens today's note instead)
+--   ctrl+cmd+d   add a todo, with an optional due date (→ Calendar/Inbox.md, in Tasks-plugin format)
+--   ctrl+cmd+k   the calendar: this month's events (drag-calendar) and dated todos, and the open todos
 --
 -- Also the 🧠 menu-bar item. Config: ~/.config/lbrain/config.json {server, token, vault}.
 -- Captures made while the server is out of reach wait in ~/.local/share/lbrain/outbox.json.
@@ -123,6 +125,8 @@ local function apply(item, done)
 		local ok, err
 		if dest == "card" then
 			ok, err = V.appendCard(cfg.vault, item, date, audioName)
+		elseif dest == "todo" then
+			ok, err = V.appendTodo(cfg.vault, item)
 		elseif dest == "news" then
 			ok, err = V.appendNews(cfg.vault, date, item.text .. (audioName and (" ![[" .. audioName .. "]]") or ""))
 		elseif dest == "journal" then
@@ -163,6 +167,23 @@ local function apply(item, done)
 			toVault(audioName)
 		end
 	end)
+end
+
+-- ---------------------------------------------------------------- the calendar
+
+local DRAG_CALENDAR = "/.obsidian/plugins/drag-calendar/data.json"
+
+-- Events from the drag-calendar plugin plus every open dated todo in the vault, around month `ym`.
+local function calendarData(ym)
+	local data = hs.json.read(cfg.vault .. DRAG_CALENDAR) or {}
+	return V.snapshot(data.events or {}, V.scanTasks(cfg.vault), ym)
+end
+
+-- The phone can't read the vault, so the Mac sends it the month.
+local function pushCalendar()
+	if not cfg then return end
+	local ok, snap = pcall(calendarData, os.date("%Y-%m"))
+	if ok then request("PUT", "/v1/calendar", snap, function() end) end
 end
 
 -- ---------------------------------------------------------------- sync
@@ -229,6 +250,7 @@ function M.sync()
 				pending = failed + #readOutbox()
 				if failed == 0 then lastSync = "synced " .. os.date("%H:%M") end
 				refreshMenu()
+				pushCalendar()
 			end)
 		end)
 	end)
@@ -267,6 +289,7 @@ local PAGE = [=[
   .hint { font-size: 12px; opacity: .55; margin-top: 4px; }
   #status { color: #f0c049; font-size: 12px; min-height: 16px; }
   .hide { display: none; }
+  input[type=date] { width: auto; margin: 0; }
 </style>
 <div id="chips" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
@@ -278,6 +301,16 @@ local PAGE = [=[
   <div class="row">
     <input id="topic" type="text" placeholder="topic (info: history, go…)">
     <label style="margin:0;white-space:nowrap"><input id="memorize" type="checkbox" style="width:auto;margin:0 4px 0 0"> make a card</label>
+  </div>
+</div>
+<div id="todo" class="__TODOCLASS__">
+  <div class="row">
+    <label style="margin:0;white-space:nowrap">Due</label>
+    <input id="due" type="date">
+    <div class="chip" onclick="setDue(0)">Today</div>
+    <div class="chip" onclick="setDue(1)">Tomorrow</div>
+    <div class="chip" onclick="setDue(7)">+ week</div>
+    <div class="chip" onclick="setDue(null)">None</div>
   </div>
 </div>
 <div class="hint">__HINT__</div>
@@ -325,10 +358,17 @@ window.enriched = (n, e, error) => {
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
 };
+function setDue(days) {
+  if (days === null) { $("due").value = ""; return; }
+  const d = new Date(Date.now() + days * 86400000);
+  $("due").value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
 function save() {
   const text = $("text").value.trim();
   if (!text) return;
-  if (MODE === "card") {
+  if (MODE === "todo") {
+    post({ type: "save", text, due: $("due").value });
+  } else if (MODE === "card") {
     post({ type: "save", kind, text, back: $("back").value.trim(), example: $("example").value.trim(),
            topic: $("topic").value.trim(), memorize: $("memorize").checked });
   } else {
@@ -379,7 +419,8 @@ local function openPanel(mode)
 	local page = PAGE:gsub("__MODE__", mode)
 		:gsub("__ROWS__", card and "2" or "5")
 		:gsub("__CARDCLASS__", card and "" or "hide")
-		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or "journal"))
+		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
+		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or "journal")))
 		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌥1–5 kind · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
@@ -406,6 +447,8 @@ local function openPanel(mode)
 			closePanel()
 			if mode == "card" then
 				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize })
+			elseif mode == "todo" then
+				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, memorize = false })
 			else
 				submit({ kind = mode, text = body.text, memorize = false })
 			end
@@ -413,10 +456,10 @@ local function openPanel(mode)
 	end)
 
 	local screen = hs.screen.mainScreen():frame()
-	local w, h = 560, card and 360 or 230
+	local w, h = 560, card and 360 or (mode == "todo" and 270 or 230)
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + screen.h * 0.22, w = w, h = h }, {}, uc)
 	panel:windowStyle({ "titled", "closable", "utility" })
-		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or "LBrain · journal"))
+		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or (mode == "todo" and "LBrain · todo" or "LBrain · journal")))
 		:level(hs.drawing.windowLevels.floating)
 		:allowTextEntry(true)
 		:html(page)
@@ -427,6 +470,164 @@ local function openPanel(mode)
 	panelWindowMode = mode
 end
 
+-- ---------------------------------------------------------------- the calendar window
+
+local CAL_PAGE = [=[
+<!doctype html><meta charset="utf-8">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #2e2925; color: #e8dfd3; font: 13px -apple-system, "SF Pro Text", sans-serif; display: flex; height: 100vh; }
+  #main { flex: 1; display: flex; flex-direction: column; padding: 12px 14px; min-width: 0; }
+  #side { width: 290px; border-left: 1px solid #4a4139; padding: 12px 14px; overflow-y: auto; }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  header h1 { font-size: 18px; margin: 0; flex: 1; font-weight: 600; }
+  button { background: #3a342f; color: inherit; border: 1px solid #786a5c; border-radius: 6px; padding: 3px 10px; cursor: pointer; font: inherit; }
+  button:hover { border-color: #d97757; }
+  #grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; gap: 1px; background: #4a4139; border: 1px solid #4a4139; min-height: 0; }
+  .dow { background: #2e2925; text-align: center; padding: 4px 0; opacity: .6; font-size: 11px; grid-row: 1; height: 22px; }
+  #grid { grid-template-rows: 22px repeat(6, 1fr); }
+  .day { background: #2e2925; padding: 3px 4px; overflow: hidden; cursor: pointer; min-height: 0; }
+  .day.other { opacity: .38; }
+  .day.sel { outline: 2px solid #d97757; outline-offset: -2px; }
+  .day .n { font-size: 12px; margin-bottom: 2px; }
+  .day.today .n { background: #d97757; color: #fff; display: inline-block; min-width: 20px; text-align: center; border-radius: 10px; padding: 0 4px; }
+  .e { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 15px; }
+  .e i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; background: #039be5; }
+  .e.task i { border-radius: 2px; background: #f0c049; }
+  .e.done { text-decoration: line-through; opacity: .5; }
+  .more { font-size: 10px; opacity: .6; }
+  h2 { font-size: 13px; margin: 0 0 6px; opacity: .8; }
+  .item { padding: 4px 0; border-bottom: 1px solid #3a342f; display: flex; gap: 6px; }
+  .item .t { opacity: .6; min-width: 40px; }
+  .item .d { opacity: .55; font-size: 11px; margin-left: auto; white-space: nowrap; }
+  .late .d { color: #e8704f; opacity: 1; }
+  .empty { opacity: .45; padding: 4px 0; }
+  #todos { margin-top: 18px; }
+  .hint { opacity: .45; font-size: 11px; margin-top: 10px; }
+</style>
+<div id="main">
+  <header><h1 id="title"></h1><button onclick="go(-1)">‹</button><button onclick="today()">Today</button><button onclick="go(1)">›</button></header>
+  <div id="grid"></div>
+</div>
+<div id="side">
+  <h2 id="dayTitle"></h2><div id="dayList"></div>
+  <div id="todos"><h2>Open todos</h2><div id="todoList"></div></div>
+  <div class="hint">←/→ month · t today · ⎋ close</div>
+</div>
+<script>
+let data = __DATA__;
+let weekStart = data.weekStart === 0 ? 0 : 1;
+const post = m => window.webkit.messageHandlers.lbrain.postMessage(m);
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const fmt = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const todayStr = fmt(new Date());
+let ym = data.month, sel = todayStr.slice(0, 7) === data.month ? todayStr : data.month + "-01";
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function dayMap() { return Array.isArray(data.days) ? {} : data.days; }
+function esc(s) { return String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+function entry(e, withTime) {
+  const t = withTime && e.time ? e.time + " " : "";
+  return '<i style="' + (e.color && e.kind !== "task" ? "background:" + e.color : "") + '"></i>' + t + esc(e.title);
+}
+function covered(m) { return m + "-01" >= data.from && m + "-28" <= data.to; }
+function render() {
+  const [y, m] = ym.split("-").map(Number);
+  $("title").textContent = MONTHS[m - 1] + " " + y;
+  const first = new Date(y, m - 1, 1);
+  const lead = (first.getDay() - weekStart + 7) % 7;
+  const start = new Date(y, m - 1, 1 - lead);
+  const names = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  let html = "";
+  for (let i = 0; i < 7; i++) html += '<div class="dow">' + names[(weekStart + i) % 7] + "</div>";
+  const days = dayMap();
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const s = fmt(d), list = days[s] || [];
+    const cls = "day" + (d.getMonth() !== m - 1 ? " other" : "") + (s === todayStr ? " today" : "") + (s === sel ? " sel" : "");
+    html += '<div class="' + cls + '" onclick="pick(\'' + s + '\')"><div class="n">' + d.getDate() + "</div>";
+    list.slice(0, 3).forEach(e => { html += '<div class="e ' + e.kind + (e.done ? " done" : "") + '">' + entry(e, false) + "</div>"; });
+    if (list.length > 3) html += '<div class="more">+' + (list.length - 3) + " more</div>";
+    html += "</div>";
+  }
+  $("grid").innerHTML = html;
+  renderSide();
+}
+function renderSide() {
+  const [y, m, d] = sel.split("-").map(Number);
+  $("dayTitle").textContent = new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+  const list = dayMap()[sel] || [];
+  $("dayList").innerHTML = list.length ? list.map(e => '<div class="item"><span class="t">' + (e.time || (e.kind === "task" ? "todo" : "")) + "</span><span class='e " + e.kind + (e.done ? " done" : "") + "' style='white-space:normal'>" + entry(e, false) + "</span></div>").join("") : '<div class="empty">Nothing planned</div>';
+  const todos = data.todos || [];
+  $("todoList").innerHTML = todos.length ? todos.map(t => '<div class="item' + (t.due && t.due < todayStr ? " late" : "") + '"><span>' + esc(t.text) + '</span><span class="d">' + (t.due || "") + "</span></div>").join("") : '<div class="empty">None</div>';
+}
+function pick(s) { sel = s; if (s.slice(0, 7) !== ym) { ym = s.slice(0, 7); ensure(); } render(); }
+function ensure() { if (!covered(ym)) post({ type: "month", ym }); }
+function go(n) {
+  let [y, m] = ym.split("-").map(Number);
+  m += n; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+  ym = y + "-" + pad(m); sel = ym + "-01"; ensure(); render();
+}
+function today() { ym = todayStr.slice(0, 7); sel = todayStr; ensure(); render(); }
+window.setData = d => { data = d; render(); };
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") post({ type: "close" });
+  else if (e.key === "ArrowLeft" || e.key === "h") go(-1);
+  else if (e.key === "ArrowRight" || e.key === "l") go(1);
+  else if (e.key === "t") today();
+});
+render();
+</script>
+]=]
+
+local calendar
+
+local function closeCalendar()
+	if calendar then
+		calendar:delete()
+		calendar = nil
+	end
+end
+
+local function openCalendar()
+	if calendar then return closeCalendar() end
+	if not cfg then cfg = loadConfig() end
+	if not cfg then return end
+	local uc = hs.webview.usercontent.new("lbrain")
+	local function snapshot(ym)
+		local snap = calendarData(ym)
+		local settings = (hs.json.read(cfg.vault .. DRAG_CALENDAR) or {}).settings or {}
+		snap.weekStart = settings.weekStart == 0 and 0 or 1
+		return snap
+	end
+	uc:setCallback(function(msg)
+		local body = msg.body
+		if body.type == "close" then
+			closeCalendar()
+		elseif body.type == "month" and calendar then
+			local ok, snap = pcall(snapshot, body.ym)
+			if ok then calendar:evaluateJavaScript("setData(" .. (hs.json.encode(snap):gsub("</", "<\\/")) .. ")") end
+		end
+	end)
+	local ok, snap = pcall(snapshot, os.date("%Y-%m"))
+	if not ok then return hs.alert.show("LBrain: could not read the calendar", 2) end
+	local json = hs.json.encode(snap):gsub("</", "<\\/")
+	local page = CAL_PAGE:gsub("__DATA__", function() return json end)
+	local screen = hs.screen.mainScreen():frame()
+	local w, h = math.min(1180, screen.w - 80), math.min(740, screen.h - 80)
+	calendar = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + (screen.h - h) / 2, w = w, h = h }, {}, uc)
+	calendar:windowStyle({ "titled", "closable", "utility" })
+		:windowTitle("LBrain · calendar")
+		:level(hs.drawing.windowLevels.floating)
+		:allowTextEntry(true)
+		:html(page)
+		:show()
+		:bringToFront(true)
+	local win = calendar:hswindow()
+	if win then win:focus() end
+end
+
 -- ---------------------------------------------------------------- menu bar and hotkeys
 
 local function buildMenu()
@@ -434,6 +635,8 @@ local function buildMenu()
 		{ title = "Add word / phrase / info", fn = function() openPanel("card") end },
 		{ title = "Add news", fn = function() openPanel("news") end },
 		{ title = "Add to journal", fn = function() openPanel("journal") end },
+		{ title = "Add a todo", fn = function() openPanel("todo") end },
+		{ title = "Calendar", fn = openCalendar },
 		{ title = "-" },
 		{ title = "Open today's journal", fn = function()
 			if not cfg then cfg = loadConfig() end
@@ -459,6 +662,8 @@ end
 hs.hotkey.bind({ "ctrl", "cmd" }, "b", function() openPanel("card") end)
 hs.hotkey.bind({ "ctrl", "cmd" }, "n", function() openPanel("news") end)
 hs.hotkey.bind({ "ctrl", "cmd" }, "j", function() openPanel("journal") end)
+hs.hotkey.bind({ "ctrl", "cmd" }, "d", function() openPanel("todo") end)
+hs.hotkey.bind({ "ctrl", "cmd" }, "k", openCalendar)
 
 M.timer = hs.timer.doEvery(SYNC_EVERY, M.sync)
 hs.timer.doAfter(3, M.sync)
