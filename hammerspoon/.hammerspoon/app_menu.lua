@@ -19,7 +19,8 @@ local function volumeDirs()
 	local ok, iterFn, dirObj = pcall(hs.fs.dir, "/Volumes")
 	if ok and iterFn then
 		for vol in iterFn, dirObj do
-			if vol:sub(1, 1) ~= "." then
+			-- the boot disk is listed in /Volumes as a link to "/": already scanned
+			if vol:sub(1, 1) ~= "." and hs.fs.pathToAbsolute("/Volumes/" .. vol) ~= "/" then
 				table.insert(dirs, "/Volumes/" .. vol .. "/Applications")
 				table.insert(dirs, "/Volumes/" .. vol .. "/Games")
 			end
@@ -65,10 +66,12 @@ local function buildAppList()
 	local seen = {}
 
 	local function addApp(path)
-		if seen[path] then
+		-- one entry per real app, however many paths (links, volumes) lead to it
+		local real = hs.fs.pathToAbsolute(path) or path
+		if seen[real] then
 			return
 		end
-		seen[path] = true
+		seen[real] = true
 		local name = path:match("([^/]+)%.app$")
 		if not name then
 			return
