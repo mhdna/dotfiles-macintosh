@@ -665,17 +665,17 @@ local function listen()
 	request("GET", "/v1/wait?since=" .. hs.http.encodeForQuery(sinceMark), nil, function(status, data)
 		if status == 200 and type(data) == "table" and data.changed then
 			M.sync()
-			hs.timer.doAfter(1, listen)
+			M.next = hs.timer.doAfter(1, listen)
 		elseif status == 200 then
-			hs.timer.doAfter(0.2, listen)
+			M.next = hs.timer.doAfter(0.2, listen)
 		else
-			hs.timer.doAfter(5, listen) -- offline, asleep, or the server restarting
+			M.next = hs.timer.doAfter(5, listen) -- offline, asleep, or the server restarting
 		end
 	end)
 end
 
 M.timer = hs.timer.doEvery(SYNC_EVERY, M.sync)
-hs.timer.doAfter(3, M.sync)
-hs.timer.doAfter(4, listen)
+M.first = hs.timer.doAfter(3, M.sync)
+M.listener = hs.timer.doAfter(4, listen)
 
 return M
