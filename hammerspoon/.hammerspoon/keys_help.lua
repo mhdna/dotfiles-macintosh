@@ -126,6 +126,11 @@ local GROUPS = {
 	{ "App time limits (Morganize)", "#e07a4f", {
 		{ { "ctrl", "cmd" }, "o", "open Morganize (vim keys)" },
 	} },
+	{ "Second brain (Brain)", "#c792ea", {
+		{ { "ctrl", "cmd" }, "b", "add a word, phrase or info (→ vault + Anki)" },
+		{ { "ctrl", "cmd" }, "n", "add news" },
+		{ { "ctrl", "cmd" }, "j", "add to the journal (⌘⏎ opens today's note)" },
+	} },
 	{ "Hammerspoon & misc", "#d0d0d0", {
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },
 		{ { "ctrl", "alt" }, "f", "Finder → LFGUI redirect on/off" },
