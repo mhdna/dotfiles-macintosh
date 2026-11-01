@@ -316,6 +316,8 @@ local PAGE = [=[
   .hint { font-size: 12px; opacity: .55; margin-top: 4px; }
   #status { color: #f0c049; font-size: 12px; min-height: 16px; }
   .hide { display: none; }
+  .sum { border: 1px solid #58585b; border-radius: 10px; padding: 10px 12px; background: #333335; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+  .sum b { color: #c9c3bd; }
   .pick { border: 1px solid #58585b; border-radius: 10px; padding: 8px 10px; background: #333335; }
   .pickhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 15px; }
   .arrow { cursor: pointer; padding: 0 14px; font-size: 22px; line-height: 22px; user-select: none; }
@@ -359,6 +361,9 @@ local PAGE = [=[
     <div class="pickhead"><span class="arrow" onclick="pickMonth(-1)">‹</span><b id="pickTitle"></b><span class="arrow" onclick="pickMonth(1)">›</span></div>
     <div id="pickGrid"></div>
   </div>
+</div>
+<div id="cmd" class="__CMDCLASS__">
+  <div id="summary" class="sum">Say or type what to add. For example: "todo for tomorrow call mum", or "phrase break a leg, funny, translate the back".</div>
 </div>
 <div class="hint">__HINT__</div>
 <script>
@@ -430,6 +435,23 @@ window.enriched = (n, e, error) => {
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
 };
+let draft = null, parsedFor = "";
+function describe(d) {
+  const kinds = { en_word: "English word", en_phrase: "English phrase", ar_word: "Arabic word", ar_phrase: "Arabic phrase", info: "Info", todo: "Todo", news: "News", journal: "Journal" };
+  const cats = { use_more: "Use more", funny: "Funny", slang: "Slang", idiom: "Idioms & proverbs" };
+  let s = "<b>" + (kinds[d.kind] || d.kind) + "</b>" + (d.category ? " · " + cats[d.category] : "") + (d.due ? " · due " + d.due : "") + "\n" + (d.text || "").replace(/</g, "&lt;");
+  if (d.back) s += "\n<b>back:</b> " + d.back.replace(/</g, "&lt;");
+  if (d.example) s += "\n<b>example:</b> " + d.example.replace(/</g, "&lt;");
+  if (d.topic) s += "\n<b>topic:</b> " + d.topic;
+  const card = d.memorize ? (d.single ? "an Anki card, just the text" : "an Anki card") : "no Anki card";
+  if (["en_word", "en_phrase", "ar_word", "ar_phrase", "info"].includes(d.kind)) s += "\n<b>" + card + "</b>";
+  return s;
+}
+window.parsed = (d, error) => {
+  if (error) { $("summary").textContent = "Couldn't understand that: " + error; draft = null; return; }
+  draft = d; parsedFor = $("text").value.trim();
+  $("summary").innerHTML = describe(d) + "\n\n⏎ save · or change the order and ⏎ to try again";
+};
 let dueVal = "", pickYM = null;
 const ymd = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 function setDue(days) {
@@ -456,6 +478,12 @@ function drawPicker() {
 function save() {
   const text = $("text").value.trim();
   if (!text) return;
+  if (MODE === "command") {
+    // first ⏎ understands the order; a second ⏎, with the text unchanged, saves it
+    if (draft && parsedFor === text) post({ type: "save", draft });
+    else { $("summary").textContent = "Understanding…"; post({ type: "parse", text }); }
+    return;
+  }
   if (MODE === "todo") {
     post({ type: "save", text, due: dueVal });
   } else if (MODE === "card") {
@@ -466,7 +494,7 @@ function save() {
     post({ type: "save", text });
   }
 }
-$("text").addEventListener("input", () => { ask(); });
+$("text").addEventListener("input", () => { ask(); if (MODE === "command") draft = null; });
 if (MODE === "card") {
   $("back").addEventListener("input", () => { backEdited = true; });
   $("memorize").checked = true;
@@ -522,7 +550,8 @@ local function openPanel(mode, preset)
 		:gsub("__ROWS__", card and "2" or "5")
 		:gsub("__CARDCLASS__", card and "" or "hide")
 		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
-		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or "journal")))
+		:gsub("__CMDCLASS__", mode == "command" and "" or "hide")
+		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or (mode == "command" and "what to add, in your own words" or "journal"))))
 		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
@@ -533,6 +562,16 @@ local function openPanel(mode, preset)
 		elseif body.type == "open" then
 			closePanel()
 			openTodayInObsidian()
+		elseif body.type == "parse" then
+			request("POST", "/v1/parse", { text = body.text, today = os.date("%Y-%m-%d") }, function(status, data)
+				if not panel then return end
+				if status == 200 and type(data) == "table" then
+					panel:evaluateJavaScript("parsed(" .. (hs.json.encode(data):gsub("</", "<\\/")) .. ")")
+				else
+					local why = (type(data) == "table" and data.error) or ("error " .. tostring(status))
+					panel:evaluateJavaScript("parsed(null, " .. hs.json.encode({ why }):sub(2, -2) .. ")")
+				end
+			end)
 		elseif body.type == "enrich" then
 			request("POST", "/v1/enrich", { kind = body.kind, text = body.text }, function(status, data, text)
 				if not panel then return end
@@ -547,7 +586,12 @@ local function openPanel(mode, preset)
 			end)
 		elseif body.type == "save" then
 			closePanel()
-			if mode == "card" then
+			if mode == "command" then
+				local d = body.draft
+				submit({ kind = d.kind, text = d.text, back = d.back ~= "" and d.back or nil, example = d.example ~= "" and d.example or nil,
+					topic = d.topic ~= "" and d.topic or nil, category = d.category ~= "" and d.category or nil, single = d.single or nil,
+					memorize = d.memorize, due = d.due ~= "" and d.due or nil })
+			elseif mode == "card" then
 				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil })
 			elseif mode == "todo" then
 				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, memorize = false })
@@ -558,12 +602,12 @@ local function openPanel(mode, preset)
 	end)
 
 	local screen = hs.screen.mainScreen():frame()
-	local w, h = 560, card and 420 or (mode == "todo" and 600 or 230)
+	local w, h = 560, card and 420 or (mode == "todo" and 600 or (mode == "command" and 330 or 230))
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, math.min(screen.h * 0.22, screen.h - h - 40)), w = w, h = h }, {}, uc)
 	panel:windowStyle({ "borderless" })
 		:transparent(true)
 		:shadow(true)
-		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or (mode == "todo" and "LBrain · todo" or "LBrain · journal")))
+		:windowTitle(card and "LBrain" or (mode == "news" and "LBrain · news" or (mode == "todo" and "LBrain · todo" or (mode == "command" and "LBrain · order" or "LBrain · journal"))))
 		:level(hs.drawing.windowLevels.floating)
 		:allowTextEntry(true)
 		:html(page)
@@ -618,6 +662,7 @@ end
 -- One shortcut: ctrl+cmd+j opens a list; type to filter, ⏎ to pick.
 local ACTIONS = {
 	{ text = "Word, phrase or info", subText = "a card for Anki + the vault", fn = function() openPanel("card") end },
+	{ text = "Tell it what to add", subText = "in your own words: \"todo for tomorrow call mum\"", fn = function() openPanel("command") end },
 	{ text = "Use more", subText = "words/phrases to start using (no back)", fn = function() openPanel("card", { category = "use_more" }) end },
 	{ text = "Funny", subText = "a funny word or phrase", fn = function() openPanel("card", { category = "funny" }) end },
 	{ text = "Slang", subText = "slang or dialect", fn = function() openPanel("card", { category = "slang" }) end },
