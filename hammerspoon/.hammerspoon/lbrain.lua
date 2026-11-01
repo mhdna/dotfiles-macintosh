@@ -177,7 +177,9 @@ local DRAG_CALENDAR = "/.obsidian/plugins/drag-calendar/data.json"
 -- Events from the drag-calendar plugin plus every open dated todo in the vault, around month `ym`.
 local function calendarData(ym)
 	local data = hs.json.read(cfg.vault .. DRAG_CALENDAR) or {}
-	return V.snapshot(data.events or {}, V.scanTasks(cfg.vault), ym)
+	local snap = V.snapshot(data.events or {}, V.scanTasks(cfg.vault), ym)
+	snap.weekStart = (data.settings or {}).weekStart == 0 and 0 or 1
+	return snap
 end
 
 -- The phone can't read the vault, so the Mac sends it the month.
@@ -596,12 +598,7 @@ local function openCalendar()
 	if not cfg then cfg = loadConfig() end
 	if not cfg then return end
 	local uc = hs.webview.usercontent.new("lbrain")
-	local function snapshot(ym)
-		local snap = calendarData(ym)
-		local settings = (hs.json.read(cfg.vault .. DRAG_CALENDAR) or {}).settings or {}
-		snap.weekStart = settings.weekStart == 0 and 0 or 1
-		return snap
-	end
+	local snapshot = calendarData
 	uc:setCallback(function(msg)
 		local body = msg.body
 		if body.type == "close" then
