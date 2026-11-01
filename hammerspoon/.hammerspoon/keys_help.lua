@@ -127,7 +127,7 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "o", "open Morganize (vim keys)" },
 	} },
 	{ "Second brain (LBrain)", "#c792ea", {
-		{ { "ctrl", "cmd" }, "j", "LBrain list: word, todo, journal, news, calendar" },
+		{ { "ctrl", "cmd" }, "j", "LBrain list: word, todo, journal, news, calendar (opens in Obsidian)" },
 	} },
 	{ "Hammerspoon & misc", "#d0d0d0", {
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },
