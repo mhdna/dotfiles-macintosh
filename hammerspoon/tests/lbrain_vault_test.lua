@@ -30,7 +30,7 @@ eq(V.cardLine({ text = "a\nb", back = "", topic = "go" }, "2026-11-01", "v1.m4a"
 
 -- ankiNote
 local n = V.ankiNote({ kind = "ar_word", text = "طفرانة <b>", back = "broke", example = "", topic = "" }, nil)
-eq(n.deckName, "TODO Language::[Arabic] Words", "deck")
+eq(n.deckName, "LBrain::Arabic Words", "deck")
 eq(n.fields.Front, "طفرانة &lt;b&gt;", "front escaped")
 eq(n.fields.Back, "broke", "back")
 eq(V.ankiNote({ kind = "news", text = "x" }), nil, "news is no card")

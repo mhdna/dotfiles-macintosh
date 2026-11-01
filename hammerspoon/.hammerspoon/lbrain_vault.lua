@@ -4,10 +4,10 @@
 local M = {}
 
 M.DECKS = {
-	en_word = "TODO Language::[English] Words",
-	en_phrase = "TODO Language::[English] Phrases",
-	ar_word = "TODO Language::[Arabic] Words",
-	ar_phrase = "TODO Language::[Arabic] Phrases",
+	en_word = "LBrain::English Words",
+	en_phrase = "LBrain::English Phrases",
+	ar_word = "LBrain::Arabic Words",
+	ar_phrase = "LBrain::Arabic Phrases",
 	info = "LBrain::Info",
 }
 
