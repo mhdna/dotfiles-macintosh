@@ -148,7 +148,7 @@ hs.hotkey.bind({ "alt", "shift" }, "v", function()
 end)
 
 hs.hotkey.bind({ "alt" }, "t", function()
-	activateOrToggle("org.alacritty")
+	activateOrToggle("net.kovidgoyal.kitty")
 end)
 
 hs.hotkey.bind({ "alt", "shift" }, "i", function()

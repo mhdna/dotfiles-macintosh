@@ -38,7 +38,7 @@ end
 -- Each entry: { mods, key or {keys…}, description }.
 local GROUPS = {
 	{ "Apps (press again to go back)", "#82d4fc", {
-		{ { "alt" }, "t", "Alacritty" },
+		{ { "alt" }, "t", "Kitty" },
 		{ { "alt" }, "w", "Brave" },
 		{ { "alt" }, "r", "LFGUI" },
 		{ { "alt" }, "v", "VED" },
