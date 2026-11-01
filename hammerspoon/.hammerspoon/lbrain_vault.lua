@@ -113,6 +113,17 @@ end
 
 -- "- **front** — back _(topic, date)_", with the example and a kept recording after it.
 function M.cardLine(item, date, audioName)
+	if item.single then
+		-- just the text (maybe a list): keep its lines, indented under one bullet
+		local body = trim(item.text):gsub("\r?\n", "\n  ")
+		local meta = {}
+		local topic = oneLine(item.topic or "")
+		if topic ~= "" then meta[#meta + 1] = topic end
+		meta[#meta + 1] = date
+		local line = "- " .. body .. " _(" .. table.concat(meta, ", ") .. ")_"
+		if audioName then line = line .. " ![[" .. audioName .. "]]" end
+		return line
+	end
 	local front = oneLine(item.text)
 	local line = "- **" .. front .. "**"
 	local back = oneLine(item.back or "")
@@ -157,6 +168,18 @@ end
 function M.ankiNote(item, audioName)
 	local deck = M.DECKS[item.kind]
 	if not deck then return nil end
+	if item.single then
+		local text = html(item.text)
+		if (item.topic or "") ~= "" then text = text .. "<br><br><i>" .. html(item.topic) .. "</i>" end
+		if audioName then text = text .. "<br>[sound:" .. audioName .. "]" end
+		return {
+			deckName = deck,
+			modelName = M.SINGLE_MODEL.modelName,
+			fields = { Text = text },
+			options = { allowDuplicate = false, duplicateScope = "deck" },
+			tags = { "lbrain", item.kind, "single" },
+		}
+	end
 	local back = html(item.back)
 	if (item.example or "") ~= "" then back = back .. "<br><br><i>" .. html(item.example) .. "</i>" end
 	if (item.topic or "") ~= "" then back = back .. "<br><br>" .. html(item.topic) end
@@ -171,6 +194,16 @@ function M.ankiNote(item, audioName)
 end
 
 -- Where an item with this kind/target goes: "card", "news", "journal", "todo" or "inbox".
+-- A note type with one field: the card shows the text, and "show answer" shows it again, so a list
+-- or a fact is just read through and rated. Made in Anki (createModel) when it's missing.
+M.SINGLE_MODEL = {
+	modelName = "LBrain Note",
+	inOrderFields = { "Text" },
+	css = ".card { font-family: -apple-system, Arial; font-size: 22px; text-align: left; color: #222; background: #fff; } .nightMode.card, .night_mode .card { color: #eee; background: #2b2c2e; }",
+	isCloze = false,
+	cardTemplates = { { Name = "Card 1", Front = "{{Text}}", Back = "{{FrontSide}}" } },
+}
+
 function M.destination(item)
 	if M.DECKS[item.kind] then return "card" end
 	if item.kind == "news" or item.kind == "journal" or item.kind == "todo" then return item.kind end
