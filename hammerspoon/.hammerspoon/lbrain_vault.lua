@@ -253,7 +253,11 @@ M.TODO_FILE = "Calendar/Inbox.md"
 
 function M.todoLine(item)
 	local line = "- [ ] " .. oneLine(item.text)
-	if item.due and item.due ~= "" then line = line .. " 📅 " .. item.due end
+	local due = item.due and item.due ~= "" and item.due
+	if due then line = line .. " 📅 " .. due end
+	-- the Reminder plugin's format, so Obsidian itself reminds too; the block id lets a done mark find the line again
+	if due and item.remind then line = line .. " (@" .. due .. (item.time and item.time ~= "" and (" " .. item.time) or "") .. ")" end
+	if item.id and item.id ~= "" then line = line .. " ^lb-" .. item.id end
 	return line
 end
 
@@ -372,7 +376,7 @@ end
 -- The text of a task: everything before the first Tasks-plugin marker (due, scheduled, start, created, recurrence, priority).
 local function taskText(rest)
 	local cut = #rest + 1
-	for _, mark in ipairs({ "📅", "⏳", "🛫", "➕", "🔁", "⏫", "🔼", "🔽", "✅", "❌" }) do
+	for _, mark in ipairs({ "📅", "⏳", "🛫", "➕", "🔁", "⏫", "🔼", "🔽", "✅", "❌", "(@", " ^lb-" }) do
 		local at = rest:find(mark, 1, true)
 		if at and at < cut then cut = at end
 	end
@@ -388,8 +392,10 @@ function M.parseTasks(lines)
 		if file then
 			local due = rest:match("📅%s*(%d%d%d%d%-%d%d%-%d%d)")
 			local text = taskText(rest)
+			local time = rest:match("%(@%d%d%d%d%-%d%d%-%d%d (%d%d:%d%d)%)")
+			local id = rest:match("%^lb%-(%w+)%s*$")
 			if text ~= "" and (due or file:sub(-#M.TODO_FILE) == M.TODO_FILE) then
-				todos[#todos + 1] = { text = text, due = due or "" }
+				todos[#todos + 1] = { text = text, due = due or "", time = time or "", id = id or "" }
 			end
 		end
 	end
@@ -399,6 +405,45 @@ function M.parseTasks(lines)
 		return a.text < b.text
 	end)
 	return todos
+end
+
+-- Tick the todo with this id in the inbox, as a done mark from the phone or the notification asks for.
+-- Returns the new text and whether the line was found (and still open).
+function M.tick(text, id, date)
+	local found = false
+	local out = text:gsub("[^\n]*%^lb%-" .. id .. "[^\n]*", function(line)
+		if line:find("^%s*%- %[ %] ") then
+			found = true
+			local done = line:gsub("^(%s*%- )%[ %]", "%1[x]", 1)
+			if date and date ~= "" and not done:find("✅", 1, true) then
+				done = done:gsub(" %^lb%-" .. id, " ✅ " .. date .. " ^lb-" .. id, 1)
+			end
+			return done
+		end
+	end)
+	return out, found
+end
+
+function M.tickInbox(root, id, date)
+	local path = root .. "/" .. M.TODO_FILE
+	local text = read(path)
+	if not text then return false end
+	local out, found = M.tick(text, id, date)
+	if found then write(path, out) end
+	return found
+end
+
+-- The ids of lbrain todos ticked in the inbox (in Obsidian, say): the server has to hear they're done.
+function M.tickedIds(root)
+	local text = read(root .. "/" .. M.TODO_FILE) or ""
+	local ids = {}
+	for line in (text .. "\n"):gmatch("(.-)\n") do
+		if line:find("^%s*%- %[[xX]%] ") then
+			local id = line:match("%^lb%-(%w+)%s*$")
+			if id then ids[#ids + 1] = id end
+		end
+	end
+	return ids
 end
 
 function M.scanTasks(root)
