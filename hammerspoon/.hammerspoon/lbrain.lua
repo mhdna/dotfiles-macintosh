@@ -149,9 +149,15 @@ local function apply(item, done)
 				done(false, err)
 			end
 			local function addNote()
-				ankiCall("addNote", { note = note }, function(_, err)
+				ankiCall("addNote", { note = note }, function(noteId, err)
 					if err and not err:lower():find("duplicate") then return fail(err) end
-					toVault(audioName)
+					if not (item.single and noteId) then return toVault(audioName) end
+					-- Anki puts a card of the one-field note type in that note type's own default deck, whatever deck was asked
+					-- for, so move it where it belongs
+					ankiCall("findCards", { query = "nid:" .. tostring(noteId) }, function(cards)
+						if type(cards) ~= "table" or #cards == 0 then return toVault(audioName) end
+						ankiCall("changeDeck", { cards = cards, deck = note.deckName }, function() toVault(audioName) end)
+					end)
 				end)
 			end
 			-- a single card (just the text) needs its one-field note type; make it the first time
