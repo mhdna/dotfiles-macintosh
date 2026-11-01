@@ -130,6 +130,8 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "b", "add a word, phrase or info (→ vault + Anki)" },
 		{ { "ctrl", "cmd" }, "n", "add news" },
 		{ { "ctrl", "cmd" }, "j", "add to the journal (⌘⏎ opens today's note)" },
+		{ { "ctrl", "cmd" }, "d", "add a todo (optional due date)" },
+		{ { "ctrl", "cmd" }, "k", "calendar: month, events, open todos" },
 	} },
 	{ "Hammerspoon & misc", "#d0d0d0", {
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },

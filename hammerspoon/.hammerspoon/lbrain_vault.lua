@@ -170,15 +170,203 @@ function M.ankiNote(item, audioName)
 	}
 end
 
--- Where an item with this kind/target goes: "card", "news", "journal" or "inbox".
+-- Where an item with this kind/target goes: "card", "news", "journal", "todo" or "inbox".
 function M.destination(item)
 	if M.DECKS[item.kind] then return "card" end
-	if item.kind == "news" or item.kind == "journal" then return item.kind end
+	if item.kind == "news" or item.kind == "journal" or item.kind == "todo" then return item.kind end
 	if item.kind == "voice" then
 		if item.target == "news" or item.target == "journal" then return item.target end
 		return "inbox"
 	end
 	return "inbox"
+end
+
+-- ---------------------------------------------------------------- todos
+
+-- Todos go to the drag-calendar plugin's task inbox, in the Tasks plugin's format, so both show them.
+M.TODO_FILE = "Calendar/Inbox.md"
+
+function M.todoLine(item)
+	local line = "- [ ] " .. oneLine(item.text)
+	if item.due and item.due ~= "" then line = line .. " 📅 " .. item.due end
+	return line
+end
+
+function M.appendTodo(root, item)
+	local path = root .. "/" .. M.TODO_FILE
+	local text = read(path) or ""
+	if text ~= "" and text:sub(-1) ~= "\n" then text = text .. "\n" end
+	return write(path, text .. M.todoLine(item) .. "\n")
+end
+
+-- ---------------------------------------------------------------- calendar
+
+-- Days since 1970-01-01 for a civil date, and back (Howard Hinnant's algorithms), so date maths
+-- never depends on the time zone.
+local function dayNum(y, m, d)
+	if m <= 2 then y = y - 1 end
+	local era = (y >= 0 and y or y - 399) // 400
+	local yoe = y - era * 400
+	local doy = (153 * (m + (m > 2 and -3 or 9)) + 2) // 5 + d - 1
+	local doe = yoe * 365 + yoe // 4 - yoe // 100 + doy
+	return era * 146097 + doe - 719468
+end
+
+local function fromDayNum(z)
+	z = z + 719468
+	local era = (z >= 0 and z or z - 146096) // 146097
+	local doe = z - era * 146097
+	local yoe = (doe - doe // 1460 + doe // 36524 - doe // 146096) // 365
+	local y = yoe + era * 400
+	local doy = doe - (365 * yoe + yoe // 4 - yoe // 100)
+	local mp = (5 * doy + 2) // 153
+	local d = doy - (153 * mp + 2) // 5 + 1
+	local m = mp + (mp < 10 and 3 or -9)
+	if m <= 2 then y = y + 1 end
+	return y, m, d
+end
+
+local function parseDate(s)
+	local y, m, d = tostring(s):match("^(%d%d%d%d)-(%d%d)-(%d%d)")
+	if not y then return nil end
+	return tonumber(y), tonumber(m), tonumber(d)
+end
+
+local function fmtDate(z) return string.format("%04d-%02d-%02d", fromDayNum(z)) end
+M.dayNum, M.fromDayNum, M.fmtDate, M.parseDate = dayNum, fromDayNum, fmtDate, parseDate
+
+local function weekday(z) return (z + 4) % 7 end -- 0 = Sunday (1970-01-01 was a Thursday)
+local BYDAY = { SU = 0, MO = 1, TU = 2, WE = 3, TH = 4, FR = 5, SA = 6 }
+
+local function contains(list, v)
+	for _, x in ipairs(list or {}) do
+		if x == v then return true end
+	end
+	return false
+end
+
+-- Does the event start or recur on this day (a day number)?
+local function occursOn(ev, z)
+	local sy, sm, sd = parseDate(ev.start)
+	if not sy then return false end
+	local sz = dayNum(sy, sm, sd)
+	if z < sz then return false end
+	local r = ev.rrule
+	if type(r) ~= "table" or not r.freq then return z == sz end
+	local interval = math.max(1, tonumber(r.interval) or 1)
+	if r["until"] then
+		local uy, um, ud = parseDate(r["until"])
+		if uy and z > dayNum(uy, um, ud) then return false end
+	end
+	local freq = tostring(r.freq):lower()
+	local y, m, d = fromDayNum(z)
+	if freq == "daily" then return (z - sz) % interval == 0 end
+	if freq == "weekly" then
+		local days = {}
+		if type(r.byday) == "table" and #r.byday > 0 then
+			for _, code in ipairs(r.byday) do days[BYDAY[tostring(code):upper():sub(-2)] or -1] = true end
+		else
+			days[weekday(sz)] = true
+		end
+		if not days[weekday(z)] then return false end
+		return (((z - weekday(z)) - (sz - weekday(sz))) // 7) % interval == 0
+	end
+	if freq == "monthly" then return d == sd and ((y - sy) * 12 + (m - sm)) % interval == 0 end
+	if freq == "yearly" then return m == sm and d == sd and (y - sy) % interval == 0 end
+	return z == sz
+end
+
+-- Events (the drag-calendar plugin's data.json "events") on each day of [from, to] ("YYYY-MM-DD"):
+-- { ["2026-11-03"] = { {time, end, title, color, allDay, done, kind = "event"}, ... } }, sorted by time.
+function M.expandEvents(events, from, to)
+	local days = {}
+	local z1, z2 = dayNum(parseDate(from)), dayNum(parseDate(to))
+	for _, ev in ipairs(events or {}) do
+		for z = z1, z2 do
+			local date = fmtDate(z)
+			if occursOn(ev, z) and not contains(ev.exdates, date) then
+				days[date] = days[date] or {}
+				table.insert(days[date], {
+					time = ev.allDay and "" or (tostring(ev.start):match("T(%d%d:%d%d)") or ""),
+					["end"] = ev.allDay and "" or (tostring(ev["end"] or ""):match("T(%d%d:%d%d)") or ""),
+					title = ev.title or "", color = ev.color or "", allDay = ev.allDay and true or false,
+					done = contains(ev.doneDates, date), kind = "event",
+				})
+			end
+		end
+	end
+	for _, list in pairs(days) do
+		table.sort(list, function(a, b)
+			if a.time ~= b.time then return a.time < b.time end
+			return a.title < b.title
+		end)
+	end
+	return days
+end
+
+-- The text of a task: everything before the first Tasks-plugin marker (due, scheduled, start, created, recurrence, priority).
+local function taskText(rest)
+	local cut = #rest + 1
+	for _, mark in ipairs({ "📅", "⏳", "🛫", "➕", "🔁", "⏫", "🔼", "🔽", "✅", "❌" }) do
+		local at = rest:find(mark, 1, true)
+		if at and at < cut then cut = at end
+	end
+	return trim(rest:sub(1, cut - 1))
+end
+
+-- Open tasks from grep-style lines ("file:line:- [ ] text 📅 2026-11-05"): the dated ones from anywhere,
+-- the undated ones only from the inbox. Dated first, soonest first.
+function M.parseTasks(lines)
+	local todos = {}
+	for _, l in ipairs(lines) do
+		local file, rest = l:match("^(.-):%d+:%s*%- %[ %] (.*)$")
+		if file then
+			local due = rest:match("📅%s*(%d%d%d%d%-%d%d%-%d%d)")
+			local text = taskText(rest)
+			if text ~= "" and (due or file:sub(-#M.TODO_FILE) == M.TODO_FILE) then
+				todos[#todos + 1] = { text = text, due = due or "" }
+			end
+		end
+	end
+	table.sort(todos, function(a, b)
+		if (a.due == "") ~= (b.due == "") then return a.due ~= "" end
+		if a.due ~= b.due then return a.due < b.due end
+		return a.text < b.text
+	end)
+	return todos
+end
+
+function M.scanTasks(root)
+	local cmd = string.format("grep -rnE --include='*.md' --exclude-dir=.obsidian --exclude-dir=.git --exclude-dir='2-Areas.~1~' '^[[:space:]]*- \\[ \\] ' %q 2>/dev/null", root)
+	local p = io.popen(cmd)
+	if not p then return {} end
+	local lines = {}
+	for l in p:lines() do
+		if l:find("📅", 1, true) or l:find(M.TODO_FILE, 1, true) then lines[#lines + 1] = l end
+	end
+	p:close()
+	return M.parseTasks(lines)
+end
+
+-- Everything the calendar shows, from the month before `ym` ("2026-11") through the month after it:
+-- { month, from, to, days = { date = {entries} }, todos = { {text, due} } }. Dated todos also appear on their day.
+function M.snapshot(events, todos, ym)
+	local y, m = ym:match("^(%d%d%d%d)-(%d%d)$")
+	y, m = tonumber(y), tonumber(m)
+	local from = fmtDate(dayNum(y, m, 1) - 1):sub(1, 7) .. "-01"
+	local nextMonth = dayNum(m == 12 and y + 1 or y, m == 12 and 1 or m + 1, 1)
+	local after = fromDayNum(nextMonth)
+	local _, am = fromDayNum(nextMonth)
+	local ay = after
+	local to = fmtDate(dayNum(am == 12 and ay + 1 or ay, am == 12 and 1 or am + 1, 1) - 1)
+	local days = M.expandEvents(events, from, to)
+	for _, t in ipairs(todos) do
+		if t.due ~= "" and t.due >= from and t.due <= to then
+			days[t.due] = days[t.due] or {}
+			table.insert(days[t.due], { time = "", ["end"] = "", title = t.text, color = "", allDay = true, done = false, kind = "task" })
+		end
+	end
+	return { month = ym, from = from, to = to, days = days, todos = todos }
 end
 
 return M
