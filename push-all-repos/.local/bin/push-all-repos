@@ -42,9 +42,12 @@ if (( ${#broken} )) && [[ "$(cat $notified 2>/dev/null)" != "$slot" ]]; then
   message="${message:+$message. }Failed: ${(j:, :)broken} (see ~/Library/Logs/push-all-repos.log)"
   echo "$slot" > $notified
 fi
+# Backgrounded (&!): terminal-notifier once blocked for two days on a notification it
+# could not deliver, and a run that never ends stops launchd starting the next hourly
+# one, which silently stopped every push.
 if [[ -n $message ]] && command -v terminal-notifier >/dev/null; then
   terminal-notifier -title "Pushed to GitHub" -message "$message" -contentImage "$logo" \
-    -group push-all-repos -open "file://$HOME/Library/Logs/push-all-repos.log" >/dev/null
+    -group push-all-repos -open "file://$HOME/Library/Logs/push-all-repos.log" >/dev/null 2>&1 &!
 fi
 # A slot with a failure is retried next hour (offline, or a branch to sort out).
 (( failed )) || echo "$slot" > $state
