@@ -62,6 +62,7 @@ require("mcam")
 require("mclaude")
 require("morganize")
 require("moji")
+require("brain")
 
 -- require("silent_alttab")
 
