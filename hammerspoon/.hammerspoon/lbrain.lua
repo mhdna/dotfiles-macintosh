@@ -141,15 +141,33 @@ local function apply(item, done)
 		if audioName == false then return done(false, "could not fetch the recording") end
 		if dest == "card" and item.memorize then
 			local note = V.ankiNote(item, audioName)
-			local function add()
-				ankiCall("createDeck", { deck = note.deckName }, function()
+			local function fail(err)
+				startAnki()
+				done(false, err)
+			end
+			local function addNote()
 				ankiCall("addNote", { note = note }, function(_, err)
-					if err and not err:lower():find("duplicate") then
-						startAnki()
-						return done(false, err)
-					end
+					if err and not err:lower():find("duplicate") then return fail(err) end
 					toVault(audioName)
 				end)
+			end
+			-- a single card (just the text) needs its one-field note type; make it the first time
+			local function ensureModel(next)
+				if not item.single then return next() end
+				ankiCall("modelNames", {}, function(names, err)
+					if err then return fail(err) end
+					for _, name in ipairs(names or {}) do
+						if name == note.modelName then return next() end
+					end
+					ankiCall("createModel", V.SINGLE_MODEL, function(_, err2)
+						if err2 then return fail(err2) end
+						next()
+					end)
+				end)
+			end
+			local function add()
+				ankiCall("createDeck", { deck = note.deckName }, function()
+					ensureModel(addNote)
 				end)
 			end
 			if audioName then
@@ -310,13 +328,18 @@ local PAGE = [=[
 <div id="chips" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
 <div id="card" class="__CARDCLASS__">
+  <div id="backBlock">
   <label>Back (meaning, translation) <span id="status"></span></label>
   <textarea id="back" rows="3" dir="auto"></textarea>
   <label>Example</label>
   <input id="example" type="text" dir="auto">
+  </div>
   <div class="row">
     <input id="topic" type="text" placeholder="topic (info: history, go…)">
     <label style="margin:0;white-space:nowrap"><input id="memorize" type="checkbox" style="width:auto;margin:0 4px 0 0"> make a card</label>
+  </div>
+  <div class="row" style="margin-top:2px">
+    <label style="margin:0"><input id="single" type="checkbox" style="width:auto;margin:0 4px 0 0" onchange="onSingle()"> just the text, no front/back (a list or fact to read through)</label>
   </div>
 </div>
 <div id="todo" class="__TODOCLASS__">
@@ -351,6 +374,11 @@ function drawChips() {
     $("chips").appendChild(c);
   });
 }
+function onSingle() {
+  const on = $("single").checked;
+  $("backBlock").style.display = on ? "none" : "";
+  if (on) { $("text").rows = 6; $("status").textContent = ""; } else { $("text").rows = 2; ask(); }
+}
 function setKind(k) {
   kind = k;
   $("memorize").checked = k !== "info";
@@ -358,7 +386,7 @@ function setKind(k) {
   ask();
 }
 function ask() {
-  if (MODE !== "card") return;
+  if (MODE !== "card" || $("single").checked) return;
   clearTimeout(timer);
   const text = $("text").value.trim();
   if (!text) { $("status").textContent = ""; return; }
@@ -406,8 +434,9 @@ function save() {
   if (MODE === "todo") {
     post({ type: "save", text, due: dueVal });
   } else if (MODE === "card") {
-    post({ type: "save", kind, text, back: $("back").value.trim(), example: $("example").value.trim(),
-           topic: $("topic").value.trim(), memorize: $("memorize").checked });
+    const single = $("single").checked;
+    post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
+           topic: $("topic").value.trim(), memorize: $("memorize").checked, single });
   } else {
     post({ type: "save", text });
   }
@@ -421,7 +450,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") { e.preventDefault(); post({ type: "close" }); return; }
   if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && MODE === "journal") { e.preventDefault(); post({ type: "open" }); return; }
   if (e.key === "Enter" && !e.shiftKey && (e.target.id === "text" || e.target.tagName === "INPUT" || e.metaKey)) { e.preventDefault(); save(); return; }
-  if (MODE === "card" && e.altKey && e.code.startsWith("Digit")) {
+  if (MODE === "card" && (e.metaKey || e.altKey) && e.code.startsWith("Digit")) {
     const k = KINDS[parseInt(e.code.slice(5), 10) - 1];
     if (k) { e.preventDefault(); setKind(k[0]); }
   }
@@ -459,7 +488,7 @@ local function openPanel(mode)
 		:gsub("__CARDCLASS__", card and "" or "hide")
 		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
 		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or "journal")))
-		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌥1–5 kind · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
+		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
 	uc:setCallback(function(msg)
@@ -484,7 +513,7 @@ local function openPanel(mode)
 		elseif body.type == "save" then
 			closePanel()
 			if mode == "card" then
-				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize })
+				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil })
 			elseif mode == "todo" then
 				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, memorize = false })
 			else
