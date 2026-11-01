@@ -326,6 +326,7 @@ local PAGE = [=[
 </style>
 <div class="x" onclick="post({ type: 'close' })">✕</div>
 <div id="chips" class="chips"></div>
+<div id="cats" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
 <div id="card" class="__CARDCLASS__">
   <div id="backBlock">
@@ -359,7 +360,8 @@ local PAGE = [=[
 <script>
 const MODE = "__MODE__";
 const KINDS = [["en_word","EN word"],["en_phrase","EN phrase"],["ar_word","AR word"],["ar_phrase","AR phrase"],["info","Info"]];
-let kind = "en_word", seq = 0, timer = null, backEdited = false;
+const CATS = __CATS__;
+let kind = "en_word", category = "__CATEGORY__", seq = 0, timer = null, backEdited = false;
 const $ = id => document.getElementById(id);
 const post = m => window.webkit.messageHandlers.lbrain.postMessage(m);
 
@@ -379,10 +381,29 @@ function onSingle() {
   $("backBlock").style.display = on ? "none" : "";
   if (on) { $("text").rows = 6; $("status").textContent = ""; } else { $("text").rows = 2; ask(); }
 }
+function drawCats() {
+  if (MODE !== "card") return;
+  $("cats").innerHTML = "";
+  if (kind === "info") return;
+  CATS.forEach((c, i) => {
+    const el = document.createElement("div");
+    el.className = "chip" + (category === c.id ? " on" : "");
+    el.textContent = (i + 6) + " " + c.label;
+    el.onclick = () => setCategory(c.id);
+    $("cats").appendChild(el);
+  });
+}
+function setCategory(id) {
+  category = category === id ? "" : id;
+  const c = CATS.find(x => x.id === category);
+  if (c && c.single && !$("single").checked) { $("single").checked = true; onSingle(); }
+  drawCats();
+}
 function setKind(k) {
   kind = k;
   $("memorize").checked = k !== "info";
   drawChips();
+  drawCats();
   ask();
 }
 function ask() {
@@ -400,7 +421,7 @@ window.enriched = (n, e, error) => {
   if (n !== seq) return;
   if (error) { $("status").textContent = "· " + error; return; }
   $("status").textContent = "";
-  if (e.kind && e.kind !== kind && !backEdited) { kind = e.kind; $("memorize").checked = kind !== "info"; drawChips(); }
+  if (e.kind && e.kind !== kind && !backEdited) { kind = e.kind; $("memorize").checked = kind !== "info"; drawChips(); drawCats(); }
   if (!backEdited) $("back").value = e.back || "";
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
@@ -436,7 +457,7 @@ function save() {
   } else if (MODE === "card") {
     const single = $("single").checked;
     post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
-           topic: $("topic").value.trim(), memorize: $("memorize").checked, single });
+           topic: $("topic").value.trim(), memorize: $("memorize").checked, single, category: kind === "info" ? "" : category });
   } else {
     post({ type: "save", text });
   }
@@ -451,12 +472,16 @@ document.addEventListener("keydown", e => {
   if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && MODE === "journal") { e.preventDefault(); post({ type: "open" }); return; }
   if (e.key === "Enter" && !e.shiftKey && (e.target.id === "text" || e.target.tagName === "INPUT" || e.metaKey)) { e.preventDefault(); save(); return; }
   if (MODE === "card" && (e.metaKey || e.altKey) && e.code.startsWith("Digit")) {
-    const k = KINDS[parseInt(e.code.slice(5), 10) - 1];
+    const n = parseInt(e.code.slice(5), 10);
+    const k = KINDS[n - 1];
     if (k) { e.preventDefault(); setKind(k[0]); }
+    else if (n >= 6 && CATS[n - 6] && kind !== "info") { e.preventDefault(); setCategory(CATS[n - 6].id); }
   }
 });
 drawChips();
+drawCats();
 drawPicker();
+if (category) { const c = CATS.find(x => x.id === category); if (c && c.single) { $("single").checked = true; onSingle(); } }
 </script>
 ]=]
 
@@ -478,17 +503,23 @@ local function openTodayInObsidian()
 	hs.urlevent.openURL("obsidian://open?vault=" .. hs.http.encodeForQuery(cfg.vault:match("([^/]+)$")) .. "&file=" .. hs.http.encodeForQuery("Journal/Days/" .. date))
 end
 
-local function openPanel(mode)
+local function openPanel(mode, preset)
 	if not cfg then cfg = loadConfig() end
 	if not cfg then return end
 	closePanel()
 	local card = mode == "card"
-	local page = PAGE:gsub("__MODE__", mode)
+	preset = preset or {}
+	local cats = {}
+	for _, c in ipairs(V.CATEGORIES) do cats[#cats + 1] = { id = c.id, label = c.label, single = c.single or false } end
+	local catsJson = hs.json.encode(cats)
+	local page = PAGE:gsub("__CATS__", function() return catsJson end)
+		:gsub("__CATEGORY__", preset.category or "")
+		:gsub("__MODE__", mode)
 		:gsub("__ROWS__", card and "2" or "5")
 		:gsub("__CARDCLASS__", card and "" or "hide")
 		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
 		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or "journal")))
-		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
+		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
 	uc:setCallback(function(msg)
@@ -513,7 +544,7 @@ local function openPanel(mode)
 		elseif body.type == "save" then
 			closePanel()
 			if mode == "card" then
-				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil })
+				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil })
 			elseif mode == "todo" then
 				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, memorize = false })
 			else
@@ -523,7 +554,7 @@ local function openPanel(mode)
 	end)
 
 	local screen = hs.screen.mainScreen():frame()
-	local w, h = 560, card and 360 or (mode == "todo" and 600 or 230)
+	local w, h = 560, card and 420 or (mode == "todo" and 600 or 230)
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, math.min(screen.h * 0.22, screen.h - h - 40)), w = w, h = h }, {}, uc)
 	panel:windowStyle({ "borderless" })
 		:transparent(true)
@@ -583,6 +614,10 @@ end
 -- One shortcut: ctrl+cmd+j opens a list; type to filter, ⏎ to pick.
 local ACTIONS = {
 	{ text = "Word, phrase or info", subText = "a card for Anki + the vault", fn = function() openPanel("card") end },
+	{ text = "Use more", subText = "words/phrases to start using (no back)", fn = function() openPanel("card", { category = "use_more" }) end },
+	{ text = "Funny", subText = "a funny word or phrase", fn = function() openPanel("card", { category = "funny" }) end },
+	{ text = "Slang", subText = "slang or dialect", fn = function() openPanel("card", { category = "slang" }) end },
+	{ text = "Idioms & proverbs", subText = "sayings", fn = function() openPanel("card", { category = "idiom" }) end },
 	{ text = "Todo", subText = "with an optional due date", fn = function() openPanel("todo") end },
 	{ text = "Journal", subText = "a line in today's note", fn = function() openPanel("journal") end },
 	{ text = "News", subText = "a line under today's date", fn = function() openPanel("news") end },

@@ -27,6 +27,37 @@ M.LABELS = {
 	info = "Info",
 }
 
+-- Sections of words and phrases: each is an Anki subdeck of the kind's deck and its own vault file.
+-- "Use more" is for words you want to start using yourself, so it's a no-back card.
+M.CATEGORIES = {
+	{ id = "use_more", label = "Use more", single = true },
+	{ id = "funny", label = "Funny" },
+	{ id = "slang", label = "Slang" },
+	{ id = "idiom", label = "Idioms & proverbs" },
+}
+
+local function categoryOf(item)
+	for _, c in ipairs(M.CATEGORIES) do
+		if c.id == item.category then return c end
+	end
+end
+
+-- The deck an item goes to: the kind's deck, then its category's subdeck.
+function M.deckFor(item)
+	local deck = M.DECKS[item.kind]
+	local cat = deck and item.kind ~= "info" and categoryOf(item)
+	if cat then return deck .. "::" .. cat.label end
+	return deck
+end
+
+-- The vault file: "LBrain/English words.md" -> "LBrain/English words - Funny.md" for a category.
+function M.fileFor(item)
+	local file = M.FILES[item.kind]
+	local cat = file and item.kind ~= "info" and categoryOf(item)
+	if cat then return (file:gsub("%.md$", " - " .. cat.label .. ".md")) end
+	return file
+end
+
 local TEMPLATE = "Sources/Templates/Diary day note.md"
 
 local function read(path)
@@ -140,7 +171,7 @@ function M.cardLine(item, date, audioName)
 end
 
 function M.appendCard(root, item, date, audioName)
-	local file = M.FILES[item.kind]
+	local file = M.fileFor(item)
 	if not file then return nil, "no file for " .. tostring(item.kind) end
 	local path = root .. "/" .. file
 	local text = read(path) or ""
@@ -166,8 +197,9 @@ end
 -- The AnkiConnect "note" for an item. The back is the meaning, an example, the topic, and a
 -- [sound:] tag for a kept recording (the file stored with storeMediaFile under audioName).
 function M.ankiNote(item, audioName)
-	local deck = M.DECKS[item.kind]
+	local deck = M.deckFor(item)
 	if not deck then return nil end
+	local extraTags = categoryOf(item) and item.kind ~= "info" and { item.category } or {}
 	if item.single then
 		local text = html(item.text)
 		if (item.topic or "") ~= "" then text = text .. "<br><br><i>" .. html(item.topic) .. "</i>" end
@@ -177,7 +209,7 @@ function M.ankiNote(item, audioName)
 			modelName = M.SINGLE_MODEL.modelName,
 			fields = { Text = text },
 			options = { allowDuplicate = false, duplicateScope = "deck" },
-			tags = { "lbrain", item.kind, "single" },
+			tags = { "lbrain", item.kind, "single", table.unpack(extraTags) },
 		}
 	end
 	local back = html(item.back)
@@ -189,7 +221,7 @@ function M.ankiNote(item, audioName)
 		modelName = "Basic",
 		fields = { Front = html(item.text), Back = back },
 		options = { allowDuplicate = false, duplicateScope = "deck" },
-		tags = { "lbrain", item.kind },
+		tags = { "lbrain", item.kind, table.unpack(extraTags) },
 	}
 end
 
