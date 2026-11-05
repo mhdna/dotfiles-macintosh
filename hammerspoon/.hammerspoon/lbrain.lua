@@ -573,7 +573,7 @@ function drawCats() {
 function setCategory(id) {
   category = category === id ? "" : id;
   const c = CATS.find(x => x.id === category);
-  if (c && c.single && !$("single").checked) { $("single").checked = true; onSingle(); }
+  if (c && $("single").checked !== !!c.single) { $("single").checked = !!c.single; onSingle(); } // a section sets no-back on or off; ⌘0 can still flip it
   drawCats();
 }
 function setKind(k) {

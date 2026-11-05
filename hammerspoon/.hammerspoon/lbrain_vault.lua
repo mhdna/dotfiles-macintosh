@@ -28,12 +28,12 @@ M.LABELS = {
 }
 
 -- Sections of words and phrases: each is an Anki subdeck of the kind's deck and its own vault file.
--- Every section is a no-back card (just the text); ⌘0 in the capture window turns that off.
+-- "Use more" is a no-back card (just the text); the others have a back. cmd+0 in the capture window toggles no-back.
 M.CATEGORIES = {
 	{ id = "use_more", label = "Use more", single = true },
-	{ id = "funny", label = "Funny", single = true },
-	{ id = "slang", label = "Slang", single = true },
-	{ id = "idiom", label = "Idioms & proverbs", single = true },
+	{ id = "funny", label = "Funny" },
+	{ id = "slang", label = "Slang" },
+	{ id = "idiom", label = "Idioms & proverbs" },
 }
 
 local function categoryOf(item)
