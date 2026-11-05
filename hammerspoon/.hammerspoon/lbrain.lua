@@ -123,9 +123,52 @@ local function fetchAudio(item, callback)
 	end)
 end
 
+-- Speech from Microsoft's neural voices (the edge-tts tool: `uv tool install edge-tts`), cached by word so a repeat
+-- is instant; falls back to the Mac's own `say` voice when it isn't installed or the network is down.
+local EDGE_TTS = HOME .. "/.local/bin/edge-tts"
+local TTS_DIR = HOME .. "/.local/share/lbrain/tts"
+local VOICE_EN, VOICE_AR = "en-US-AvaMultilingualNeural", "ar-LB-LaylaNeural"
+
+local function isArabicText(kind, text)
+	return kind == "ar_word" or kind == "ar_phrase" or tostring(text):find("[\216-\219]") ~= nil
+end
+
+-- callback(path, bytes, ext): an audio file for the text, or nil
+local function speechFile(text, kind, callback)
+	text = tostring(text):gsub("%s+", " ")
+	if text == "" or #text > 200 then return callback(nil) end
+	local arabic = isArabicText(kind, text)
+	local voice = arabic and VOICE_AR or VOICE_EN
+	local path = TTS_DIR .. "/" .. hs.hash.MD5(voice .. "|" .. text) .. ".mp3"
+	local function done()
+		local f = io.open(path, "rb")
+		if not f then return callback(nil) end
+		local bytes = f:read("a")
+		f:close()
+		callback(path, bytes, "mp3")
+	end
+	if hs.fs.attributes(path) then return done() end
+	if not hs.fs.attributes(EDGE_TTS) then return callback(nil) end
+	hs.fs.mkdir(HOME .. "/.local/share/lbrain")
+	hs.fs.mkdir(TTS_DIR)
+	local tmp = path .. ".part"
+	local task
+	task = hs.task.new(EDGE_TTS, function(code)
+		if code == 0 and hs.fs.attributes(tmp) and hs.fs.attributes(tmp).size > 500 then
+			os.rename(tmp, path)
+			return done()
+		end
+		os.remove(tmp)
+		callback(nil)
+	end, { "--voice", voice, "--text", text, "--write-media", tmp })
+	task:start()
+	-- don't wait forever on a bad network
+	hs.timer.doAfter(15, function() if task and task:isRunning() then task:terminate() end end)
+end
+
 -- The spoken word, made on this Mac with its own voices (Samantha for English, Majed for Arabic) and packed
 -- as a small AAC file; calls back with the file name and its bytes, or nil when it can't be made.
-local function pronounce(item, callback)
+local function sayPronounce(item, callback)
 	local arabic = item.kind == "ar_word" or item.kind == "ar_phrase"
 	local text = tostring(item.text or ""):gsub("%s+", " ")
 	if text == "" or #text > 200 then return callback(nil) end
@@ -149,9 +192,24 @@ end
 -- Say a word out loud now (⌘P in the capture window), with the same voices as the card's pronunciation.
 function M.speak(text, kind)
 	if M.speaking then M.speaking:terminate() end
-	local arabic = kind == "ar_word" or kind == "ar_phrase" or tostring(text):find("[\216-\219]") ~= nil
-	M.speaking = hs.task.new("/usr/bin/say", function() M.speaking = nil end, { "-v", arabic and "Majed" or "Samantha", "--", tostring(text):sub(1, 200) })
-	M.speaking:start()
+	local function sayIt()
+		local arabic = isArabicText(kind, text)
+		M.speaking = hs.task.new("/usr/bin/say", function() M.speaking = nil end, { "-v", arabic and "Majed" or "Samantha", "--", tostring(text):sub(1, 200) })
+		M.speaking:start()
+	end
+	speechFile(text, kind, function(path)
+		if not path then return sayIt() end
+		if M.speaking then M.speaking:terminate() end
+		M.speaking = hs.task.new("/usr/bin/afplay", function() M.speaking = nil end, { path })
+		M.speaking:start()
+	end)
+end
+
+local function pronounce(item, callback)
+	speechFile(item.text, item.kind, function(_, bytes, ext)
+		if bytes then return callback(item.id .. "-pron." .. ext, bytes) end
+		sayPronounce(item, callback)
+	end)
 end
 
 -- done(true) when everything for this item is in place; done(false, why) leaves it waiting.
@@ -891,6 +949,7 @@ local function openPanel(mode, preset)
 				end
 			end)
 		elseif body.type == "dupe" then
+			speechFile(body.text, nil, function() end) -- fetch the voice now, so ⌘P and the card audio are instant
 			M.findDuplicates(body.text, function(list, edit)
 				if panel then panel:evaluateJavaScript(string.format("dupes(%d, %s, %s)", body.seq, hs.json.encode(list), edit and (hs.json.encode(edit):gsub("</", "<\\/")) or "null")) end
 			end)
