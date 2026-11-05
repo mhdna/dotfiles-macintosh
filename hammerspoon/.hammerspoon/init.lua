@@ -62,6 +62,8 @@ require("mcam")
 require("mclaude")
 require("morganize")
 require("moji")
+require("mlife")
+require("show_desktop")
 require("lbrain")
 
 -- require("silent_alttab")
@@ -102,7 +104,7 @@ hs.hotkey.bind({ "cmd", "alt" }, "T", function()
 	end
 end)
 
-hs.hotkey.bind({ "cmd" }, "`", function()
+hs.hotkey.bind({ "cmd" }, 50, function()
 	local app = hs.application.frontmostApplication()
 	local windows = app:allWindows()
 
@@ -131,7 +133,8 @@ end
 hs.hotkey.bind({ "alt" }, "tab", toggleMissionControlAfterRelease)
 
 -- opt+`: the same, all open windows at a glance
-hs.hotkey.bind({ "alt" }, "`", toggleMissionControlAfterRelease)
+-- bound by raw keycode (50, the ANSI backtick key): a name lookup depends on the active layout, so with Arabic selected at load it never matched
+hs.hotkey.bind({ "alt" }, 50, toggleMissionControlAfterRelease)
 
 hs.hotkey.bind({ "alt" }, "]", function()
 	hs.spaces.goRight()
@@ -749,7 +752,7 @@ tildeKeyTap = hs.eventtap.new({ eventTypes.keyDown, eventTypes.keyUp }, function
 			table.insert(mods, m)
 		end
 	end
-	hs.eventtap.event.newKeyEvent(mods, "`", isDown):post()
+	hs.eventtap.event.newKeyEvent(mods, 50, isDown):post()
 	return true
 end)
 tildeKeyTap:start()

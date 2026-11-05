@@ -1,5 +1,11 @@
 # Fixed bugs
 
+## 2026-11-05 — opt+` (Mission Control) and cmd+` did nothing
+
+**Symptom:** opt+` stopped opening Mission Control.
+**Cause:** the hotkeys were bound by the name "`", which Hammerspoon resolves through the keyboard layout active at load; with Arabic selected it did not match the backtick key. (Inferred from the setup; not reproduced.)
+**Fix:** bound by raw keycode 50 in `hammerspoon/.hammerspoon/init.lua`, including the § to ` remap. No automated test.
+
 Newest first.
 
 ## 2026-10-30: Moji's emojis never appeared in Alacritty
