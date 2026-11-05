@@ -127,7 +127,7 @@ end
 -- is instant; falls back to the Mac's own `say` voice when it isn't installed or the network is down.
 local EDGE_TTS = HOME .. "/.local/bin/edge-tts"
 local TTS_DIR = HOME .. "/.local/share/lbrain/tts"
-local VOICE_EN, VOICE_AR = "en-US-AvaMultilingualNeural", "ar-LB-LaylaNeural"
+local VOICE_EN, VOICE_AR = "en-US-AndrewMultilingualNeural", "ar-LB-RamiNeural" -- male voices; en-US-BrianMultilingualNeural, en-GB-RyanNeural and ar-SA-HamedNeural are other options
 
 local function isArabicText(kind, text)
 	return kind == "ar_word" or kind == "ar_phrase" or tostring(text):find("[\216-\219]") ~= nil
