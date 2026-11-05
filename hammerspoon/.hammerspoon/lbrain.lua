@@ -617,6 +617,7 @@ function ask() {
   if (!text) { $("status").textContent = ""; return; }
   timer = setTimeout(() => {
     seq++;
+    askedText = text;
     $("status").textContent = "· asking Claude…";
     post({ type: "enrich", kind, text, seq, arabic });
     // draw in parallel with the card back, from the word alone: nothing waits for anything. A photo that
@@ -624,10 +625,10 @@ function ask() {
     if (kind !== "info") { drawSeq++; post({ type: "illustrate", text, back: "", seq: drawSeq }); }
   }, 700);
 }
-let image = "";
+let image = "", askedText = "", ignoreFix = "";
 function picMime(b) { return b.startsWith("iVBOR") ? "image/png" : (b.startsWith("PHN2Zy") || b.startsWith("PD94b")) ? "image/svg+xml" : "image/jpeg"; }
 let drawSeq = 0;
-window.illustrated = (n, b64, note) => { if (n !== drawSeq) return; $("status").textContent = note ? "· " + note : ""; if (!picDropped && !image) showPic(b64); };
+window.illustrated = (n, b64, note) => { if (n !== drawSeq) return; if (note) $("status").textContent = "· " + note; if (!picDropped && !image) showPic(b64); };
 function showPic(b64) {
   image = b64 || "";
   $("pic").style.display = image ? "flex" : "none";
@@ -635,6 +636,19 @@ function showPic(b64) {
 }
 function dropPic() { showPic(""); picDropped = true; }
 let picDropped = false;
+// The model found a clear typo: put the corrected spelling in the box, say so, and offer an undo.
+function fixSpelling(before, after, redraw) {
+  $("text").value = after;
+  askedText = after;
+  const st = $("status");
+  st.textContent = "· ✓ fixed spelling: " + before + " → " + after + "  ";
+  const a = document.createElement("a");
+  a.href = "#"; a.textContent = "undo"; a.style.color = "#fff";
+  a.onclick = ev => { ev.preventDefault(); ignoreFix = before.toLowerCase(); $("text").value = before; st.textContent = ""; checkDupe(); ask(); };
+  st.appendChild(a);
+  checkDupe();
+  if (redraw) { drawSeq++; post({ type: "illustrate", text: after, back: "", seq: drawSeq }); }
+}
 window.enriched = (n, e, error) => {
   if (n !== seq) return;
   if (error) { $("status").textContent = "· " + error; return; }
@@ -643,6 +657,7 @@ window.enriched = (n, e, error) => {
   if (!backEdited) $("back").value = e.back || "";
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
+  if (e.fixed && $("text").value.trim() === askedText && ignoreFix !== askedText.toLowerCase()) fixSpelling(askedText, e.fixed, !e.image && (e.kind || kind) !== "info");
   if (e.image) { drawSeq++; if (!picDropped) showPic(e.image); } // a photo beats the drawing still on its way
   if ((e.kind || kind) === "info") { drawSeq++; showPic(""); }
 };
