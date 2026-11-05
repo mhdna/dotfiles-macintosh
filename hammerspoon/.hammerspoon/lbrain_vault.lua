@@ -171,6 +171,40 @@ function M.cardLine(item, date, audioName, imageName)
 	return line
 end
 
+-- Anki's Back field as the capture window builds it ("meaning<br><br><i>example</i><br><br>topic") -> its parts.
+function M.parseBack(html)
+	local function plain(x) return (tostring(x):gsub("<br%s*/?>", "\n"):gsub("<[^>]*>", ""):gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&amp;", "&"):gsub("^%s+", ""):gsub("%s+$", "")) end
+	local parts, rest = {}, tostring(html) .. "<br><br>"
+	for chunk in rest:gmatch("(.-)<br><br>") do parts[#parts + 1] = chunk end
+	local back, example, topic = parts[1] or "", "", ""
+	local i = 2
+	if parts[i] and parts[i]:match("^<i>.*</i>$") then example = parts[i]; i = i + 1 end
+	if parts[i] and not parts[i]:find("%[sound:") and not parts[i]:find("<img") then topic = parts[i] end
+	return { front = "", back = plain(back), example = plain(example), topic = plain(topic) }
+end
+
+-- Rewrite the card line "- **front** ..." in its file, keeping the date it was added on.
+function M.replaceCard(root, item, date)
+	local file = M.fileFor(item)
+	if not file then return nil end
+	local path = root .. "/" .. file
+	local text = read(path)
+	if not text then return nil end
+	local want = "- **" .. oneLine(item.text):lower() .. "**"
+	local out, hit = {}, false
+	for raw in (text .. "\n"):gmatch("(.-)\n") do
+		local line = raw
+		if not hit and line:lower():sub(1, #want) == want then
+			hit = true
+			line = M.cardLine(item, line:match("(%d%d%d%d%-%d%d%-%d%d)%)_") or date)
+		end
+		out[#out + 1] = line
+	end
+	if not hit then return nil end
+	if out[#out] == "" then out[#out] = nil end
+	return write(path, table.concat(out, "\n") .. "\n")
+end
+
 function M.appendCard(root, item, date, audioName, imageName)
 	local file = M.fileFor(item)
 	if not file then return nil, "no file for " .. tostring(item.kind) end

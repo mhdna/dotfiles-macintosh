@@ -222,15 +222,17 @@ end
 function M.findDuplicates(text, callback)
 	local want = norm(text)
 	local found = {}
+	local edit -- the first plain Front/Back card with exactly this word, so it can be loaded for editing
 	-- the vault: lines like "- **word** — ..." in the LBrain notes
 	local out = hs.execute(string.format("/usr/bin/grep -rhiF -m1 -- %q %q 2>/dev/null | head -3", "**" .. text .. "**", cfg.vault .. "/LBrain"))
 	if out and out ~= "" then found[#found + 1] = "in your vault notes" end
+	local function finish() callback(found, edit) end
 	for _, it in ipairs(readOutbox()) do
 		if norm(it.text) == want then found[#found + 1] = "waiting in the outbox" break end
 	end
 	local escaped = text:gsub('\\', '\\\\'):gsub('"', '\\"')
 	ankiCall("findCards", { query = '"' .. escaped .. '"' }, function(ids)
-		if type(ids) ~= "table" or #ids == 0 then return callback(found) end
+		if type(ids) ~= "table" or #ids == 0 then return finish() end
 		local first = {}
 		for i = 1, math.min(#ids, 12) do first[i] = ids[i] end
 		ankiCall("cardsInfo", { cards = first }, function(cards)
@@ -242,9 +244,25 @@ function M.findDuplicates(text, callback)
 						found[#found + 1] = "Anki: " .. tostring(c.deckName)
 					end
 				end
+				local fr, bk = c.fields and c.fields.Front, c.fields and c.fields.Back
+				if not edit and fr and bk and norm(fr.value) == want then
+					edit = V.parseBack(bk.value)
+					edit.noteId, edit.deck = c.note, c.deckName
+				end
 			end
-			callback(found)
+			finish()
 		end)
+	end)
+end
+
+-- Save an edited existing card in place: Anki's note fields and the vault line, no new capture.
+function M.saveEdit(body)
+	local item = { kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, category = body.category ~= "" and body.category or nil }
+	local note = V.ankiNote(item)
+	ankiCall("updateNoteFields", { note = { id = body.editNote, fields = note and note.fields or {} } }, function(_, err)
+		if err then startAnki() return hs.alert.show("LBrain: could not update the card: " .. err, 3) end
+		local ok = V.replaceCard(cfg.vault, item, os.date("%Y-%m-%d"))
+		hs.alert.show(ok and "LBrain: card updated" or "LBrain: card updated in Anki (not found in the vault)", 1.2)
 	end)
 end
 
@@ -648,7 +666,7 @@ function save() {
     const single = $("single").checked;
     post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
            topic: $("topic").value.trim(), memorize: $("memorize").checked, single, category: kind === "info" ? "" : category,
-           image: single || kind === "info" ? "" : image });
+           image: single || kind === "info" ? "" : image, editNote: editing ? editing.noteId : null });
   } else {
     post({ type: "save", text });
   }
@@ -660,14 +678,28 @@ function checkDupe() {
   if (MODE !== "card" || text.length < 2) { $("dupe").style.display = "none"; return; }
   dupeTimer = setTimeout(() => { dupeSeq++; post({ type: "dupe", text, seq: dupeSeq }); }, 400);
 }
-window.dupes = (n, list) => {
+let editing = null;
+window.dupes = (n, list, edit) => {
   if (n !== dupeSeq) return;
   const el = $("dupe");
   if (!list || !list.length) { el.style.display = "none"; return; }
   el.textContent = "⚠ already have it: " + list.join(" · ");
+  if (edit && !editing) {
+    const a = document.createElement("a");
+    a.href = "#"; a.textContent = "  ✎ load it to edit"; a.style.color = "#fff";
+    a.onclick = e => { e.preventDefault(); loadForEdit(edit); };
+    el.appendChild(a);
+  }
   el.style.display = "block";
 };
-$("text").addEventListener("input", () => { checkDupe(); ask(); if (MODE === "command") draft = null; });
+function loadForEdit(e) {
+  editing = e; backEdited = true;
+  $("back").value = e.back || ""; $("example").value = e.example || ""; $("topic").value = e.topic || "";
+  $("single").checked = false; onSingle();
+  $("dupe").textContent = "✎ editing your existing card (" + (e.deck || "Anki") + ") — ⏎ saves the changes";
+  $("status").textContent = "";
+}
+$("text").addEventListener("input", () => { if (editing) editing = null; checkDupe(); ask(); if (MODE === "command") draft = null; });
 if (MODE === "card") {
   $("back").addEventListener("input", () => { backEdited = true; });
   $("memorize").checked = true;
@@ -746,8 +778,8 @@ local function openPanel(mode, preset)
 				end
 			end)
 		elseif body.type == "dupe" then
-			M.findDuplicates(body.text, function(list)
-				if panel then panel:evaluateJavaScript(string.format("dupes(%d, %s)", body.seq, hs.json.encode(list))) end
+			M.findDuplicates(body.text, function(list, edit)
+				if panel then panel:evaluateJavaScript(string.format("dupes(%d, %s, %s)", body.seq, hs.json.encode(list), edit and (hs.json.encode(edit):gsub("</", "<\\/")) or "null")) end
 			end)
 		elseif body.type == "enrich" then
 			request("POST", "/v1/enrich", { kind = body.kind, text = body.text }, function(status, data, text)
@@ -768,6 +800,8 @@ local function openPanel(mode, preset)
 				submit({ kind = d.kind, text = d.text, back = d.back ~= "" and d.back or nil, example = d.example ~= "" and d.example or nil,
 					topic = d.topic ~= "" and d.topic or nil, category = d.category ~= "" and d.category or nil, single = d.single or nil,
 					memorize = d.memorize, due = d.due ~= "" and d.due or nil, time = d.time ~= "" and d.time or nil, remind = d.remind or nil })
+			elseif mode == "card" and body.editNote then
+				M.saveEdit(body)
 			elseif mode == "card" then
 				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil,
 					image = body.image ~= "" and body.image or nil })
