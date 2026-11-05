@@ -144,7 +144,7 @@ local function apply(item, done)
 	end
 
 	-- a tiny picture rides along in the item itself: it goes in the vault and, below, in Anki's media folder
-	local imageName = item.image and item.image ~= "" and (item.id .. (item.image:sub(1, 5) == "iVBOR" and ".png" or ".jpg")) or nil
+	local imageName = item.image and item.image ~= "" and (item.id .. (item.image:sub(1, 5) == "iVBOR" and ".png" or ((item.image:sub(1, 6) == "PHN2Zy" or item.image:sub(1, 5) == "PD94b") and ".svg" or ".jpg"))) or nil
 	local imageBytes = imageName and hs.base64.decode(item.image)
 	if imageName and dest == "card" then V.write(cfg.vault .. "/LBrain/images/" .. imageName, imageBytes) end
 
@@ -620,10 +620,13 @@ function ask() {
   }, 700);
 }
 let image = "";
+function picMime(b) { return b.startsWith("iVBOR") ? "image/png" : (b.startsWith("PHN2Zy") || b.startsWith("PD94b")) ? "image/svg+xml" : "image/jpeg"; }
+let drawSeq = 0;
+window.illustrated = (n, b64) => { if (n !== drawSeq) return; $("status").textContent = ""; if (!picDropped && !image) showPic(b64); };
 function showPic(b64) {
   image = b64 || "";
   $("pic").style.display = image ? "flex" : "none";
-  if (image) $("picImg").src = "data:image/" + (image.startsWith("iVBOR") ? "png" : "jpeg") + ";base64," + image;
+  if (image) $("picImg").src = "data:" + picMime(image) + ";base64," + image;
 }
 function dropPic() { showPic(""); picDropped = true; }
 let picDropped = false;
@@ -636,6 +639,12 @@ window.enriched = (n, e, error) => {
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
   if (!picDropped) showPic(e.image);
+  // no photo (not a concrete noun): have Claude draw a tiny picture of the meaning, in the background
+  if (!e.image && !picDropped && e.back && (e.kind || kind) !== "info") {
+    drawSeq++;
+    $("status").textContent = "· drawing a picture…";
+    post({ type: "illustrate", text: $("text").value.trim(), back: e.back, seq: drawSeq });
+  }
 };
 let draft = null, parsedFor = "";
 function describe(d) {
@@ -828,6 +837,12 @@ local function openPanel(mode, preset)
 					js = string.format("answered(%d, null, %s)", body.seq, hs.json.encode({ why }):sub(2, -2))
 				end
 				panel:evaluateJavaScript(js)
+			end)
+		elseif body.type == "illustrate" then
+			request("POST", "/v1/illustrate", { text = body.text, back = body.back }, function(status, data)
+				if not panel then return end
+				local img = (status == 200 and data and data.image) or ""
+				panel:evaluateJavaScript(string.format("illustrated(%d, %s)", body.seq, hs.json.encode({ img }):sub(2, -2)))
 			end)
 		elseif body.type == "enrich" then
 			request("POST", "/v1/enrich", { kind = body.kind, text = body.text, arabic = body.arabic ~= false }, function(status, data, text)
