@@ -461,7 +461,7 @@ local PAGE = [=[
   .x:hover { opacity: 1; background: #3d3d3d; }
   .chips { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
   .chip { padding: 4px 10px; border-radius: 12px; border: 1px solid #4d4d4d; cursor: pointer; user-select: none; font-size: 13px; }
-  .chip.on { background: #777777; border-color: #777777; color: #fff; }
+  .chip.on { background: #a8a8a8; border-color: #a8a8a8; color: #111; font-weight: 500; }
   textarea, input { width: 100%; box-sizing: border-box; background: #333333; color: inherit; border: 1px solid #4d4d4d; border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 8px; outline: none; }
   textarea:focus, input:focus { border-color: #777777; }
   textarea { resize: none; }
@@ -481,9 +481,9 @@ local PAGE = [=[
   #pickGrid .dow { cursor: default; opacity: .5; font-size: 12px; padding: 3px 0; }
   #pickGrid .other { opacity: .35; }
   #pickGrid .today { box-shadow: inset 0 0 0 1.5px #777777; }
-  #pickGrid .on { background: #777777; color: #fff; }
+  #pickGrid .on { background: #a8a8a8; color: #111; }
   #pickGrid div:not(.dow):hover { background: #3d3d3d; }
-  #pickGrid .on:hover { background: #777777; }
+  #pickGrid .on:hover { background: #a8a8a8; }
 </style>
 <div class="x" onclick="post({ type: 'close' })">✕</div>
 <div id="chips" class="chips"></div>
