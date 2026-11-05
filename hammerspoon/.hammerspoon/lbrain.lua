@@ -489,10 +489,12 @@ local PAGE = [=[
 <div id="chips" class="chips"></div>
 <div id="cats" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
+<div id="askRow" style="display:none"><input id="ask" type="text" dir="auto" placeholder="ask AI a question about it (⌘L) — e.g. origin of this word" style="margin-bottom:6px">
+<div id="answer" style="display:none;border:1px solid #434343;border-radius:8px;padding:8px 10px;margin-bottom:8px;background:#262626;font-size:13.5px;line-height:1.45;white-space:pre-wrap"></div></div>
 <div id="dupe" style="display:none;color:#f0c049;font-size:13px;margin:-4px 0 8px;line-height:1.4"></div>
 <div id="card" class="__CARDCLASS__">
   <div id="backBlock">
-  <label>Back (meaning, translation) <span id="status"></span></label>
+  <label>Back (meaning, translation) <span id="ar" style="opacity:.8"></span> <span id="status"></span></label>
   <textarea id="back" rows="3" dir="auto"></textarea>
   <label>Example</label>
   <input id="example" type="text" dir="auto">
@@ -581,6 +583,31 @@ function setKind(k) {
   drawCats();
   ask();
 }
+let arabic = true, askSeq = 0, lastAnswer = "";
+function drawArabic() { $("ar").textContent = arabic ? "· عربي on (⌘⇧0)" : "· Arabic off (⌘⇧0)"; }
+function toggleArabic() { arabic = !arabic; drawArabic(); backEdited = false; ask(); }
+function askAI() {
+  const q = $("ask").value.trim();
+  if (!q) return;
+  askSeq++;
+  const box = $("answer");
+  box.style.display = "block"; box.textContent = "asking…"; lastAnswer = "";
+  post({ type: "ask", question: q, about: $("text").value.trim(), seq: askSeq });
+}
+window.answered = (n, answer, error) => {
+  if (n !== askSeq) return;
+  const box = $("answer");
+  if (error) { box.textContent = "· " + error; return; }
+  lastAnswer = answer;
+  box.textContent = answer + "\n\n";
+  for (const [label, fn] of [["use as back", () => { $("back").value = lastAnswer; backEdited = true; $("single").checked = false; onSingle(); $("back").focus(); }],
+                             ["add to back", () => { $("back").value = ($("back").value ? $("back").value + "\n" : "") + lastAnswer; backEdited = true; $("single").checked = false; onSingle(); }]]) {
+    const a = document.createElement("a");
+    a.href = "#"; a.textContent = "↳ " + label; a.style.cssText = "color:#fff;margin-right:14px";
+    a.onclick = e => { e.preventDefault(); fn(); };
+    box.appendChild(a);
+  }
+};
 function ask() {
   if (MODE !== "card" || $("single").checked) return;
   clearTimeout(timer);
@@ -589,7 +616,7 @@ function ask() {
   timer = setTimeout(() => {
     seq++;
     $("status").textContent = "· asking Claude…";
-    post({ type: "enrich", kind, text, seq });
+    post({ type: "enrich", kind, text, seq, arabic });
   }, 700);
 }
 let image = "";
@@ -708,11 +735,14 @@ if (MODE === "card") {
   $("memorize").checked = true;
 }
 document.addEventListener("keydown", e => {
+  if (e.target.id === "ask" && e.key === "Enter" && !e.shiftKey && !e.metaKey) { e.preventDefault(); askAI(); return; }
+  if (MODE === "card" && e.metaKey && e.code === "KeyL") { e.preventDefault(); $("ask").focus(); return; }
   if (e.key === "Escape") { e.preventDefault(); post({ type: "close" }); return; }
   if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && MODE === "journal") { e.preventDefault(); post({ type: "open" }); return; }
   if (e.key === "Enter" && !e.shiftKey && (e.target.id === "text" || e.target.tagName === "INPUT" || e.metaKey)) { e.preventDefault(); save(); return; }
   if (MODE === "card" && (e.metaKey || e.altKey) && e.code.startsWith("Digit")) {
     const n = parseInt(e.code.slice(5), 10);
+    if (n === 0 && e.shiftKey) { e.preventDefault(); toggleArabic(); return; }
     if (n === 0) { e.preventDefault(); $("single").checked = !$("single").checked; onSingle(); return; }
     const k = KINDS[n - 1];
     if (k) { e.preventDefault(); setKind(k[0]); }
@@ -722,6 +752,8 @@ document.addEventListener("keydown", e => {
 drawChips();
 drawCats();
 drawPicker();
+drawArabic();
+if (MODE === "card") $("askRow").style.display = "block";
 if (category) { const c = CATS.find(x => x.id === category); if (c && c.single) { $("single").checked = true; onSingle(); } }
 </script>
 ]=]
@@ -761,7 +793,7 @@ local function openPanel(mode, preset)
 		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
 		:gsub("__CMDCLASS__", mode == "command" and "" or "hide")
 		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or (mode == "command" and "what to add, in your own words" or "journal"))))
-		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⌘0 no back on/off · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
+		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⌘0 no back · ⌘⇧0 Arabic · ⌘L ask AI · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
 	uc:setCallback(function(msg)
@@ -785,8 +817,20 @@ local function openPanel(mode, preset)
 			M.findDuplicates(body.text, function(list, edit)
 				if panel then panel:evaluateJavaScript(string.format("dupes(%d, %s, %s)", body.seq, hs.json.encode(list), edit and (hs.json.encode(edit):gsub("</", "<\\/")) or "null")) end
 			end)
+		elseif body.type == "ask" then
+			request("POST", "/v1/ask", { question = body.question, about = body.about }, function(status, data)
+				if not panel then return end
+				local js
+				if status == 200 and data and data.answer then
+					js = string.format("answered(%d, %s)", body.seq, (hs.json.encode({ data.answer }):sub(2, -2):gsub("</", "<\\/")))
+				else
+					local why = (data and data.error) or ("error " .. tostring(status))
+					js = string.format("answered(%d, null, %s)", body.seq, hs.json.encode({ why }):sub(2, -2))
+				end
+				panel:evaluateJavaScript(js)
+			end)
 		elseif body.type == "enrich" then
-			request("POST", "/v1/enrich", { kind = body.kind, text = body.text }, function(status, data, text)
+			request("POST", "/v1/enrich", { kind = body.kind, text = body.text, arabic = body.arabic ~= false }, function(status, data, text)
 				if not panel then return end
 				local js
 				if status == 200 and data then
@@ -819,7 +863,7 @@ local function openPanel(mode, preset)
 	end)
 
 	local screen = hs.screen.mainScreen():frame()
-	local w, h = 560, card and 420 or (mode == "todo" and 600 or (mode == "command" and 330 or 230))
+	local w, h = 560, card and 560 or (mode == "todo" and 600 or (mode == "command" and 330 or 230))
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, math.min(screen.h * 0.22, screen.h - h - 40)), w = w, h = h }, {}, uc)
 	panel:windowStyle({ "borderless" })
 		:transparent(true)
