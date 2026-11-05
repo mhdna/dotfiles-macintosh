@@ -617,6 +617,9 @@ function ask() {
     seq++;
     $("status").textContent = "· asking Claude…";
     post({ type: "enrich", kind, text, seq, arabic });
+    // draw in parallel with the card back, from the word alone: nothing waits for anything. A photo that
+    // comes back with the back (a concrete noun) wins over the drawing.
+    if (kind !== "info") { drawSeq++; post({ type: "illustrate", text, back: "", seq: drawSeq }); }
   }, 700);
 }
 let image = "";
@@ -638,13 +641,8 @@ window.enriched = (n, e, error) => {
   if (!backEdited) $("back").value = e.back || "";
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
-  if (!picDropped) showPic(e.image);
-  // no photo (not a concrete noun): have Claude draw a tiny picture of the meaning, in the background
-  if (!e.image && !picDropped && e.back && (e.kind || kind) !== "info") {
-    drawSeq++;
-    $("status").textContent = "· drawing a picture…";
-    post({ type: "illustrate", text: $("text").value.trim(), back: e.back, seq: drawSeq });
-  }
+  if (e.image) { drawSeq++; if (!picDropped) showPic(e.image); } // a photo beats the drawing still on its way
+  if ((e.kind || kind) === "info") { drawSeq++; showPic(""); }
 };
 let draft = null, parsedFor = "";
 function describe(d) {
@@ -738,7 +736,7 @@ function loadForEdit(e) {
   $("dupe").textContent = "✎ editing your existing card (" + (e.deck || "Anki") + ") — ⏎ saves the changes";
   $("status").textContent = "";
 }
-$("text").addEventListener("input", () => { if (editing) editing = null; checkDupe(); ask(); if (MODE === "command") draft = null; });
+$("text").addEventListener("input", () => { if (editing) editing = null; showPic(""); picDropped = false; checkDupe(); ask(); if (MODE === "command") draft = null; });
 if (MODE === "card") {
   $("back").addEventListener("input", () => { backEdited = true; });
   $("memorize").checked = true;
