@@ -52,7 +52,8 @@ local function request(method, path, body, callback)
 	-- never from the URL cache: an answer from before the server's route existed (the shop's page) stuck around
 	hs.http.doAsyncRequest(cfg.server .. path, method, body and hs.json.encode(body) or nil, headers, function(status, text)
 		local data = nil
-		if text and text ~= "" then
+		-- only parse what looks like JSON: a plain-text error page makes LuaSkin log an error, and Hammerspoon pops its console up for those
+		if text and text:match("^%s*[%[{]") then
 			local ok, decoded = pcall(hs.json.decode, text)
 			if ok then data = decoded end
 		end
@@ -97,7 +98,8 @@ local function ankiCall(action, params, callback)
 	local body = hs.json.encode(request)
 	hs.http.doAsyncRequest(ANKI, "POST", body, { ["Content-Type"] = "application/json" }, function(status, text)
 		if status ~= 200 then return callback(nil, "Anki is not answering (is AnkiConnect installed?)") end
-		local ok, reply = pcall(hs.json.decode, text)
+		local ok, reply = false, nil
+		if text and text:match("^%s*[%[{]") then ok, reply = pcall(hs.json.decode, text) end
 		if not ok or type(reply) ~= "table" then return callback(nil, "unreadable reply from Anki") end
 		if reply.error and reply.error ~= hs.json.null then return callback(nil, tostring(reply.error)) end
 		callback(reply.result)
