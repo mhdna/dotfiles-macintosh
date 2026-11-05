@@ -958,26 +958,101 @@ local ACTIONS = {
 	{ text = "Sync now", subText = function() return lastSync end, fn = function() M.sync() end },
 }
 
-local chooser = hs.chooser.new(function(choice)
-	if choice then
-		-- after the chooser has closed, so the panel it opens gets the keyboard
-		hs.timer.doAfter(0.05, ACTIONS[choice.index].fn)
-	end
-end)
-chooser:placeholderText("LBrain")
-chooser:rows(#ACTIONS)
-chooser:searchSubText(true)
+-- The launcher: a grid of tiles with an icon each (ACTIONS order = ⌘1…⌘9 for the first nine).
+local ICONS = { "📝", "✨", "🔁", "😂", "🗣", "📜", "✅", "📓", "📰", "📅", "📖", "🗞", "🔄" }
+local HUES = { 210, 270, 150, 45, 20, 330, 130, 190, 240, 0, 170, 300, 90 }
 
-hs.hotkey.bind({ "ctrl", "cmd" }, "j", function()
-	if chooser:isVisible() then return chooser:hide() end
-	local choices = {}
-	for i, a in ipairs(ACTIONS) do
-		choices[i] = { text = a.text, subText = type(a.subText) == "function" and a.subText() or a.subText, index = i }
+local LAUNCHER = [=[
+<!doctype html><meta charset="utf-8">
+<style>
+  :root { color-scheme: dark; }
+  html { background: transparent; }
+  body { margin: 0; padding: 18px; background: #1c1c1c; color: #e6e6e6; font: 15px -apple-system, "SF Pro Text", sans-serif; border: 1px solid #434343; border-radius: 14px; min-height: calc(100vh - 38px); box-sizing: content-box; }
+  #q { width: 100%; box-sizing: border-box; background: #262626; color: inherit; border: 1px solid #434343; border-radius: 10px; padding: 11px 14px; font: 18px -apple-system, sans-serif; outline: none; margin-bottom: 14px; }
+  #q:focus { border-color: #777; }
+  #grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .t { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; border: 1px solid #333; background: #232323; cursor: pointer; position: relative; min-width: 0; }
+  .t:hover { background: #2c2c2c; }
+  .t.on { background: #333; border-color: #888; }
+  .ic { flex: none; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .tx { min-width: 0; }
+  .tt { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ts { font-size: 12px; opacity: .6; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .k { position: absolute; top: 6px; right: 9px; font-size: 11px; opacity: .45; }
+  .none { opacity: .5; padding: 20px; text-align: center; grid-column: 1 / -1; }
+  .hint { font-size: 12px; opacity: .5; margin-top: 12px; }
+</style>
+<input id="q" placeholder="LBrain" autofocus autocomplete="off">
+<div id="grid"></div>
+<div class="hint">← ↑ ↓ → move · ⏎ open · ⌘1–9 jump · ⎋ close · type to filter</div>
+<script>
+const ITEMS = __ITEMS__;
+const $ = id => document.getElementById(id);
+const post = m => window.webkit.messageHandlers.launcher.postMessage(m);
+let shown = [], sel = 0;
+function draw() {
+  const q = $("q").value.trim().toLowerCase();
+  shown = ITEMS.filter(i => !q || (i.text + " " + i.sub).toLowerCase().includes(q));
+  if (sel >= shown.length) sel = Math.max(0, shown.length - 1);
+  const g = $("grid"); g.innerHTML = "";
+  if (!shown.length) { g.innerHTML = '<div class="none">nothing matches</div>'; return; }
+  shown.forEach((it, n) => {
+    const d = document.createElement("div");
+    d.className = "t" + (n === sel ? " on" : "");
+    d.innerHTML = '<div class="ic" style="background:hsl(' + it.hue + ',45%,26%)">' + it.icon + '</div><div class="tx"><div class="tt"></div><div class="ts"></div></div>' + (it.index <= 9 ? '<span class="k">⌘' + it.index + '</span>' : "");
+    d.querySelector(".tt").textContent = it.text; d.querySelector(".ts").textContent = it.sub;
+    d.onclick = () => post({ type: "pick", index: it.index });
+    g.appendChild(d);
+  });
+  const on = g.querySelector(".on"); if (on) on.scrollIntoView({ block: "nearest" });
+}
+$("q").addEventListener("input", () => { sel = 0; draw(); });
+document.addEventListener("keydown", e => {
+  const cols = 3;
+  if (e.key === "Escape") { e.preventDefault(); post({ type: "close" }); return; }
+  if (e.key === "Enter") { e.preventDefault(); if (shown[sel]) post({ type: "pick", index: shown[sel].index }); return; }
+  if (e.metaKey && /^Digit[1-9]$/.test(e.code)) { e.preventDefault(); const n = +e.code.slice(5); if (ITEMS[n - 1]) post({ type: "pick", index: n }); return; }
+  const move = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols }[e.key];
+  if (move) { e.preventDefault(); sel = Math.min(Math.max(sel + move, 0), shown.length - 1); draw(); }
+});
+draw();
+</script>
+]=]
+
+local launcher
+local function closeLauncher()
+	if launcher then
+		launcher:delete()
+		launcher = nil
 	end
-	chooser:choices(choices)
-	chooser:query("")
-	chooser:show()
-end)
+end
+
+local function openLauncher()
+	if launcher then return closeLauncher() end
+	local items = {}
+	for i, a in ipairs(ACTIONS) do
+		items[i] = { text = a.text, sub = type(a.subText) == "function" and a.subText() or a.subText, icon = ICONS[i] or "•", hue = HUES[i] or 210, index = i }
+	end
+	local page = LAUNCHER:gsub("__ITEMS__", function() return (hs.json.encode(items):gsub("</", "<\\/")) end)
+	local uc = hs.webview.usercontent.new("launcher")
+	uc:setCallback(function(msg)
+		local body = msg.body
+		closeLauncher()
+		if body.type == "pick" and ACTIONS[body.index] then
+			-- after the launcher has closed, so the panel it opens gets the keyboard
+			hs.timer.doAfter(0.05, ACTIONS[body.index].fn)
+		end
+	end)
+	local screen = hs.screen.mainScreen():frame()
+	local w, h = 780, 470
+	launcher = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, screen.h * 0.2), w = w, h = h }, {}, uc)
+	launcher:windowStyle({ "borderless" }):transparent(true):shadow(true):windowTitle("LBrain")
+		:level(hs.drawing.windowLevels.floating):allowTextEntry(true):html(page):show():bringToFront(true)
+	local win = launcher:hswindow()
+	if win then win:focus() end
+end
+
+hs.hotkey.bind({ "ctrl", "cmd" }, "j", openLauncher)
 
 -- The server holds this request open until something is captured (or ~25s pass), so a capture from the
 -- phone is applied at once. The timer below stays as a backstop, and "Sync now" still works.
