@@ -984,7 +984,7 @@ local LAUNCHER = [=[
 </style>
 <input id="q" placeholder="LBrain" autofocus autocomplete="off">
 <div id="grid"></div>
-<div class="hint">← ↑ ↓ → move · ⏎ open · ⌘1–9 jump · ⎋ close · type to filter</div>
+<div class="hint">← ↑ ↓ → or ^b ^p ^n ^f move · ⏎ open · ⌘1–9 jump · ⎋ close · type to filter</div>
 <script>
 const ITEMS = __ITEMS__;
 const $ = id => document.getElementById(id);
@@ -1012,7 +1012,9 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") { e.preventDefault(); post({ type: "close" }); return; }
   if (e.key === "Enter") { e.preventDefault(); if (shown[sel]) post({ type: "pick", index: shown[sel].index }); return; }
   if (e.metaKey && /^Digit[1-9]$/.test(e.code)) { e.preventDefault(); const n = +e.code.slice(5); if (ITEMS[n - 1]) post({ type: "pick", index: n }); return; }
-  const move = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols }[e.key];
+  // emacs keys: ctrl+f / b / n / p move right, left, down, up
+  const emacs = e.ctrlKey && !e.metaKey && !e.altKey ? { f: 1, b: -1, n: cols, p: -cols }[e.key.toLowerCase()] : undefined;
+  const move = emacs !== undefined ? emacs : { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols }[e.key];
   if (move) { e.preventDefault(); sel = Math.min(Math.max(sel + move, 0), shown.length - 1); draw(); }
 });
 draw();
