@@ -28,7 +28,11 @@ eq(V.cardLine({ text = "solidarity", back = "unity", example = "They stood in so
 	"- **solidarity** — unity (e.g. They stood in solidarity.) _(2026-11-01)_", "card line")
 eq(V.cardLine({ text = "a\nb", back = "", topic = "go" }, "2026-11-01", "v1.m4a"), "- **a b** _(go, 2026-11-01)_ ![[v1.m4a]]", "card line with audio, multi-line")
 
+eq(V.cardLine({ text = "slug", back = "a mollusc" }, "2026-11-05", nil, "x.jpg"), "- **slug** — a mollusc _(2026-11-05)_ ![[x.jpg|96]]", "card line with a picture")
+
 -- ankiNote
+local pn = V.ankiNote({ kind = "en_word", text = "slug", back = "a mollusc", example = "", topic = "" }, nil, "x.jpg")
+eq(pn.fields.Back, 'a mollusc<br><br><img src="x.jpg" style="max-height:160px;border-radius:8px">', "anki back with a picture")
 local n = V.ankiNote({ kind = "ar_word", text = "طفرانة <b>", back = "broke", example = "", topic = "" }, nil)
 eq(n.deckName, "LBrain::Arabic Words", "deck")
 eq(n.fields.Front, "طفرانة &lt;b&gt;", "front escaped")

@@ -127,7 +127,7 @@ local function apply(item, done)
 	local function toVault(audioName)
 		local ok, err
 		if dest == "card" then
-			ok, err = V.appendCard(cfg.vault, item, date, audioName)
+			ok, err = V.appendCard(cfg.vault, item, date, audioName, imageName)
 		elseif dest == "todo" then
 			ok, err = V.appendTodo(cfg.vault, item)
 		elseif dest == "news" then
@@ -140,10 +140,15 @@ local function apply(item, done)
 		done(ok and true or false, err)
 	end
 
+	-- a tiny picture rides along in the item itself: it goes in the vault and, below, in Anki's media folder
+	local imageName = item.image and item.image ~= "" and (item.id .. (item.image:sub(1, 5) == "iVBOR" and ".png" or ".jpg")) or nil
+	local imageBytes = imageName and hs.base64.decode(item.image)
+	if imageName and dest == "card" then V.write(cfg.vault .. "/LBrain/images/" .. imageName, imageBytes) end
+
 	fetchAudio(item, function(audioName, bytes)
 		if audioName == false then return done(false, "could not fetch the recording") end
 		if dest == "card" and item.memorize then
-			local note = V.ankiNote(item, audioName)
+			local note = V.ankiNote(item, audioName, imageName)
 			local function fail(err)
 				startAnki()
 				done(false, err)
@@ -179,16 +184,23 @@ local function apply(item, done)
 					ensureModel(addNote)
 				end)
 			end
+			local function storeImage(next)
+				if not imageName then return next() end
+				ankiCall("storeMediaFile", { filename = imageName, data = item.image }, function(_, err)
+					if err then return fail(err) end
+					next()
+				end)
+			end
 			if audioName then
 				ankiCall("storeMediaFile", { filename = audioName, data = hs.base64.encode(bytes) }, function(_, err)
 					if err then
 						startAnki()
 						return done(false, err)
 					end
-					add()
+					storeImage(add)
 				end)
 			else
-				add()
+				storeImage(add)
 			end
 		else
 			toVault(audioName)
@@ -427,6 +439,7 @@ local PAGE = [=[
   <textarea id="back" rows="3" dir="auto"></textarea>
   <label>Example</label>
   <input id="example" type="text" dir="auto">
+  <div id="pic" style="display:none;margin-top:8px;align-items:center;gap:10px"><img id="picImg" style="height:64px;border-radius:8px"> <a href="#" onclick="dropPic();return false" style="color:#9a9a9a;font-size:13px">remove picture</a></div>
   </div>
   <div class="row">
     <input id="topic" type="text" placeholder="topic (info: history, go…)">
@@ -522,6 +535,14 @@ function ask() {
     post({ type: "enrich", kind, text, seq });
   }, 700);
 }
+let image = "";
+function showPic(b64) {
+  image = b64 || "";
+  $("pic").style.display = image ? "flex" : "none";
+  if (image) $("picImg").src = "data:image/" + (image.startsWith("iVBOR") ? "png" : "jpeg") + ";base64," + image;
+}
+function dropPic() { showPic(""); picDropped = true; }
+let picDropped = false;
 window.enriched = (n, e, error) => {
   if (n !== seq) return;
   if (error) { $("status").textContent = "· " + error; return; }
@@ -530,6 +551,7 @@ window.enriched = (n, e, error) => {
   if (!backEdited) $("back").value = e.back || "";
   if (!$("example").value) $("example").value = e.example || "";
   if (!$("topic").value) $("topic").value = e.topic || "";
+  if (!picDropped) showPic(e.image);
 };
 let draft = null, parsedFor = "";
 function describe(d) {
@@ -589,7 +611,8 @@ function save() {
   } else if (MODE === "card") {
     const single = $("single").checked;
     post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
-           topic: $("topic").value.trim(), memorize: $("memorize").checked, single, category: kind === "info" ? "" : category });
+           topic: $("topic").value.trim(), memorize: $("memorize").checked, single, category: kind === "info" ? "" : category,
+           image: single || kind === "info" ? "" : image });
   } else {
     post({ type: "save", text });
   }
@@ -692,7 +715,8 @@ local function openPanel(mode, preset)
 					topic = d.topic ~= "" and d.topic or nil, category = d.category ~= "" and d.category or nil, single = d.single or nil,
 					memorize = d.memorize, due = d.due ~= "" and d.due or nil, time = d.time ~= "" and d.time or nil, remind = d.remind or nil })
 			elseif mode == "card" then
-				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil })
+				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil,
+					image = body.image ~= "" and body.image or nil })
 			elseif mode == "todo" then
 				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, time = body.time ~= "" and body.time or nil,
 					remind = body.remind or nil, memorize = false })

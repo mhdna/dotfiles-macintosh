@@ -143,7 +143,7 @@ function M.appendNews(root, date, text)
 end
 
 -- "- **front** — back _(topic, date)_", with the example and a kept recording after it.
-function M.cardLine(item, date, audioName)
+function M.cardLine(item, date, audioName, imageName)
 	if item.single then
 		-- just the text (maybe a list): keep its lines, indented under one bullet
 		local body = trim(item.text):gsub("\r?\n", "\n  ")
@@ -167,16 +167,17 @@ function M.cardLine(item, date, audioName)
 	meta[#meta + 1] = date
 	line = line .. " _(" .. table.concat(meta, ", ") .. ")_"
 	if audioName then line = line .. " ![[" .. audioName .. "]]" end
+	if imageName then line = line .. " ![[" .. imageName .. "|96]]" end
 	return line
 end
 
-function M.appendCard(root, item, date, audioName)
+function M.appendCard(root, item, date, audioName, imageName)
 	local file = M.fileFor(item)
 	if not file then return nil, "no file for " .. tostring(item.kind) end
 	local path = root .. "/" .. file
 	local text = read(path) or ""
 	if text ~= "" and text:sub(-1) ~= "\n" then text = text .. "\n" end
-	return write(path, text .. M.cardLine(item, date, audioName) .. "\n")
+	return write(path, text .. M.cardLine(item, date, audioName, imageName) .. "\n")
 end
 
 -- A voice note aimed at "inbox", or an item with no home of its own, lands in LBrain/Inbox.md.
@@ -196,7 +197,7 @@ end
 
 -- The AnkiConnect "note" for an item. The back is the meaning, an example, the topic, and a
 -- [sound:] tag for a kept recording (the file stored with storeMediaFile under audioName).
-function M.ankiNote(item, audioName)
+function M.ankiNote(item, audioName, imageName)
 	local deck = M.deckFor(item)
 	if not deck then return nil end
 	local extraTags = categoryOf(item) and item.kind ~= "info" and { item.category } or {}
@@ -216,6 +217,7 @@ function M.ankiNote(item, audioName)
 	if (item.example or "") ~= "" then back = back .. "<br><br><i>" .. html(item.example) .. "</i>" end
 	if (item.topic or "") ~= "" then back = back .. "<br><br>" .. html(item.topic) end
 	if audioName then back = back .. "<br>[sound:" .. audioName .. "]" end
+	if imageName then back = back .. '<br><br><img src="' .. imageName .. '" style="max-height:160px;border-radius:8px">' end
 	return {
 		deckName = deck,
 		modelName = "Basic",
