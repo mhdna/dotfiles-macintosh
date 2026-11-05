@@ -64,7 +64,10 @@ local function newId() return (hs.host.uuid():gsub("-", ""):lower()) end
 
 -- ---------------------------------------------------------------- outbox
 
-local function readOutbox() return hs.json.read(OUTBOX) or {} end
+local function readOutbox()
+	if not hs.fs.attributes(OUTBOX) then return {} end -- no file when nothing is waiting; reading it would log an error
+	return hs.json.read(OUTBOX) or {}
+end
 
 local function writeOutbox(list)
 	os.execute(string.format("mkdir -p %q", HOME .. "/.local/share/lbrain"))
