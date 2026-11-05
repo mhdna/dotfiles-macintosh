@@ -213,6 +213,41 @@ end
 local DRAG_CALENDAR = "/.obsidian/plugins/drag-calendar/data.json"
 
 -- Events from the drag-calendar plugin plus every open dated todo in the vault, around month `ym`.
+-- Where a word already is: Anki (every deck, with the deck's name), the vault's LBrain notes, and
+-- captures still waiting to be applied. Calls back with a list of short strings (empty: it's new).
+local function norm(s)
+	return (tostring(s or ""):gsub("<[^>]*>", " "):gsub("&nbsp;", " "):gsub("%s+", " "):gsub("^ ", ""):gsub(" $", ""):lower())
+end
+
+function M.findDuplicates(text, callback)
+	local want = norm(text)
+	local found = {}
+	-- the vault: lines like "- **word** — ..." in the LBrain notes
+	local out = hs.execute(string.format("/usr/bin/grep -rhiF -m1 -- %q %q 2>/dev/null | head -3", "**" .. text .. "**", cfg.vault .. "/LBrain"))
+	if out and out ~= "" then found[#found + 1] = "in your vault notes" end
+	for _, it in ipairs(readOutbox()) do
+		if norm(it.text) == want then found[#found + 1] = "waiting in the outbox" break end
+	end
+	local escaped = text:gsub('\\', '\\\\'):gsub('"', '\\"')
+	ankiCall("findCards", { query = '"' .. escaped .. '"' }, function(ids)
+		if type(ids) ~= "table" or #ids == 0 then return callback(found) end
+		local first = {}
+		for i = 1, math.min(#ids, 12) do first[i] = ids[i] end
+		ankiCall("cardsInfo", { cards = first }, function(cards)
+			local seen = {}
+			for _, c in ipairs(cards or {}) do
+				for _, f in pairs(c.fields or {}) do
+					if norm(f.value) == want and not seen[c.deckName] then
+						seen[c.deckName] = true
+						found[#found + 1] = "Anki: " .. tostring(c.deckName)
+					end
+				end
+			end
+			callback(found)
+		end)
+	end)
+end
+
 local function calendarData(ym)
 	local data = hs.json.read(cfg.vault .. DRAG_CALENDAR) or {}
 	local snap = V.snapshot(data.events or {}, V.scanTasks(cfg.vault), ym)
@@ -433,6 +468,7 @@ local PAGE = [=[
 <div id="chips" class="chips"></div>
 <div id="cats" class="chips"></div>
 <textarea id="text" rows="__ROWS__" dir="auto" placeholder="__PLACEHOLDER__" autofocus></textarea>
+<div id="dupe" style="display:none;color:#f0c049;font-size:13px;margin:-4px 0 8px;line-height:1.4"></div>
 <div id="card" class="__CARDCLASS__">
   <div id="backBlock">
   <label>Back (meaning, translation) <span id="status"></span></label>
@@ -617,7 +653,21 @@ function save() {
     post({ type: "save", text });
   }
 }
-$("text").addEventListener("input", () => { ask(); if (MODE === "command") draft = null; });
+let dupeTimer, dupeSeq = 0;
+function checkDupe() {
+  clearTimeout(dupeTimer);
+  const text = $("text").value.trim();
+  if (MODE !== "card" || text.length < 2) { $("dupe").style.display = "none"; return; }
+  dupeTimer = setTimeout(() => { dupeSeq++; post({ type: "dupe", text, seq: dupeSeq }); }, 400);
+}
+window.dupes = (n, list) => {
+  if (n !== dupeSeq) return;
+  const el = $("dupe");
+  if (!list || !list.length) { el.style.display = "none"; return; }
+  el.textContent = "⚠ already have it: " + list.join(" · ");
+  el.style.display = "block";
+};
+$("text").addEventListener("input", () => { checkDupe(); ask(); if (MODE === "command") draft = null; });
 if (MODE === "card") {
   $("back").addEventListener("input", () => { backEdited = true; });
   $("memorize").checked = true;
@@ -694,6 +744,10 @@ local function openPanel(mode, preset)
 					local why = (type(data) == "table" and data.error) or ("error " .. tostring(status))
 					panel:evaluateJavaScript("parsed(null, " .. hs.json.encode({ why }):sub(2, -2) .. ")")
 				end
+			end)
+		elseif body.type == "dupe" then
+			M.findDuplicates(body.text, function(list)
+				if panel then panel:evaluateJavaScript(string.format("dupes(%d, %s)", body.seq, hs.json.encode(list))) end
 			end)
 		elseif body.type == "enrich" then
 			request("POST", "/v1/enrich", { kind = body.kind, text = body.text }, function(status, data, text)
