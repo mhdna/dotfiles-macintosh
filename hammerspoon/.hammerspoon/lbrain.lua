@@ -622,7 +622,7 @@ function ask() {
 let image = "";
 function picMime(b) { return b.startsWith("iVBOR") ? "image/png" : (b.startsWith("PHN2Zy") || b.startsWith("PD94b")) ? "image/svg+xml" : "image/jpeg"; }
 let drawSeq = 0;
-window.illustrated = (n, b64) => { if (n !== drawSeq) return; $("status").textContent = ""; if (!picDropped && !image) showPic(b64); };
+window.illustrated = (n, b64, note) => { if (n !== drawSeq) return; $("status").textContent = note ? "· " + note : ""; if (!picDropped && !image) showPic(b64); };
 function showPic(b64) {
   image = b64 || "";
   $("pic").style.display = image ? "flex" : "none";
@@ -842,7 +842,8 @@ local function openPanel(mode, preset)
 			request("POST", "/v1/illustrate", { text = body.text, back = body.back }, function(status, data)
 				if not panel then return end
 				local img = (status == 200 and data and data.image) or ""
-				panel:evaluateJavaScript(string.format("illustrated(%d, %s)", body.seq, hs.json.encode({ img }):sub(2, -2)))
+				local note = status == 200 and (img == "" and "no picture for this one" or "") or ("couldn't draw a picture (" .. tostring(status) .. "): is the server updated?")
+				panel:evaluateJavaScript(string.format("illustrated(%d, %s, %s)", body.seq, hs.json.encode({ img }):sub(2, -2), hs.json.encode({ note }):sub(2, -2)))
 			end)
 		elseif body.type == "enrich" then
 			request("POST", "/v1/enrich", { kind = body.kind, text = body.text, arabic = body.arabic ~= false }, function(status, data, text)
