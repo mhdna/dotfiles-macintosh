@@ -31,6 +31,10 @@ eq(V.cardLine({ text = "a\nb", back = "", topic = "go" }, "2026-11-01", "v1.m4a"
 eq(V.cardLine({ text = "slug", back = "a mollusc" }, "2026-11-05", nil, "x.jpg"), "- **slug** — a mollusc _(2026-11-05)_ ![[x.jpg|96]]", "card line with a picture")
 
 -- ankiNote
+local sn = V.ankiNote({ kind = "en_word", text = "slug", back = "a mollusc", example = "", topic = "" }, nil, nil, "id-pron.m4a")
+eq(sn.fields.Back, "a mollusc<br>[sound:id-pron.m4a]", "anki back with a pronunciation")
+eq(sn.fields.Front, "slug", "the front stays clean so duplicates still match")
+eq(tostring(V.isLanguage("en_word")) .. tostring(V.isLanguage("todo")), "truefalse", "isLanguage")
 local pn = V.ankiNote({ kind = "en_word", text = "slug", back = "a mollusc", example = "", topic = "" }, nil, "x.jpg")
 eq(pn.fields.Back, 'a mollusc<br><br><img src="x.jpg" style="max-height:160px;border-radius:8px">', "anki back with a picture")
 local n = V.ankiNote({ kind = "ar_word", text = "طفرانة <b>", back = "broke", example = "", topic = "" }, nil)

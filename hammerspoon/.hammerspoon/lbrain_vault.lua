@@ -80,6 +80,9 @@ end
 
 M.read, M.write = read, write
 
+-- kinds that are a word or phrase in English or Arabic
+function M.isLanguage(kind) return kind == "en_word" or kind == "en_phrase" or kind == "ar_word" or kind == "ar_phrase" end
+
 local function trim(s) return (s:gsub("^%s+", ""):gsub("%s+$", "")) end
 
 function M.dayPath(root, date) return root .. "/Journal/Days/" .. date .. ".md" end
@@ -174,13 +177,15 @@ end
 -- Anki's Back field as the capture window builds it ("meaning<br><br><i>example</i><br><br>topic") -> its parts.
 function M.parseBack(html)
 	local function plain(x) return (tostring(x):gsub("<br%s*/?>", "\n"):gsub("<[^>]*>", ""):gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&amp;", "&"):gsub("^%s+", ""):gsub("%s+$", "")) end
-	local parts, rest = {}, tostring(html) .. "<br><br>"
+	local keep = {}
+	html = tostring(html):gsub("%[sound:[^%]]*%]", function(tag) keep[#keep + 1] = tag return "" end):gsub("<br>%s*$", "")
+	local parts, rest = {}, html .. "<br><br>"
 	for chunk in rest:gmatch("(.-)<br><br>") do parts[#parts + 1] = chunk end
 	local back, example, topic = parts[1] or "", "", ""
 	local i = 2
 	if parts[i] and parts[i]:match("^<i>.*</i>$") then example = parts[i]; i = i + 1 end
 	if parts[i] and not parts[i]:find("%[sound:") and not parts[i]:find("<img") then topic = parts[i] end
-	return { front = "", back = plain(back), example = plain(example), topic = plain(topic) }
+	return { front = "", back = plain(back), example = plain(example), topic = plain(topic), keep = table.concat(keep, "<br>") }
 end
 
 -- Rewrite the card line "- **front** ..." in its file, keeping the date it was added on.
@@ -231,7 +236,7 @@ end
 
 -- The AnkiConnect "note" for an item. The back is the meaning, an example, the topic, and a
 -- [sound:] tag for a kept recording (the file stored with storeMediaFile under audioName).
-function M.ankiNote(item, audioName, imageName)
+function M.ankiNote(item, audioName, imageName, pronName)
 	local deck = M.deckFor(item)
 	if not deck then return nil end
 	local extraTags = categoryOf(item) and item.kind ~= "info" and { item.category } or {}
@@ -251,6 +256,7 @@ function M.ankiNote(item, audioName, imageName)
 	if (item.example or "") ~= "" then back = back .. "<br><br><i>" .. html(item.example) .. "</i>" end
 	if (item.topic or "") ~= "" then back = back .. "<br><br>" .. html(item.topic) end
 	if audioName then back = back .. "<br>[sound:" .. audioName .. "]" end
+	if pronName then back = back .. "<br>[sound:" .. pronName .. "]" end
 	if imageName then back = back .. '<br><br><img src="' .. imageName .. '" style="max-height:160px;border-radius:8px">' end
 	return {
 		deckName = deck,

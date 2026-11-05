@@ -123,6 +123,29 @@ local function fetchAudio(item, callback)
 	end)
 end
 
+-- The spoken word, made on this Mac with its own voices (Samantha for English, Majed for Arabic) and packed
+-- as a small AAC file; calls back with the file name and its bytes, or nil when it can't be made.
+local function pronounce(item, callback)
+	local arabic = item.kind == "ar_word" or item.kind == "ar_phrase"
+	local text = tostring(item.text or ""):gsub("%s+", " ")
+	if text == "" or #text > 200 then return callback(nil) end
+	local dir = (os.getenv("TMPDIR") or "/tmp/") .. "lbrain-pron"
+	hs.fs.mkdir(dir)
+	local base = dir .. "/" .. item.id
+	local name = item.id .. "-pron.m4a"
+	local function cleanup() os.remove(base .. ".aiff"); os.remove(base .. ".m4a") end
+	hs.task.new("/usr/bin/say", function(code)
+		if code ~= 0 then cleanup() return callback(nil) end
+		hs.task.new("/usr/bin/afconvert", function(code2)
+			local f = code2 == 0 and io.open(base .. ".m4a", "rb")
+			local bytes = f and f:read("a")
+			if f then f:close() end
+			cleanup()
+			callback(bytes and name or nil, bytes)
+		end, { "-f", "m4af", "-d", "aac", "-b", "48000", base .. ".aiff", base .. ".m4a" }):start()
+	end, { "-v", arabic and "Majed" or "Samantha", "-o", base .. ".aiff", "--", text }):start()
+end
+
 -- done(true) when everything for this item is in place; done(false, why) leaves it waiting.
 local function apply(item, done)
 	local at = epochOf(item.createdAt)
@@ -152,8 +175,16 @@ local function apply(item, done)
 
 	fetchAudio(item, function(audioName, bytes)
 		if audioName == false then return done(false, "could not fetch the recording") end
+		if dest == "card" and item.memorize and not item.single and V.isLanguage(item.kind) and not item.pronDone then
+			-- hear the word: make the pronunciation first, then carry on with it attached
+			item.pronDone = true
+			return pronounce(item, function(pronName, pronBytes)
+				item.pronName, item.pronBytes = pronName, pronBytes
+				apply(item, done)
+			end)
+		end
 		if dest == "card" and item.memorize then
-			local note = V.ankiNote(item, audioName, imageName)
+			local note = V.ankiNote(item, audioName, imageName, item.pronName)
 			local function fail(err)
 				startAnki()
 				done(false, err)
@@ -189,6 +220,13 @@ local function apply(item, done)
 					ensureModel(addNote)
 				end)
 			end
+			local function storePron(next)
+				if not item.pronName then return next() end
+				ankiCall("storeMediaFile", { filename = item.pronName, data = hs.base64.encode(item.pronBytes) }, function(_, err)
+					if err then return fail(err) end
+					next()
+				end)
+			end
 			local function storeImage(next)
 				if not imageName then return next() end
 				ankiCall("storeMediaFile", { filename = imageName, data = item.image }, function(_, err)
@@ -202,10 +240,10 @@ local function apply(item, done)
 						startAnki()
 						return done(false, err)
 					end
-					storeImage(add)
+					storePron(function() storeImage(add) end)
 				end)
 			else
-				storeImage(add)
+				storePron(function() storeImage(add) end)
 			end
 		else
 			toVault(audioName)
@@ -221,7 +259,7 @@ local DRAG_CALENDAR = "/.obsidian/plugins/drag-calendar/data.json"
 -- Where a word already is: Anki (every deck, with the deck's name), the vault's LBrain notes, and
 -- captures still waiting to be applied. Calls back with a list of short strings (empty: it's new).
 local function norm(s)
-	return (tostring(s or ""):gsub("<[^>]*>", " "):gsub("&nbsp;", " "):gsub("%s+", " "):gsub("^ ", ""):gsub(" $", ""):lower())
+	return (tostring(s or ""):gsub("%[sound:[^%]]*%]", " "):gsub("<[^>]*>", " "):gsub("&nbsp;", " "):gsub("%s+", " "):gsub("^ ", ""):gsub(" $", ""):lower())
 end
 
 function M.findDuplicates(text, callback)
@@ -264,7 +302,9 @@ end
 function M.saveEdit(body)
 	local item = { kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, category = body.category ~= "" and body.category or nil }
 	local note = V.ankiNote(item)
-	ankiCall("updateNoteFields", { note = { id = body.editNote, fields = note and note.fields or {} } }, function(_, err)
+	-- only the Back changes (the front is the word it was found by, and the Back keeps its pronunciation tag)
+	local fields = note and note.fields and { Back = note.fields.Back .. ((body.keep or "") ~= "" and ("<br>" .. body.keep) or "") } or {}
+	ankiCall("updateNoteFields", { note = { id = body.editNote, fields = fields } }, function(_, err)
 		if err then startAnki() return hs.alert.show("LBrain: could not update the card: " .. err, 3) end
 		local ok = V.replaceCard(cfg.vault, item, os.date("%Y-%m-%d"))
 		hs.alert.show(ok and "LBrain: card updated" or "LBrain: card updated in Anki (not found in the vault)", 1.2)
@@ -720,7 +760,7 @@ function save() {
     const single = $("single").checked;
     post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
            topic: $("topic").value.trim(), memorize: $("memorize").checked, single, category: kind === "info" ? "" : category,
-           image: single || kind === "info" ? "" : image, editNote: editing ? editing.noteId : null });
+           image: single || kind === "info" ? "" : image, editNote: editing ? editing.noteId : null, keep: editing ? (editing.keep || "") : "" });
   } else {
     post({ type: "save", text });
   }
