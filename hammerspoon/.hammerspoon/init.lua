@@ -794,3 +794,6 @@ end)
 hs.hotkey.bind({ "cmd", "shift" }, "q", function()
 	hs.caffeinate.systemSleep()
 end)
+
+-- keep the console closed after a load (a restart reopens it if it was open); errors still print to it
+hs.timer.doAfter(0.5, function() hs.closeConsole() end)
