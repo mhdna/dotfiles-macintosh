@@ -146,6 +146,14 @@ local function pronounce(item, callback)
 	end, { "-v", arabic and "Majed" or "Samantha", "-o", base .. ".aiff", "--", text }):start()
 end
 
+-- Say a word out loud now (⌘P in the capture window), with the same voices as the card's pronunciation.
+function M.speak(text, kind)
+	if M.speaking then M.speaking:terminate() end
+	local arabic = kind == "ar_word" or kind == "ar_phrase" or tostring(text):find("[\216-\219]") ~= nil
+	M.speaking = hs.task.new("/usr/bin/say", function() M.speaking = nil end, { "-v", arabic and "Majed" or "Samantha", "--", tostring(text):sub(1, 200) })
+	M.speaking:start()
+end
+
 -- done(true) when everything for this item is in place; done(false, why) leaves it waiting.
 local function apply(item, done)
 	local at = epochOf(item.createdAt)
@@ -536,7 +544,7 @@ local PAGE = [=[
 <div id="dupe" style="display:none;color:#f0c049;font-size:13px;margin:-4px 0 8px;line-height:1.4"></div>
 <div id="card" class="__CARDCLASS__">
   <div id="backBlock">
-  <label>Back (meaning, translation) <span id="ar" style="opacity:.8"></span> <span id="status"></span></label>
+  <label>Back (meaning, translation) <span id="ar" style="opacity:.8"></span> <a href="#" id="hear" onclick="hear();return false" style="color:#fff;text-decoration:none" title="hear it (⌘P)">🔊</a> <span id="status"></span></label>
   <textarea id="back" rows="3" dir="auto"></textarea>
   <label>Example</label>
   <input id="example" type="text" dir="auto">
@@ -626,6 +634,10 @@ function setKind(k) {
   ask();
 }
 let arabic = true, askSeq = 0, lastAnswer = "";
+function hear() {
+  const text = $("text").value.trim();
+  if (text) post({ type: "speak", text, kind });
+}
 function drawArabic() { $("ar").textContent = arabic ? "· عربي on (⌘⇧0)" : "· Arabic off (⌘⇧0)"; }
 function toggleArabic() { arabic = !arabic; drawArabic(); backEdited = false; ask(); }
 function askAI() {
@@ -800,6 +812,7 @@ if (MODE === "card") {
 }
 document.addEventListener("keydown", e => {
   if (e.target.id === "ask" && e.key === "Enter" && !e.shiftKey && !e.metaKey) { e.preventDefault(); askAI(); return; }
+  if (MODE === "card" && e.metaKey && !e.shiftKey && e.code === "KeyP") { e.preventDefault(); hear(); return; }
   if (MODE === "card" && e.metaKey && e.code === "KeyL") { e.preventDefault(); $("ask").focus(); return; }
   if (e.key === "Escape") { e.preventDefault(); post({ type: "close" }); return; }
   if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && MODE === "journal") { e.preventDefault(); post({ type: "open" }); return; }
@@ -857,7 +870,7 @@ local function openPanel(mode, preset)
 		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
 		:gsub("__CMDCLASS__", mode == "command" and "" or "hide")
 		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or (mode == "command" and "what to add, in your own words" or "journal"))))
-		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⌘0 no back · ⌘⇧0 Arabic · ⌘L ask AI · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
+		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⌘0 no back · ⌘⇧0 Arabic · ⌘L ask AI · ⌘P hear it · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
 	uc:setCallback(function(msg)
@@ -881,6 +894,8 @@ local function openPanel(mode, preset)
 			M.findDuplicates(body.text, function(list, edit)
 				if panel then panel:evaluateJavaScript(string.format("dupes(%d, %s, %s)", body.seq, hs.json.encode(list), edit and (hs.json.encode(edit):gsub("</", "<\\/")) or "null")) end
 			end)
+		elseif body.type == "speak" then
+			M.speak(body.text, body.kind)
 		elseif body.type == "ask" then
 			request("POST", "/v1/ask", { question = body.question, about = body.about }, function(status, data)
 				if not panel then return end
