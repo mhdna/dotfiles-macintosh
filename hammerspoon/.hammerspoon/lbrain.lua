@@ -455,14 +455,14 @@ local PAGE = [=[
 <!doctype html><meta charset="utf-8">
 <style>
   :root { color-scheme: dark; }
-  body { margin: 0; padding: 16px 18px; background: #282828; color: #e6e6e6; font: 15px -apple-system, "SF Pro Text", sans-serif; border: 1px solid #4d4d4d; border-radius: 12px; min-height: calc(100vh - 34px); }
+  body { margin: 0; padding: 16px 18px; background: #1c1c1c; color: #e6e6e6; font: 15px -apple-system, "SF Pro Text", sans-serif; border: 1px solid #434343; border-radius: 12px; min-height: calc(100vh - 34px); }
   html { background: transparent; }
   .x { position: absolute; top: 8px; right: 10px; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 13px; cursor: pointer; opacity: .55; font-size: 14px; user-select: none; z-index: 10; }
-  .x:hover { opacity: 1; background: #3d3d3d; }
+  .x:hover { opacity: 1; background: #333333; }
   .chips { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-  .chip { padding: 4px 10px; border-radius: 12px; border: 1px solid #4d4d4d; cursor: pointer; user-select: none; font-size: 13px; }
+  .chip { padding: 4px 10px; border-radius: 12px; border: 1px solid #434343; cursor: pointer; user-select: none; font-size: 13px; }
   .chip.on { background: #a8a8a8; border-color: #a8a8a8; color: #111; font-weight: 500; }
-  textarea, input { width: 100%; box-sizing: border-box; background: #333333; color: inherit; border: 1px solid #4d4d4d; border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 8px; outline: none; }
+  textarea, input { width: 100%; box-sizing: border-box; background: #262626; color: inherit; border: 1px solid #434343; border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 8px; outline: none; }
   textarea:focus, input:focus { border-color: #777777; }
   textarea { resize: none; }
   label { font-size: 12px; opacity: .65; display: block; margin: 2px 0 3px; }
@@ -471,9 +471,9 @@ local PAGE = [=[
   .hint { font-size: 12px; opacity: .55; margin-top: 4px; }
   #status { color: #f0c049; font-size: 12px; min-height: 16px; }
   .hide { display: none; }
-  .sum { border: 1px solid #4d4d4d; border-radius: 10px; padding: 10px 12px; background: #333333; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+  .sum { border: 1px solid #434343; border-radius: 10px; padding: 10px 12px; background: #262626; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
   .sum b { color: #c8c8c8; }
-  .pick { border: 1px solid #4d4d4d; border-radius: 10px; padding: 8px 10px; background: #333333; }
+  .pick { border: 1px solid #434343; border-radius: 10px; padding: 8px 10px; background: #262626; }
   .pickhead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 15px; }
   .arrow { cursor: pointer; padding: 0 14px; font-size: 22px; line-height: 22px; user-select: none; }
   #pickGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
@@ -482,7 +482,7 @@ local PAGE = [=[
   #pickGrid .other { opacity: .35; }
   #pickGrid .today { box-shadow: inset 0 0 0 1.5px #777777; }
   #pickGrid .on { background: #a8a8a8; color: #111; }
-  #pickGrid div:not(.dow):hover { background: #3d3d3d; }
+  #pickGrid div:not(.dow):hover { background: #333333; }
   #pickGrid .on:hover { background: #a8a8a8; }
 </style>
 <div class="x" onclick="post({ type: 'close' })">✕</div>
