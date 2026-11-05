@@ -710,6 +710,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey && (e.target.id === "text" || e.target.tagName === "INPUT" || e.metaKey)) { e.preventDefault(); save(); return; }
   if (MODE === "card" && (e.metaKey || e.altKey) && e.code.startsWith("Digit")) {
     const n = parseInt(e.code.slice(5), 10);
+    if (n === 0) { e.preventDefault(); $("single").checked = !$("single").checked; onSingle(); return; }
     const k = KINDS[n - 1];
     if (k) { e.preventDefault(); setKind(k[0]); }
     else if (n >= 6 && CATS[n - 6] && kind !== "info") { e.preventDefault(); setCategory(CATS[n - 6].id); }
@@ -757,7 +758,7 @@ local function openPanel(mode, preset)
 		:gsub("__TODOCLASS__", mode == "todo" and "" or "hide")
 		:gsub("__CMDCLASS__", mode == "command" and "" or "hide")
 		:gsub("__PLACEHOLDER__", card and "a word, a phrase or something you learned" or (mode == "news" and "news for today" or (mode == "todo" and "a todo" or (mode == "command" and "what to add, in your own words" or "journal"))))
-		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
+		:gsub("__HINT__", card and "⏎ save · ⎋ cancel · ⌘1–5 kind · ⌘6–9 category · ⌘0 no back on/off · ⇧⏎ new line" or (mode == "journal" and "⏎ save · ⌘⏎ open today's note · ⎋ cancel" or "⏎ save · ⎋ cancel · ⇧⏎ new line"))
 
 	local uc = hs.webview.usercontent.new("lbrain")
 	uc:setCallback(function(msg)
