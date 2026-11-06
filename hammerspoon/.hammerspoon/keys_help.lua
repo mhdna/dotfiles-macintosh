@@ -116,7 +116,7 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "a", "open the Mmix window (vim keys)" },
 		{ { "ctrl", "cmd" }, "1", "play the vine boom" },
 		{ { "ctrl", "cmd" }, "2", "play the Top 5 Meme 1 sound" },
-		{ { "ctrl", "cmd" }, "3", "play the YouTube wow" },
+		{ { "ctrl", "cmd" }, "3", "play the Eddy Wally wow" },
 		{ { "ctrl", "cmd" }, "4", "play the anime wow" },
 		{ { "ctrl", "cmd" }, "5", "play the sudden suspense sound" },
 	} },
