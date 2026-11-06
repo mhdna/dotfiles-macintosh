@@ -34,6 +34,10 @@ local full = { text = "rebuke", back = "to scold", origin = "Old French rebuker"
 eq(V.cardLine(full, "2026-11-06"), "- **rebuke** — to scold _(2026-11-06)_\n  - origin: Old French rebuker\n  - synonyms: scold, reprimand · antonyms: praise", "card line with origin and words around it")
 local fb = V.ankiNote({ kind = "en_word", text = "rebuke", back = "to scold", example = "He rebuked me.", origin = "Old French rebuker", synonyms = "scold", antonyms = "praise", topic = "speech" }).fields.Back
 eq(fb, "to scold<br><br><i>He rebuked me.</i><br><br><b>Origin:</b> Old French rebuker<br><br><b>Synonyms:</b> scold<br><br><b>Antonyms:</b> praise<br><br>speech", "anki back with origin, synonyms, antonyms")
+local pb2 = V.ankiNote({ kind = "en_word", text = "rebuke", back = "to scold", parts = "re- (back) + buker (strike)", topic = "" }).fields.Back
+eq(pb2, "to scold<br><br><b>Parts:</b> re- (back) + buker (strike)", "anki back with word parts")
+eq(V.parseBack(pb2).parts, "re- (back) + buker (strike)", "parseBack reads the parts")
+eq(V.cardLine({ text = "rebuke", back = "to scold", parts = "re- + buker" }, "2026-11-06"), "- **rebuke** — to scold _(2026-11-06)_\n  - parts: re- + buker", "card line with parts")
 local pf = V.parseBack(fb)
 eq(pf.origin .. "|" .. pf.synonyms .. "|" .. pf.antonyms .. "|" .. pf.topic .. "|" .. pf.example, "Old French rebuker|scold|praise|speech|He rebuked me.", "parseBack reads them back")
 

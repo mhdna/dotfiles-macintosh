@@ -172,6 +172,8 @@ function M.cardLine(item, date, audioName, imageName)
 	if audioName then line = line .. " ![[" .. audioName .. "]]" end
 	if imageName then line = line .. " ![[" .. imageName .. "|96]]" end
 	-- what to understand about it, as indented lines under the card's bullet
+	local parts = oneLine(item.parts or "")
+	if parts ~= "" then line = line .. "\n  - parts: " .. parts end
 	local origin = oneLine(item.origin or "")
 	if origin ~= "" then line = line .. "\n  - origin: " .. origin end
 	local words = {}
@@ -189,17 +191,19 @@ function M.parseBack(html)
 	html = tostring(html):gsub("%[sound:[^%]]*%]", function(tag) keep[#keep + 1] = tag return "" end):gsub("<br>%s*$", "")
 	local parts, rest = {}, html .. "<br><br>"
 	for chunk in rest:gmatch("(.-)<br><br>") do parts[#parts + 1] = chunk end
-	local back, example, topic, origin, synonyms, antonyms = parts[1] or "", "", "", "", "", ""
+	local back, example, topic, origin, synonyms, antonyms, wordParts = parts[1] or "", "", "", "", "", "", ""
 	for i = 2, #parts do
 		local part = parts[i]
 		local o, sy, an = part:match("^<b>Origin:</b>%s*(.*)$"), part:match("^<b>Synonyms:</b>%s*(.*)$"), part:match("^<b>Antonyms:</b>%s*(.*)$")
-		if o then origin = o
+		local wp = part:match("^<b>Parts:</b>%s*(.*)$")
+		if wp then wordParts = wp
+		elseif o then origin = o
 		elseif sy then synonyms = sy
 		elseif an then antonyms = an
 		elseif example == "" and part:match("^<i>.*</i>$") then example = part
 		elseif topic == "" and not part:find("%[sound:") and not part:find("<img") then topic = part end
 	end
-	return { front = "", back = plain(back), example = plain(example), topic = plain(topic), origin = plain(origin), synonyms = plain(synonyms), antonyms = plain(antonyms), keep = table.concat(keep, "<br>") }
+	return { front = "", back = plain(back), example = plain(example), topic = plain(topic), parts = plain(wordParts), origin = plain(origin), synonyms = plain(synonyms), antonyms = plain(antonyms), keep = table.concat(keep, "<br>") }
 end
 
 -- Rewrite the card line "- **front** ..." in its file, keeping the date it was added on.
@@ -274,6 +278,7 @@ function M.ankiNote(item, audioName, imageName, pronName)
 	end
 	local back = html(item.back)
 	if (item.example or "") ~= "" then back = back .. "<br><br><i>" .. html(item.example) .. "</i>" end
+	if (item.parts or "") ~= "" then back = back .. "<br><br><b>Parts:</b> " .. html(item.parts) end
 	if (item.origin or "") ~= "" then back = back .. "<br><br><b>Origin:</b> " .. html(item.origin) end
 	if (item.synonyms or "") ~= "" then back = back .. "<br><br><b>Synonyms:</b> " .. html(item.synonyms) end
 	if (item.antonyms or "") ~= "" then back = back .. "<br><br><b>Antonyms:</b> " .. html(item.antonyms) end

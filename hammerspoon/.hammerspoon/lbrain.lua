@@ -366,7 +366,7 @@ end
 
 -- Save an edited existing card in place: Anki's note fields and the vault line, no new capture.
 function M.saveEdit(body)
-	local item = { kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, origin = body.origin, synonyms = body.synonyms, antonyms = body.antonyms, category = body.category ~= "" and body.category or nil }
+	local item = { kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic, parts = body.parts, origin = body.origin, synonyms = body.synonyms, antonyms = body.antonyms, category = body.category ~= "" and body.category or nil }
 	local note = V.ankiNote(item)
 	-- only the Back changes (the front is the word it was found by, and the Back keeps its pronunciation tag)
 	local fields = note and note.fields and { Back = note.fields.Back .. ((body.keep or "") ~= "" and ("<br>" .. body.keep) or "") } or {}
@@ -606,6 +606,8 @@ local PAGE = [=[
   <textarea id="back" rows="3" dir="auto"></textarea>
   <label>Example</label>
   <input id="example" type="text" dir="auto">
+  <label>Word parts <span style="opacity:.6">(prefix, root, suffix)</span></label>
+  <input id="parts" type="text" dir="auto">
   <label>Origin <span style="opacity:.6">(where it comes from)</span></label>
   <textarea id="origin" rows="2" dir="auto"></textarea>
   <div class="row"><div style="flex:1"><label>Synonyms</label><input id="synonyms" type="text" dir="auto"></div>
@@ -770,6 +772,7 @@ window.enriched = (n, e, error) => {
   if (e.kind && e.kind !== kind && !backEdited) { kind = e.kind; $("memorize").checked = kind !== "info"; drawChips(); drawCats(); }
   if (!backEdited) $("back").value = e.back || "";
   if (!$("example").value) $("example").value = e.example || "";
+  if (!$("parts").value) $("parts").value = e.parts || "";
   if (!$("origin").value) $("origin").value = e.origin || "";
   if (!$("synonyms").value) $("synonyms").value = e.synonyms || "";
   if (!$("antonyms").value) $("antonyms").value = e.antonyms || "";
@@ -836,7 +839,7 @@ function save() {
   } else if (MODE === "card") {
     const single = $("single").checked;
     post({ type: "save", kind, text, back: single ? "" : $("back").value.trim(), example: single ? "" : $("example").value.trim(),
-           origin: single ? "" : $("origin").value.trim(), synonyms: single ? "" : $("synonyms").value.trim(), antonyms: single ? "" : $("antonyms").value.trim(),
+           parts: single ? "" : $("parts").value.trim(), origin: single ? "" : $("origin").value.trim(), synonyms: single ? "" : $("synonyms").value.trim(), antonyms: single ? "" : $("antonyms").value.trim(),
            topic: $("topic").value.trim(), memorize: $("memorize").checked, single, category: kind === "info" ? "" : category,
            image: single || kind === "info" ? "" : image, editNote: editing ? editing.noteId : null, keep: editing ? (editing.keep || "") : "" });
   } else {
@@ -867,7 +870,7 @@ window.dupes = (n, list, edit) => {
 function loadForEdit(e) {
   editing = e; backEdited = true;
   $("back").value = e.back || ""; $("example").value = e.example || ""; $("topic").value = e.topic || "";
-  $("origin").value = e.origin || ""; $("synonyms").value = e.synonyms || ""; $("antonyms").value = e.antonyms || "";
+  $("parts").value = e.parts || ""; $("origin").value = e.origin || ""; $("synonyms").value = e.synonyms || ""; $("antonyms").value = e.antonyms || "";
   $("single").checked = false; onSingle();
   $("dupe").textContent = "✎ editing your existing card (" + (e.deck || "Anki") + ") — ⏎ saves the changes";
   $("status").textContent = "";
@@ -1006,7 +1009,7 @@ local function openPanel(mode, preset)
 				M.saveEdit(body)
 			elseif mode == "card" then
 				submit({ kind = body.kind, text = body.text, back = body.back, example = body.example, topic = body.topic,
-					origin = body.origin ~= "" and body.origin or nil, synonyms = body.synonyms ~= "" and body.synonyms or nil, antonyms = body.antonyms ~= "" and body.antonyms or nil, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil,
+					parts = body.parts ~= "" and body.parts or nil, origin = body.origin ~= "" and body.origin or nil, synonyms = body.synonyms ~= "" and body.synonyms or nil, antonyms = body.antonyms ~= "" and body.antonyms or nil, memorize = body.memorize, single = body.single or nil, category = body.category ~= "" and body.category or nil,
 					image = body.image ~= "" and body.image or nil })
 			elseif mode == "todo" then
 				submit({ kind = "todo", text = body.text, due = body.due ~= "" and body.due or nil, time = body.time ~= "" and body.time or nil,
@@ -1018,7 +1021,7 @@ local function openPanel(mode, preset)
 	end)
 
 	local screen = hs.screen.mainScreen():frame()
-	local w, h = 560, card and 720 or (mode == "todo" and 600 or (mode == "command" and 330 or 230))
+	local w, h = 560, card and 760 or (mode == "todo" and 600 or (mode == "command" and 330 or 230))
 	panel = hs.webview.new({ x = screen.x + (screen.w - w) / 2, y = screen.y + math.max(20, math.min(screen.h * 0.22, screen.h - h - 40)), w = w, h = h }, {}, uc)
 	panel:windowStyle({ "borderless" })
 		:transparent(true)
