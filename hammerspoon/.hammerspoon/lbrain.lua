@@ -129,13 +129,24 @@ local EDGE_TTS = HOME .. "/.local/bin/edge-tts"
 local TTS_DIR = HOME .. "/.local/share/lbrain/tts"
 local VOICE_EN, VOICE_AR = "en-US-AndrewMultilingualNeural", "ar-LB-RamiNeural" -- male voices; en-US-BrianMultilingualNeural, en-GB-RyanNeural and ar-SA-HamedNeural are other options
 
+-- What to say or draw for a text: the words marked with ** ** (they are what the card is about), else the text.
+local function spokenText(text)
+	local marked = {}
+	for found in tostring(text):gmatch("%*%*([^*]+)%*%*") do
+		local w = found:gsub("^%s+", ""):gsub("%s+$", "")
+		if w ~= "" then marked[#marked + 1] = w end
+	end
+	if #marked > 0 then return table.concat(marked, ", ") end
+	return (tostring(text):gsub("%*%*", ""))
+end
+
 local function isArabicText(kind, text)
 	return kind == "ar_word" or kind == "ar_phrase" or tostring(text):find("[\216-\219]") ~= nil
 end
 
 -- callback(path, bytes, ext): an audio file for the text, or nil
 local function speechFile(text, kind, callback)
-	text = tostring(text):gsub("%s+", " ")
+	text = spokenText(text):gsub("%s+", " ")
 	if text == "" or #text > 200 then return callback(nil) end
 	local arabic = isArabicText(kind, text)
 	local voice = arabic and VOICE_AR or VOICE_EN
@@ -170,7 +181,7 @@ end
 -- as a small AAC file; calls back with the file name and its bytes, or nil when it can't be made.
 local function sayPronounce(item, callback)
 	local arabic = item.kind == "ar_word" or item.kind == "ar_phrase"
-	local text = tostring(item.text or ""):gsub("%s+", " ")
+	local text = spokenText(item.text or ""):gsub("%s+", " ")
 	if text == "" or #text > 200 then return callback(nil) end
 	local dir = (os.getenv("TMPDIR") or "/tmp/") .. "lbrain-pron"
 	hs.fs.mkdir(dir)
@@ -194,7 +205,7 @@ function M.speak(text, kind)
 	if M.speaking then M.speaking:terminate() end
 	local function sayIt()
 		local arabic = isArabicText(kind, text)
-		M.speaking = hs.task.new("/usr/bin/say", function() M.speaking = nil end, { "-v", arabic and "Majed" or "Samantha", "--", tostring(text):sub(1, 200) })
+		M.speaking = hs.task.new("/usr/bin/say", function() M.speaking = nil end, { "-v", arabic and "Majed" or "Samantha", "--", spokenText(text):sub(1, 200) })
 		M.speaking:start()
 	end
 	speechFile(text, kind, function(path)
@@ -698,6 +709,9 @@ function setKind(k) {
   ask();
 }
 let arabic = true, askSeq = 0, lastAnswer = "";
+// the words marked with ** ** are what the card is about
+function focusWords(text) { return [...text.matchAll(/\*\*([^*]+?)\*\*/g)].map(m => m[1].trim()).filter(Boolean); }
+function plainText(text) { const f = focusWords(text); return f.length === 1 ? f[0] : text.replace(/\*\*/g, ""); }
 function hear() {
   const text = $("text").value.trim();
   if (text) post({ type: "speak", text, kind });
@@ -738,7 +752,7 @@ function ask() {
     post({ type: "enrich", kind, text, seq, arabic });
     // draw in parallel with the card back, from the word alone: nothing waits for anything. A photo that
     // comes back with the back (a concrete noun) wins over the drawing.
-    if (kind !== "info") { drawSeq++; post({ type: "illustrate", text, back: "", seq: drawSeq }); }
+    if (kind !== "info" && focusWords(text).length < 2) { drawSeq++; post({ type: "illustrate", text: plainText(text), back: "", seq: drawSeq }); }
   }, 700);
 }
 let image = "", askedText = "", ignoreFix = "";
@@ -763,7 +777,7 @@ function fixSpelling(before, after, redraw) {
   a.onclick = ev => { ev.preventDefault(); ignoreFix = before.toLowerCase(); $("text").value = before; st.textContent = ""; checkDupe(); ask(); };
   st.appendChild(a);
   checkDupe();
-  if (redraw) { drawSeq++; post({ type: "illustrate", text: after, back: "", seq: drawSeq }); }
+  if (redraw && focusWords(after).length < 2) { drawSeq++; post({ type: "illustrate", text: plainText(after), back: "", seq: drawSeq }); }
 }
 window.enriched = (n, e, error) => {
   if (n !== seq) return;
