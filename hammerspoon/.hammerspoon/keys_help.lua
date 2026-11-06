@@ -116,8 +116,8 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "a", "open the Mmix window (vim keys)" },
 		{ { "ctrl", "cmd" }, "1", "play the Top 5 Meme 1 sound" },
 		{ { "ctrl", "cmd" }, "2", "play the vine boom" },
-		{ { "ctrl", "cmd" }, "3", "play the anime wow" },
-		{ { "ctrl", "cmd" }, "4", "play FUCK" },
+		{ { "ctrl", "cmd" }, "3", "play the YouTube vine boom" },
+		{ { "ctrl", "cmd" }, "4", "play the anime wow" },
 		{ { "ctrl", "cmd" }, "5", "play the sudden suspense sound" },
 	} },
 	{ "Virtual camera (Mcam)", "#7be0a0", {
