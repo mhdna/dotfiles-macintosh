@@ -6,7 +6,7 @@
 --   Only a is bound for now (everything else is done from the window); the rest are
 --   commented out at the bottom and work again if you uncomment them.
 --   a  open / close the Mmix window (vim keys: j/k, h/l, tab, ⏎, s, m, c, o, n, e, q; 1–9 sounds, 0 stops)
---   1  play "Top 5 Meme 1"       2  play "Vine Boom"             (soundboard clips)
+--   1  play "Vine Boom"          2  play "Top 5 Meme 1"          (soundboard clips)
 --   3  play "Vine Boom (YouTube)"   4  play "Anime Wow"          5  play "Sudden Suspense"
 --   shift+a  start / stop sharing    d  mute / unmute computer audio
 --   n  mute / unmute mic             o  share only the selected apps on / off
@@ -63,8 +63,8 @@ local function sound(name)
 	end
 	hs.task.new("/usr/bin/open", nil, { "-g", "mmix://sound?name=" .. hs.http.encodeForQuery(name) }):start()
 end
-hs.hotkey.bind(MODS, "1", function() sound("Top 5 Meme 1") end)
-hs.hotkey.bind(MODS, "2", function() sound("Vine Boom") end)
+hs.hotkey.bind(MODS, "1", function() sound("Vine Boom") end)
+hs.hotkey.bind(MODS, "2", function() sound("Top 5 Meme 1") end)
 hs.hotkey.bind(MODS, "3", function() sound("Vine Boom (YouTube)") end)
 hs.hotkey.bind(MODS, "4", function() sound("Anime Wow") end)
 hs.hotkey.bind(MODS, "5", function() sound("Sudden Suspense") end)

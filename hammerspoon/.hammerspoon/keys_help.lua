@@ -114,8 +114,8 @@ local GROUPS = {
 	} },
 	{ "Audio sharing (Mmix)", "#5ad1a0", {
 		{ { "ctrl", "cmd" }, "a", "open the Mmix window (vim keys)" },
-		{ { "ctrl", "cmd" }, "1", "play the Top 5 Meme 1 sound" },
-		{ { "ctrl", "cmd" }, "2", "play the vine boom" },
+		{ { "ctrl", "cmd" }, "1", "play the vine boom" },
+		{ { "ctrl", "cmd" }, "2", "play the Top 5 Meme 1 sound" },
 		{ { "ctrl", "cmd" }, "3", "play the YouTube vine boom" },
 		{ { "ctrl", "cmd" }, "4", "play the anime wow" },
 		{ { "ctrl", "cmd" }, "5", "play the sudden suspense sound" },
