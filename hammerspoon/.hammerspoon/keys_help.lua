@@ -114,6 +114,8 @@ local GROUPS = {
 	} },
 	{ "Audio sharing (Mmix)", "#5ad1a0", {
 		{ { "ctrl", "cmd" }, "a", "open the Mmix window (vim keys)" },
+		{ { "ctrl", "cmd" }, "1", "play the Top 5 Meme 1 sound" },
+		{ { "ctrl", "cmd" }, "2", "play the vine boom" },
 	} },
 	{ "Virtual camera (Mcam)", "#7be0a0", {
 		{ { "ctrl", "cmd" }, "s", "pick a screen or window to share (vim keys)" },
