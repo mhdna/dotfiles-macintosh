@@ -171,6 +171,14 @@ function M.cardLine(item, date, audioName, imageName)
 	line = line .. " _(" .. table.concat(meta, ", ") .. ")_"
 	if audioName then line = line .. " ![[" .. audioName .. "]]" end
 	if imageName then line = line .. " ![[" .. imageName .. "|96]]" end
+	-- what to understand about it, as indented lines under the card's bullet
+	local origin = oneLine(item.origin or "")
+	if origin ~= "" then line = line .. "\n  - origin: " .. origin end
+	local words = {}
+	local syn, ant = oneLine(item.synonyms or ""), oneLine(item.antonyms or "")
+	if syn ~= "" then words[#words + 1] = "synonyms: " .. syn end
+	if ant ~= "" then words[#words + 1] = "antonyms: " .. ant end
+	if #words > 0 then line = line .. "\n  - " .. table.concat(words, " · ") end
 	return line
 end
 
@@ -181,11 +189,17 @@ function M.parseBack(html)
 	html = tostring(html):gsub("%[sound:[^%]]*%]", function(tag) keep[#keep + 1] = tag return "" end):gsub("<br>%s*$", "")
 	local parts, rest = {}, html .. "<br><br>"
 	for chunk in rest:gmatch("(.-)<br><br>") do parts[#parts + 1] = chunk end
-	local back, example, topic = parts[1] or "", "", ""
-	local i = 2
-	if parts[i] and parts[i]:match("^<i>.*</i>$") then example = parts[i]; i = i + 1 end
-	if parts[i] and not parts[i]:find("%[sound:") and not parts[i]:find("<img") then topic = parts[i] end
-	return { front = "", back = plain(back), example = plain(example), topic = plain(topic), keep = table.concat(keep, "<br>") }
+	local back, example, topic, origin, synonyms, antonyms = parts[1] or "", "", "", "", "", ""
+	for i = 2, #parts do
+		local part = parts[i]
+		local o, sy, an = part:match("^<b>Origin:</b>%s*(.*)$"), part:match("^<b>Synonyms:</b>%s*(.*)$"), part:match("^<b>Antonyms:</b>%s*(.*)$")
+		if o then origin = o
+		elseif sy then synonyms = sy
+		elseif an then antonyms = an
+		elseif example == "" and part:match("^<i>.*</i>$") then example = part
+		elseif topic == "" and not part:find("%[sound:") and not part:find("<img") then topic = part end
+	end
+	return { front = "", back = plain(back), example = plain(example), topic = plain(topic), origin = plain(origin), synonyms = plain(synonyms), antonyms = plain(antonyms), keep = table.concat(keep, "<br>") }
 end
 
 -- Rewrite the card line "- **front** ..." in its file, keeping the date it was added on.
@@ -196,14 +210,20 @@ function M.replaceCard(root, item, date)
 	local text = read(path)
 	if not text then return nil end
 	local want = "- **" .. oneLine(item.text):lower() .. "**"
-	local out, hit = {}, false
+	local out, hit, skipping = {}, false, false
 	for raw in (text .. "\n"):gmatch("(.-)\n") do
 		local line = raw
-		if not hit and line:lower():sub(1, #want) == want then
-			hit = true
-			line = M.cardLine(item, line:match("(%d%d%d%d%-%d%d%-%d%d)%)_") or date)
+		if skipping and line:match("^%s%s+%-") then
+			-- an indented line of the card being replaced: it is written again by cardLine
+		else
+			skipping = false
+			if not hit and line:lower():sub(1, #want) == want then
+				hit = true
+				skipping = true
+				line = M.cardLine(item, line:match("(%d%d%d%d%-%d%d%-%d%d)%)_") or date)
+			end
+			out[#out + 1] = line
 		end
-		out[#out + 1] = line
 	end
 	if not hit then return nil end
 	if out[#out] == "" then out[#out] = nil end
@@ -254,6 +274,9 @@ function M.ankiNote(item, audioName, imageName, pronName)
 	end
 	local back = html(item.back)
 	if (item.example or "") ~= "" then back = back .. "<br><br><i>" .. html(item.example) .. "</i>" end
+	if (item.origin or "") ~= "" then back = back .. "<br><br><b>Origin:</b> " .. html(item.origin) end
+	if (item.synonyms or "") ~= "" then back = back .. "<br><br><b>Synonyms:</b> " .. html(item.synonyms) end
+	if (item.antonyms or "") ~= "" then back = back .. "<br><br><b>Antonyms:</b> " .. html(item.antonyms) end
 	if (item.topic or "") ~= "" then back = back .. "<br><br>" .. html(item.topic) end
 	if audioName then back = back .. "<br>[sound:" .. audioName .. "]" end
 	if pronName then back = back .. "<br>[sound:" .. pronName .. "]" end

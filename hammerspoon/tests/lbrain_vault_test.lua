@@ -30,6 +30,13 @@ eq(V.cardLine({ text = "a\nb", back = "", topic = "go" }, "2026-11-01", "v1.m4a"
 
 eq(V.cardLine({ text = "slug", back = "a mollusc" }, "2026-11-05", nil, "x.jpg"), "- **slug** — a mollusc _(2026-11-05)_ ![[x.jpg|96]]", "card line with a picture")
 
+local full = { text = "rebuke", back = "to scold", origin = "Old French rebuker", synonyms = "scold, reprimand", antonyms = "praise", topic = "" }
+eq(V.cardLine(full, "2026-11-06"), "- **rebuke** — to scold _(2026-11-06)_\n  - origin: Old French rebuker\n  - synonyms: scold, reprimand · antonyms: praise", "card line with origin and words around it")
+local fb = V.ankiNote({ kind = "en_word", text = "rebuke", back = "to scold", example = "He rebuked me.", origin = "Old French rebuker", synonyms = "scold", antonyms = "praise", topic = "speech" }).fields.Back
+eq(fb, "to scold<br><br><i>He rebuked me.</i><br><br><b>Origin:</b> Old French rebuker<br><br><b>Synonyms:</b> scold<br><br><b>Antonyms:</b> praise<br><br>speech", "anki back with origin, synonyms, antonyms")
+local pf = V.parseBack(fb)
+eq(pf.origin .. "|" .. pf.synonyms .. "|" .. pf.antonyms .. "|" .. pf.topic .. "|" .. pf.example, "Old French rebuker|scold|praise|speech|He rebuked me.", "parseBack reads them back")
+
 -- ankiNote
 local sn = V.ankiNote({ kind = "en_word", text = "slug", back = "a mollusc", example = "", topic = "" }, nil, nil, "id-pron.m4a")
 eq(sn.fields.Back, "a mollusc<br>[sound:id-pron.m4a]", "anki back with a pronunciation")
