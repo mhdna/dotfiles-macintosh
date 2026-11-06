@@ -61,7 +61,8 @@ local function sound(name)
 		hs.alert.show("Mmix isn't running", 0.6)
 		return
 	end
-	hs.task.new("/usr/bin/open", nil, { "-g", "mmix://sound?name=" .. hs.http.encodeForQuery(name) }):start()
+	-- A distributed notification reaches Mmix in a few ms; `open mmix://…` takes ~100.
+	hs.distributednotifications.post("com.mahdi.mmix.command", "sound?name=" .. hs.http.encodeForQuery(name))
 end
 hs.hotkey.bind(MODS, "1", function() sound("Vine Boom") end)
 hs.hotkey.bind(MODS, "2", function() sound("Top 5 Meme 1") end)
