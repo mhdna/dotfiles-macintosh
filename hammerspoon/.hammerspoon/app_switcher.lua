@@ -151,6 +151,11 @@ hs.hotkey.bind({ "alt" }, "t", function()
 	activateOrToggle("net.kovidgoyal.kitty")
 end)
 
+-- Raawi (audiobook studio): launch it, or bring it to the front
+hs.hotkey.bind({ "alt", "shift" }, "r", function()
+	hs.application.launchOrFocusByBundleID("app.raawi.studio")
+end)
+
 hs.hotkey.bind({ "alt", "shift" }, "i", function()
 	activateOrToggle("com.hnc.Discord")
 end)
