@@ -20,7 +20,7 @@ If unsure, use light mode and say in one line that full mode is available. The p
 Do not ask questions, do not write directions, and do not invent a new identity. The existing product is the identity.
 
 1. **Follow the existing system.** Read the nearby code first and reuse its colors, fonts, spacing, components and CSS variables. Do not add a new color, font, shadow style or radius unless the task needs it, and say so when you do.
-2. **Avoid the habits.** Everything in "Habits that give AI work away", "My own additions" and "The author's own pet peeves" applies, in new code and in the code you touch. Do not go hunting through untouched files, but mention any you saw nearby.
+2. **Avoid the habits.** Long dashes and dot separators are never allowed in any text you write or touch. Everything in "Habits that give AI work away", "My own additions" and "The author's own pet peeves" applies, in new code and in the code you touch. Do not go hunting through untouched files, but mention any you saw nearby.
 3. **Apply the principles** in "What makes it feel designed by a person": a clear most important element, unequal weight for unequal content, real copy, states for everything that can be touched, layouts that survive messy content, calm over decoration.
 4. **Arabic and right-to-left** rules apply whenever the UI has Arabic.
 5. **Short review before showing.** Check the habits item by item in what you changed, plus the Messy content, Touch and Judgment tests from the final review. If you can render, look at desktop and phone width; if you cannot, say you did not check the visual result. Report in a line or two what you avoided or fixed.
@@ -128,13 +128,17 @@ The principle comes before the list: if your first idea would fit any business o
 
 **Live dots and status circles.** The small colored circle (red, green or orange, often pulsing or glowing) placed next to a clock, a "live" or "online" label, a breaking news line, a status, a menu item or a card title. This includes the red dot next to a live time display, the pulsing "LIVE" badge, green "online" dots and colored bullet dots used as decoration. Alternative: let the content itself show that it is live or current (the time ticking, a fresh timestamp such as "قبل دقيقتين", the word "مباشر" set in the headline type, a change in color or weight of the text itself, or an element from the concept's universe). Only use a dot when it is the established, functional convention of the interface (for example an unread indicator a user actually acts on), and never as decoration. Why: it is one of the most repeated tics of generated dashboards and news sites, and it adds urgency the content has not earned.
 
+**Long dashes, anywhere.** No em dash (—) or en dash (–) in any text a person will see: page and dialog titles, labels, buttons, menus, tooltips, messages, copy, release notes, Arabic or English. This includes the title pattern "Action — Context" (for example «تعديل الرموز — فئة الطبيب»). Alternatives: a colon («تعديل الرموز: فئة الطبيب»), a comma, a period, or the context on its own line in a smaller or lighter style. For a range use "to" or «إلى» («من ١ إلى ٥»), or a plain hyphen only in numeric ranges like 10-20. Why: long dashes are one of the most recognizable habits of generated text.
+
+**Dots as separators.** No middle dot (·), bullet (•) or similar dot between items in a line ("5 events · last 24h", «زيارة • ٢٥$», "Admin · 3 users"). Alternatives: a comma, a line break, real space between the items (a gap in the layout), a thin vertical line drawn in CSS, or different weight or color for each part. Why: it is the stock separator of generated metadata lines.
+
+Both rules apply in light mode and full mode, in new text and in any text you touch.
+
 ## The author's own pet peeves (on by default, release freely)
 
 These are matters of taste more than signs of AI. They are on by default because the author of this skill dislikes them. Release any of them in Step 0.
 
-**Slashes as separators.** A single slash ("/") or double slash ("//") between words, in menus, labels, dates or credits. Alternative: a space, a middle dot, a line, or an element from the concept. Why: it is a decorative stand-in for a separator, common in generated menus, dates and credits.
-
-**Dashes in the text.** Use a comma, a period or a colon. Why: long dashes are one of the most recognizable habits of generated text.
+**Slashes as separators.** A single slash ("/") or double slash ("//") between words, in menus, labels, dates or credits. Alternative: a comma, real space between the items, a thin line, or an element from the concept (never a middle dot, see My own additions). Why: it is a decorative stand-in for a separator, common in generated menus, dates and credits.
 
 **Italic serif** as an automatic "elegant touch". Why: it is an automatic way of looking elegant that turns up in a lot of generated work.
 
@@ -189,7 +193,7 @@ Everything above applies to every format: poster, slide, social post, banner, co
 
 ## Final review (before showing)
 
-1. Check the person's adjustments and the habits above, item by item. Look especially for forgotten pills, live dots and status circles, numbers, slashes and dashes in menus, footers, cards and supporting text.
+1. Check the person's adjustments and the habits above, item by item. Look especially for forgotten pills, live dots and status circles, numbers, slashes, long dashes (— –) and dot separators (· •) in menus, footers, cards and supporting text.
 2. Check the result against your Step 2 decisions: dominant element, type scale, spacing unit, three composition moves.
 3. If you can render, render at desktop and phone sizes and run the first six tests below. If you cannot, say that you did not check the visual result. The last test always applies.
 4. Report what you found and what you changed.
