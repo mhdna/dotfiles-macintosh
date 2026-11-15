@@ -60,6 +60,20 @@ Write these decisions down, with real numbers, before you draw. They are also th
 | Spacing unit | One base unit (for example 8) and the few multiples you will use |
 | Three composition moves | Three choices that shape the layout, such as an off center anchor, a deliberate crop or a change of density between sections. Not decoration |
 
+## What makes it feel designed by a person
+
+These principles sit above the habit list. When a habit and a principle seem to conflict, follow the principle and say why.
+
+- **Small, intentional imperfections.** One element that breaks the grid on purpose (an image that bleeds off the edge, a headline that overlaps a photo, a hand drawn underline, a slightly rotated sticker of real content). One or two per page, each with a reason. Never random jitter, and never imperfection that looks like a bug.
+- **Meaning and flow over strict alignment.** Align things that belong together, and let things that are different sit differently. A quote can hang outside the text column, a price can sit close to what it prices. Perfect alignment of everything to one grid reads as generated.
+- **Clear visual judgments, not uniform layouts.** Decide what matters most and make it much bigger, much bolder or much emptier around it. Give unequal space to unequal content: one large item and two small ones, not three equal ones. If every block has the same weight, nothing was decided.
+- **Typography with personality.** Chosen for this concept, as Step 1 says, and then used with intent: real contrast in size and weight, a considered line length, one typographic moment per page that only this concept would have.
+- **Copy the way people actually speak.** Short, direct, specific. Buttons say what happens ("احجز طاولة", "Send the file"), not "Get started" or "Learn more". Errors and empty states say what went wrong and what to do, in a human voice.
+- **Small pauses and feedback in interactions.** Hover, press, loading and success states for everything that can be touched. Short, purposeful timing (about 120 to 250 ms), easing that feels physical, a brief confirmation after an action. Respect `prefers-reduced-motion`. No entrance animation on every block.
+- **Design for real, messy content early.** Test with the longest name, a two line title, a missing photo, one item and fifty items, a very long Arabic word next to a Latin one, a price with many digits. The layout must survive the worst real case, not just the demo.
+- **Personality sparingly and with intent.** One or two brand moments (the brand element of Step 1, a line of copy with a wink, an illustration in an empty state). Everywhere else stays quiet so those moments land.
+- **Clarity and calm over polish.** Fewer colors, fewer sizes, fewer effects, more space. A calm page that is easy to use beats a busy page full of details. When in doubt, remove something.
+
 ## Habits that give AI work away (each one can be released in Step 0)
 
 The principle comes before the list: if your first idea would fit any business of the same type, discard it and start again from this business.
@@ -159,3 +173,6 @@ Everything above applies to every format: poster, slide, social post, banner, co
 | Cut and empty | Text cut by an edge, overlaps, large empty areas |
 | Font swap | Replace the display font with the closest reflex pair for the style you chose (for example Poppins 800 for a heavy rounded headline): if the page looks the same or better, the font choice is not doing any work for the concept |
 | Logo | Remove the logo: would anyone know which project this is? If not, identity is missing |
+| Messy content | Put in the longest real text, a missing image, one item and many items: does the layout still hold? |
+| Touch | Hover, press, focus, loading, empty and error states: does each exist and feel calm? |
+| Judgment | Is one thing clearly the most important on each screen, and is there at least one deliberate break from the grid? |
