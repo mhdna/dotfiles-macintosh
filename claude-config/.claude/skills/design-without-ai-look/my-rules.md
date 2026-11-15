@@ -13,11 +13,11 @@ when the two disagree.
 
 **Dots as separators.** No middle dot (·), bullet (•) or similar dot between items in a line ("5 events · last 24h", «زيارة • ٢٥$», "Admin · 3 users"). Alternatives: a comma, a line break, real space between the items (a gap in the layout), a thin vertical line drawn in CSS, or different weight or color for each part. Why: it is the stock separator of generated metadata lines.
 
-**Tonal colors.** No light tinted backgrounds with colored text on top: Vuetify's `variant="tonal"`, Material's tonal or "container" colors, pale green or pale blue boxes behind a status, a button or a badge. They look generated. When something needs color, use a filled color (solid background, white or dark text on it) or plain colored text. Everything else stays neutral.
+**Tonal is allowed.** Vuetify's `variant="tonal"` (and Material's tonal style) is fine, and for buttons a neutral grey tonal (tonal with no color) is the preferred default. Give a tonal element a color only when the color has a job (a delete or warning action); do not tint statuses, labels or decorations in pale green, blue or similar just to make them look lively.
 
 **Rounded and pill shapes.** No pills, fully rounded buttons or chips, or big soft corners. Prefer square or the library's default small radius. Never `rounded="pill"`, `rounded="xl"`, `border-radius: 999px` or a radius bigger than the library default.
 
-**Restyling the component library.** When the project uses Vuetify, Material UI or another component library, use its components with their default look: default variant (filled for colored buttons), default density, default radius, default elevation. Do not add custom CSS to restyle them, custom shadows, gradients or decorative wrappers. Only set what the task needs (color, size, disabled). If the project already restyled components, leave its existing styling alone unless asked, and do not add more.
+**Restyling the component library.** When the project uses Vuetify, Material UI or another component library, use its components with their default look: default variant (neutral grey tonal for buttons), default density, default radius, default elevation. Do not add custom CSS to restyle them, custom shadows, gradients or decorative wrappers. Only set what the task needs (color, size, disabled). If the project already restyled components, leave its existing styling alone unless asked, and do not add more.
 
 All of these apply in light mode and full mode, in new text and in any text you touch.
 
