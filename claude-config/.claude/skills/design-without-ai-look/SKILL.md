@@ -47,7 +47,7 @@ Example of the written answers, for a flyer for a community choir's autumn conce
 3. Palette: ink brown for text, pumpkin for the date, cream for the paper, moss for small details. One serif for the choir's name (headlines) and one plain sans for the program and the ticket line (text and data).
 4. Brand element: a row of singers drawn as simple shapes that grow from left to right like a rising scale. It would make no sense on any other piece.
 
-Typography. Use the families the concept calls for and justify each one by its job (headlines, text, data). Work in this order. First write what the small text has to do (prices, dates, captions, fine print) and where it will be read, because that sets what the family must survive. Then propose three candidate pairs (or single families) tied to the concept's universe, such as a sign painter's hand, a ledger, a hymnal, and say why each fits. Pick one and say why. When you choose a family, check that it has complete ã, ç, é and ô, in the weights you will use. Do not start from the reflex pairs given as examples in the habits below.
+Typography. Use the families the concept calls for and justify each one by its job (headlines, text, data). Work in this order. First write what the small text has to do (prices, dates, captions, fine print) and where it will be read, because that sets what the family must survive. Then propose three candidate pairs (or single families) tied to the concept's universe, such as a sign painter's hand, a ledger, a hymnal, and say why each fits. Pick one and say why. When you choose a family, check that it covers every script the piece uses, in the weights you will use. For Arabic: the full Arabic block (including ة ى ئ ؤ لا and the Arabic-Indic digits ٠١٢٣ if you use them), correct joining and ligatures, and diacritics (tashkeel) that do not collide when present. If the piece mixes Arabic and Latin, check that the two families sit well together in weight, x-height and baseline, or choose one family that covers both well. For Latin text in other languages, check accented letters such as ã, ç, é and ô. Do not start from the reflex pairs given as examples in the habits below.
 
 ## Step 2: decide before drawing
 
@@ -78,7 +78,7 @@ The principle comes before the list: if your first idea would fit any business o
 
 **Vague marketing phrases** ("Elevate your sound", "Crafted with passion") and **lorem ipsum**. Write specific copy, with plausible names, places and dates. Why: a phrase that could describe any product describes none, and placeholder text hides whether the layout works with real words.
 
-**Choosing a font pair by reflex.** The habit is picking the pair without thinking, not the pair itself: no font is forbidden. Alternative: the candidates you proposed in Step 1, tied to the concept. Why: the fonts that appear first in generated work say "default" before anyone reads a word. If the concept justifies one of them by its job (headlines, text, data), use it and say why. Examples of pairs models reach for (a guess for the author to review, and a list that ages like the examples below): Playfair Display with Inter or Lato, Fraunces with Inter, DM Serif Display with DM Sans, Cormorant Garamond with Montserrat, Space Grotesk for everything, Poppins or Montserrat alone for everything, Inter alone.
+**Choosing a font pair by reflex.** The habit is picking the pair without thinking, not the pair itself: no font is forbidden. Alternative: the candidates you proposed in Step 1, tied to the concept. Why: the fonts that appear first in generated work say "default" before anyone reads a word. If the concept justifies one of them by its job (headlines, text, data), use it and say why. Examples of pairs models reach for (a guess for the author to review, and a list that ages like the examples below): Playfair Display with Inter or Lato, Fraunces with Inter, DM Serif Display with DM Sans, Cormorant Garamond with Montserrat, Space Grotesk for everything, Poppins or Montserrat alone for everything, Inter alone. Arabic reflex choices: Cairo alone for everything, Tajawal alone, Noto Kufi Arabic or Noto Sans Arabic as the only family, IBM Plex Sans Arabic for everything, Almarai with Cairo, Amiri as an automatic "elegant" headline.
 
 **Illustrating where the person will put their own photo.** Illustration is brand art; photo spaces stay empty and easy to swap. Why: the person will replace it anyway, and it hides the fact that a photo is still missing.
 
@@ -115,6 +115,18 @@ Seen in November 2026 with Claude Sonnet 5.5, on the prompt "first screen of a n
 - When turning an existing design into code, keep fidelity to it: same sections, order, texts, colors and fonts.
 - Animation with a purpose tied to the concept, not a generic entrance effect on everything.
 - Illustrations and brand elements in SVG, not raster images.
+
+## Arabic and right-to-left
+
+When the piece is in Arabic (or any right-to-left language), design right-to-left from the start, not a left-to-right layout flipped at the end.
+
+- The reading order starts at the right: the dominant element, the anchor of an off center layout and the first thing read sit where an Arabic reader looks first. Do not just mirror a Latin composition: decide the composition for right-to-left reading.
+- In code: `dir="rtl"` and `lang="ar"` on the root, and logical CSS properties (`margin-inline-start`, `padding-inline-end`, `inset-inline-start`, `text-align: start`) instead of left and right. Mixed Arabic and Latin runs (names, URLs, prices) are isolated with `<bdi>` or `unicode-bidi: isolate` so they do not jump around.
+- Mirror what has direction (arrows, progress, chevrons, a timeline, a carousel order) and do not mirror what does not (logos, media play icons, clocks, charts with numeric axes, phone numbers).
+- Arabic punctuation: ، ؛ ؟ and Arabic quotation marks « ». Choose Western digits (123) or Arabic-Indic digits (١٢٣) once for the project and use them consistently.
+- Arabic needs more line height than Latin (often 1.6 to 1.9 for body text) and does not use letter spacing or fake uppercase. Never add `letter-spacing` to Arabic: it breaks the joining. The "tiny uppercase label" habit has no Arabic form, so do not invent one with small bold text and tracking.
+- Copy in a real Arabic voice, not translated marketing English. Use the register the audience actually reads (Modern Standard Arabic or the local dialect, as the brief says).
+- In the final review, render with real Arabic text and check: joining is intact, diacritics do not clip at line edges, nothing is left aligned by mistake, mixed runs read in the right order.
 
 ## Other formats
 
