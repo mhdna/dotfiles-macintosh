@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stockroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../lichess-style.css">
+  <style>
+    /* Page-specific bits only; everything else comes from lichess-style.css. */
+    .icon { width: 1.2em; height: 1.2em; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .site-title svg { width: 1em; height: 1em; }
+    .qty-low { color: var(--c-bad); font-weight: bold; }
+    .slist .num { text-align: end; font-variant-numeric: tabular-nums; }
+    .stats { display: flex; flex-wrap: wrap; gap: var(--block-gap); margin-bottom: var(--block-gap); }
+    .stats .box { flex: 1 1 12rem; padding: 1.2rem var(--box-padding); }
+    .stats strong { display: block; font-family: Roboto, 'Noto Sans Arabic', sans-serif; font-weight: 300; font-size: 2.2rem; color: var(--c-font-clear); }
+    .stats .box:first-child strong { color: var(--c-primary); }
+    .section-gap { margin-top: var(--block-gap); }
+    .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid var(--c-border); }
+    .switch-row:last-child { border-bottom: 0; }
+    .pager-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem var(--box-padding); }
+    .pager-row .pagination { padding: 0; }
+  </style>
+</head>
+<body>
+  <header id="top">
+    <div class="site-title-nav">
+      <a class="site-title" href="#">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
+        <div>stockroom<span>.app</span></div>
+      </a>
+      <nav id="topnav">
+        <section>
+          <a href="#">Stock</a>
+          <div><a href="#">All products</a><a href="#">Low stock</a><a href="#">Expiring soon</a><a href="#">Stocktake</a></div>
+        </section>
+        <section>
+          <a href="#">Orders</a>
+          <div><a href="#">Open orders</a><a href="#">Received</a><a href="#">Suppliers</a></div>
+        </section>
+        <section>
+          <a href="#">Sales</a>
+          <div><a href="#">Today</a><a href="#">Returns</a><a href="#">Customers</a></div>
+        </section>
+        <section>
+          <a href="#">Reports</a>
+          <div><a href="#">Stock value</a><a href="#">Profit</a><a href="#">Expiry</a></div>
+        </section>
+      </nav>
+    </div>
+    <div class="site-buttons">
+      <button class="link" id="dir-toggle" title="Switch reading direction">ع</button>
+      <button class="link" id="theme-toggle" title="Switch light or dark">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="link" href="#" title="Search"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
+      <a class="link user-tag" href="#">rana.haddad</a>
+    </div>
+  </header>
+
+  <div id="main-wrap">
+    <main class="page-menu">
+      <aside class="page-menu__menu subnav">
+        <div class="subnav__inner">
+          <a href="#">All products</a>
+          <a class="active" href="#">Low stock</a>
+          <a href="#">Expiring soon</a>
+          <span class="sep"></span>
+          <a href="#">Open orders</a>
+          <a href="#">Suppliers</a>
+          <span class="sep"></span>
+          <a href="#">Settings</a>
+        </div>
+      </aside>
+
+      <div class="page-menu__content">
+        <div class="stats">
+          <div class="box"><strong>14</strong>products below their minimum</div>
+          <div class="box"><strong>3</strong>orders waiting for delivery</div>
+          <div class="box"><strong>$2,418</strong>to reorder everything low</div>
+        </div>
+
+        <div class="box">
+          <div class="box__top">
+            <h1>Low stock</h1>
+            <div class="box__top__actions">
+              <button class="button button-metal">Export</button>
+              <button class="button" id="open-dialog">New order</button>
+            </div>
+          </div>
+
+          <div class="box__pad">
+            <div class="flash flash-box">
+              Panadol 500 mg runs out in about 4 days at today's pace. <a href="#">Order 6 boxes</a>
+            </div>
+          </div>
+
+          <div class="tabs-horiz" role="tablist">
+            <span class="active" role="tab">Main pharmacy</span>
+            <span role="tab">Clinic store</span>
+            <span role="tab">Warehouse</span>
+          </div>
+
+          <div class="slist-wrapper">
+            <table class="slist slist-pad">
+              <thead>
+                <tr><th>Product</th><th>Supplier</th><th class="num">In stock</th><th class="num">Minimum</th><th class="num">Unit cost</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr><td><a href="#">Panadol 500 mg, 24 tablets</a></td><td>Mersaco</td><td class="num qty-low">3</td><td class="num">20</td><td class="num">$2.40</td><td class="num"><button class="button button-thin button-empty">Order</button></td></tr>
+                <tr><td><a href="#">Augmentin 1 g, 14 tablets</a></td><td>Pharmaline</td><td class="num qty-low">1</td><td class="num">10</td><td class="num">$9.75</td><td class="num"><button class="button button-thin button-empty">Order</button></td></tr>
+                <tr><td><a href="#">Ventolin inhaler 100 mcg</a></td><td>Mersaco</td><td class="num">4</td><td class="num">8</td><td class="num">$6.10</td><td class="num"><button class="button button-thin button-empty">Order</button></td></tr>
+                <tr><td><a href="#">Insulin pen needles, box of 100</a></td><td>Medco Lebanon</td><td class="num">2</td><td class="num">5</td><td class="num">$14.00</td><td class="num"><button class="button button-thin button-empty">Order</button></td></tr>
+                <tr><td><a href="#">Saline 0.9%, 500 ml</a></td><td>Pharmaline</td><td class="num qty-low">0</td><td class="num">30</td><td class="num">$1.20</td><td class="num"><button class="button button-thin button-empty">Order</button></td></tr>
+                <tr><td><a href="#">Omeprazole 20 mg, 28 capsules</a></td><td>Benta Pharma</td><td class="num">6</td><td class="num">12</td><td class="num">$4.35</td><td class="num"><button class="button button-thin button-empty">Order</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="box__pad pager-row">
+            <span class="dim">6 of 14 products</span>
+            <nav class="pagination">
+              <span>&lsaquo;</span><span class="current">1</span><a href="#">2</a><a href="#">3</a><a href="#">&rsaquo;</a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="box box-pad section-gap">
+          <div class="box__top"><h2>Stock alerts</h2></div>
+          <form class="form3" onsubmit="return false">
+            <div class="form-split">
+              <div class="form-group form-half">
+                <label class="form-label" for="min">Warn when stock falls below</label>
+                <input class="form-control" id="min" type="number" value="20">
+                <p class="form-help">Applied to products that have no minimum of their own.</p>
+              </div>
+              <div class="form-group form-half">
+                <label class="form-label" for="supplier">Default supplier</label>
+                <select class="form-control" id="supplier"><option>Mersaco</option><option>Pharmaline</option><option>Medco Lebanon</option></select>
+              </div>
+            </div>
+            <div class="switch-row">
+              <span>Email me a low stock summary every morning</span>
+              <span class="cmn-toggle"><input id="t1" type="checkbox" checked><label for="t1"></label></span>
+            </div>
+            <div class="switch-row">
+              <span>Warn 30 days before a batch expires</span>
+              <span class="cmn-toggle"><input id="t2" type="checkbox" checked><label for="t2"></label></span>
+            </div>
+            <div class="switch-row">
+              <span>Order automatically from the default supplier</span>
+              <span class="cmn-toggle"><input id="t3" type="checkbox"><label for="t3"></label></span>
+            </div>
+            <div class="form-actions">
+              <button class="button button-empty button-red" type="button">Reset</button>
+              <button class="button button-green" type="submit">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="order-dialog">
+    <button class="close-button" aria-label="Close" id="close-dialog">&times;</button>
+    <div class="dialog-content">
+      <h2>New order</h2>
+      <p class="dim" style="margin-top:1em">Order every low product from its usual supplier?</p>
+      <div class="button-set" style="justify-content:center;margin-top:1.5em">
+        <button class="button button-metal" id="cancel-dialog">Cancel</button>
+        <button class="button">Create 14 orders</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const root = document.documentElement
+    document.getElementById('theme-toggle').onclick = () => root.classList.toggle('light')
+    document.getElementById('dir-toggle').onclick = () => root.dir = root.dir === 'rtl' ? 'ltr' : 'rtl'
+    const dlg = document.getElementById('order-dialog')
+    document.getElementById('open-dialog').onclick = () => dlg.showModal()
+    document.getElementById('close-dialog').onclick = () => dlg.close()
+    document.getElementById('cancel-dialog').onclick = () => dlg.close()
+    const top = document.getElementById('top')
+    addEventListener('scroll', () => top.classList.toggle('scrolled', scrollY > 0), { passive: true })
+  </script>
+</body>
+</html>
