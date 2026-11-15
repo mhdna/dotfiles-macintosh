@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panadol 500 mg, Stockroom</title>
+  <script>try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light'); if (localStorage.getItem('dir') === 'rtl') document.documentElement.dir = 'rtl' } catch {}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../lichess-style.css">
+  <link rel="stylesheet" href="assets/pages.css">
+</head>
+<body>
+  <header id="top"></header>
+  <div id="main-wrap">
+    <main class="stack">
+      <div class="flash flash-failure">Only 3 boxes left, below the minimum of 20. At today's pace they run out in about 4 days.</div>
+
+      <div class="grid-2">
+        <div class="box box-pad">
+          <div class="box__top">
+            <h1>Panadol 500 mg, 24 tablets</h1>
+          </div>
+          <dl class="facts">
+            <dt>Category</dt><dd>Pain relief</dd>
+            <dt>Barcode</dt><dd>6281086012345</dd>
+            <dt>Supplier</dt><dd><a href="orders.html">Mersaco</a></dd>
+            <dt>Price</dt><dd>$3.50, cost $2.40</dd>
+            <dt>Margin</dt><dd>31%</dd>
+            <dt>In stock</dt><dd><span class="qty-low">3</span> here, 180 in the warehouse</dd>
+            <dt>Minimum</dt><dd>20</dd>
+            <dt>Sold this month</dt><dd>412 boxes</dd>
+          </dl>
+          <div class="button-set" style="margin-top:2rem">
+            <button class="button" data-open="order-dialog">Order 40 boxes</button>
+            <button class="button button-metal" data-open="adjust-dialog">Adjust stock</button>
+            <button class="button button-empty button-red" data-open="delete-dialog">Delete</button>
+          </div>
+        </div>
+
+        <div class="box chart-box">
+          <div class="box__top chart-head">
+            <h2>Stock over 8 weeks</h2>
+            <div class="time-selector-buttons"><button>4W</button><button class="active">8W</button></div>
+          </div>
+          <div class="chart-container small"><canvas id="stock-chart" role="img" aria-label="Boxes in stock each week against the minimum of 20"></canvas></div>
+          <p class="chart-note">Stock fell under the minimum two weeks ago and the last order hasn't come yet.</p>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="tabs-horiz" data-tabs="detail" role="tablist">
+          <span class="active" data-tab="moves" role="tab">Movements</span>
+          <span data-tab="batches" role="tab">Batches</span>
+          <span data-tab="prices" role="tab">Price changes</span>
+        </div>
+        <div data-panel-group="detail" data-panel="moves">
+          <table class="slist slist-pad">
+            <thead><tr><th>When</th><th>What</th><th>By</th><th class="num">Change</th><th class="num">After</th></tr></thead>
+            <tbody>
+              <tr><td><time>Nov 15, 11:05</time></td><td><a href="#">Sale 8821</a></td><td>Rana</td><td class="num">-2</td><td class="num">3</td></tr>
+              <tr><td><time>Nov 14, 17:40</time></td><td><a href="#">Sale 8790</a></td><td>Karim</td><td class="num">-6</td><td class="num">5</td></tr>
+              <tr><td><time>Nov 14, 09:12</time></td><td>Damaged, thrown away</td><td>Rana</td><td class="num">-1</td><td class="num">11</td></tr>
+              <tr><td><time>Nov 12, 16:30</time></td><td><a href="#">Transfer from warehouse</a></td><td>Karim</td><td class="num status-done">+10</td><td class="num">12</td></tr>
+              <tr><td><time>Nov 11, 10:02</time></td><td><a href="#">Sale 8702</a></td><td>Rana</td><td class="num">-4</td><td class="num">2</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div data-panel-group="detail" data-panel="batches" hidden>
+          <table class="slist slist-pad">
+            <thead><tr><th>Batch</th><th>Received</th><th>Expires</th><th class="num">Left</th></tr></thead>
+            <tbody>
+              <tr><td>PN-2291</td><td><time>Sep 3</time></td><td class="status-late">Dec 1, in 16 days</td><td class="num">1</td></tr>
+              <tr><td>PN-2340</td><td><time>Oct 18</time></td><td>Aug 2027</td><td class="num">2</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div data-panel-group="detail" data-panel="prices" hidden>
+          <table class="slist slist-pad">
+            <thead><tr><th>Date</th><th class="num">Old price</th><th class="num">New price</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td><time>Oct 1</time></td><td class="num">$3.20</td><td class="num">$3.50</td><td>Mersaco raised its price</td></tr>
+              <tr><td><time>Mar 12</time></td><td class="num">$3.00</td><td class="num">$3.20</td><td>New price list</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+  <dialog id="adjust-dialog">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content dialog-form">
+      <h2>Adjust stock</h2>
+      <form class="form3" onsubmit="event.preventDefault(); this.closest('dialog').close()">
+        <group class="radio" style="margin-bottom:2rem">
+          <div><input type="radio" id="a-add" name="a" checked><label for="a-add">Add</label></div>
+          <div><input type="radio" id="a-remove" name="a"><label for="a-remove">Remove</label></div>
+          <div><input type="radio" id="a-set" name="a"><label for="a-set">Set to</label></div>
+        </group>
+        <div class="form-split">
+          <div class="form-group form-half"><label class="form-label" for="a-qty">Boxes</label><input class="form-control" id="a-qty" type="number" value="1"></div>
+          <div class="form-group form-half"><label class="form-label" for="a-why">Reason</label><select class="form-control" id="a-why"><option>Found in stocktake</option><option>Damaged</option><option>Expired</option><option>Other</option></select></div>
+        </div>
+        <div class="form-group"><label class="form-label" for="a-note">Note</label><textarea class="form-control" id="a-note" rows="3" placeholder="Optional"></textarea></div>
+        <div class="form-actions"><button class="button button-empty button-dim" type="button" data-close>Cancel</button><button class="button button-green">Save</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="delete-dialog">
+    <div class="dialog-content alert">
+      <h2>Delete Panadol 500 mg?</h2>
+      <p>Its 5 movements and 2 batches stay in the history, but you can't sell it any more. To hide it without losing anything, turn it off in its settings instead.</p>
+      <div class="button-set"><button class="button button-metal" data-close>Keep it</button><button class="button button-red" data-close>Delete</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="order-dialog">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content">
+      <h2>Order sent</h2>
+      <div class="flash" style="margin:1.5em 0">40 boxes of Panadol 500 mg ordered from Mersaco. Delivery usually takes 2 days.</div>
+      <button class="button button-metal" data-close>Close</button>
+    </div>
+  </dialog>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="assets/charts.js"></script>
+  <script>
+    const { make, baseOptions, lineDatasets } = window.lichessCharts
+    make('stock-chart', c => ({
+      type: 'line',
+      data: {
+        labels: ['Sep 22', 'Sep 29', 'Oct 6', 'Oct 13', 'Oct 20', 'Oct 27', 'Nov 3', 'Nov 10'],
+        datasets: lineDatasets([
+          { label: 'In stock', data: [64, 51, 40, 72, 55, 38, 19, 5] },
+          { label: 'Minimum', data: [20, 20, 20, 20, 20, 20, 20, 20] },
+        ]),
+      },
+      options: baseOptions(c),
+    }))
+  </script>
+</body>
+</html>

@@ -15,8 +15,25 @@ Files in this folder:
 - `lichess-style.css`: the whole system as plain CSS with the real values. **Copy it
   into the project unchanged** and build on its classes. Do not retype values from
   memory.
-- `example/index.html`: a complete example page (an original pharmacy stock app)
-  using every pattern below. Open it to see the target look; copy its structure.
+- `example/`: a complete multi-page example site (an original pharmacy stock app,
+  "stockroom.app") using every pattern below. Open `example/index.html` to see the
+  target look, then copy its structure:
+  - `index.html`: dashboard (headline numbers, line chart with period buttons, bar
+    chart, area chart, short table, activity feed)
+  - `products.html`: list page (side menu, search, filters, segmented radio, tabs per
+    store, table, pagination, empty state, warning flash, add and import dialogs)
+  - `product.html`: detail page (failure flash, facts list, actions, chart, tabbed
+    tables, adjust, delete-confirm and success dialogs)
+  - `orders.html`: tabs of tables, order detail dialog with a totals row, a receive
+    dialog with checkboxes, a form dialog with toggles
+  - `reports.html`: four-series chart with a metric switch, bar charts, area chart,
+    data tables under charts, collapsible boxes
+  - `settings.html`: long form (split fields, help and error text, segmented radios,
+    toggles including disabled), users table, danger zone
+  - `components.html`: every component and seven kinds of dialog side by side
+  - `assets/app.js`: header, theme and direction switches (remembered), dialogs
+    (`data-open` / `data-close`), tabs (`data-tabs` / `data-panel`), toggle boxes
+  - `assets/charts.js`: Chart.js themed exactly like Lichess (see Charts below)
 
 ## How it works with my other rules
 
@@ -146,6 +163,36 @@ hsl(209 77% 46%), metal 96% to 93%.
   button hanging off the top end corner that turns red on hover.
 - **Links**: blue, no underline; hover a lighter, more saturated blue.
 - **Scrollbars**: 0.5rem, thumb in the shade grey on the box background.
+
+## Charts
+
+Lichess draws charts with Chart.js (lila `ui/chart`). Reuse `example/assets/charts.js`;
+its values come from that source:
+
+- Font Noto Sans 12px. Text color hsl(0 0% 73%) dark, #2F2F2F light. Grid lines
+  #404040 dark, #ccc light; a zero line #676664 dark, #959595 light. No vertical grid
+  lines; the value axis sits on the right (left in RTL) with no axis border, up to
+  7 ticks, 10px padding.
+- Lines 1.5px, straight (no curve), no points at rest; on hover a 6px point with a
+  2px light ring. Animation off.
+- Series colors in this order (Lichess's own, the Okabe-Ito set): #56B4E9 blue,
+  #E69F00 orange, #009E73 green, #D55E00 red-orange. Up to 4 series per chart. Each
+  series also gets its own dash pattern and point shape (solid circle, short dash
+  diamond, long dash square, dotted triangle), as Lichess does, so lines are told
+  apart without color.
+- Single-series area: fill gradient rgb(119 152 191) from 100% to 30% opacity, line
+  #7798bf, 4px points.
+- Tooltip: background rgb(22 21 18 / 0.85) dark or rgb(255 255 255 / 0.85) light, 1px
+  grid-colored border, 6px padding, 8px point-style swatch, "Label: value" lines.
+- Legend on top, start-aligned, point-style swatches.
+- Period buttons above the chart: `.time-selector-buttons` (joined metal buttons,
+  uppercase, the chosen one sunk to #262421 dark or #dbebfc light).
+- Every chart has a one-line takeaway under it and a "Show the numbers" table.
+  In light mode the blue and orange have under 3:1 contrast on white, so the table
+  and labels are required, not optional.
+- Watch for JavaScript globals: never name a top-level variable `top`, `name`,
+  `status` or reuse a function name from a shared script. Wrap shared scripts in an
+  IIFE (as charts.js does), or the whole page script dies silently.
 
 ## Building a page in this style
 

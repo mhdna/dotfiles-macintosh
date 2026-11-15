@@ -1,0 +1,63 @@
+/* Page-level layout for the example site. Everything visual comes from
+   ../lichess-style.css; this only arranges blocks on these pages. */
+.icon { width: 1.2em; height: 1.2em; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.site-title svg { width: 1em; height: 1em; }
+
+.stack { display: flex; flex-direction: column; gap: var(--block-gap); }
+.grid-2 { display: grid; gap: var(--block-gap); grid-template-columns: 1fr; }
+@media (min-width: 980px) { .grid-2 { grid-template-columns: 3fr 2fr; } .grid-2.even { grid-template-columns: 1fr 1fr; } }
+
+/* Headline numbers */
+.stats { display: flex; flex-wrap: wrap; gap: var(--block-gap); }
+.stats .box { flex: 1 1 12rem; padding: 1.2rem var(--box-padding); }
+.stats strong { display: block; font-family: Roboto, 'Noto Sans Arabic', sans-serif; font-weight: 300; font-size: 2.2rem; color: var(--c-font-clear); }
+.stats .up { color: var(--c-good); }
+.stats .down { color: var(--c-bad); }
+
+/* Tables */
+.slist .num { text-align: end; font-variant-numeric: tabular-nums; }
+.qty-low { color: var(--c-bad); font-weight: bold; }
+.status-open { color: var(--c-brag); }
+.status-done { color: var(--c-good); }
+.status-late { color: var(--c-bad); }
+.pager-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem var(--box-padding); }
+.pager-row .pagination { padding: 0; }
+
+/* Filters row above a table */
+.filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 0 var(--box-padding) var(--box-padding-vert); }
+.filters input[type=search] { flex: 1 1 16rem; }
+
+/* Chart panels */
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+.chart-box .chart-container { margin: 0 var(--box-padding); }
+.chart-note { padding: 0.5rem var(--box-padding) 1.2rem; color: var(--c-font-dim); font-size: 0.9em; }
+details.data-table { padding: 0 var(--box-padding) 1.5rem; }
+details.data-table summary { cursor: pointer; color: var(--c-link); margin-bottom: 0.8rem; }
+
+/* Definition list (product facts) */
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.7rem 2rem; }
+.facts dt { color: var(--c-font-dim); }
+.facts dd { color: var(--c-font-clear); }
+
+/* Activity feed */
+.feed li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.8rem var(--box-padding); border-top: 1px solid var(--c-border); }
+.feed li:nth-child(even) { background: var(--c-bg-zebra); }
+
+/* Empty state */
+.empty { text-align: center; padding: 3rem var(--box-padding); color: var(--c-font-dim); }
+.empty strong { display: block; font-family: Roboto, 'Noto Sans Arabic', sans-serif; font-weight: 300; font-size: 1.6rem; color: var(--c-font); margin-bottom: 0.5rem; }
+
+/* Long-form text */
+.prose { max-width: 70ch; line-height: 1.6; }
+.prose h3 { font-size: 1.4em; margin: 1.5em 0 0.5em; }
+.prose ul { margin: 0 0 1em; padding-inline-start: 1.5em; }
+.prose li { list-style: disc; margin-bottom: 0.3em; }
+.prose blockquote { border-inline-start: 3px solid var(--c-border-light); padding: 0.3em 1em; margin: 1em 0; color: var(--c-font-dim); }
+.prose code { background: var(--c-bg-zebra); padding: 0.1em 0.4em; border-radius: var(--small-box-radius); font-size: 0.9em; }
+
+.section-title { margin: 2.5rem 0 1rem; }
+.row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.switch-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--c-border); }
+.switch-row:last-child { border-bottom: 0; }
+.dialog-form { text-align: start; width: min(520px, 92vw); }
+.dialog-form h2 { margin-bottom: 1.5rem; }

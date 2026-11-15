@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings, Stockroom</title>
+  <script>try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light'); if (localStorage.getItem('dir') === 'rtl') document.documentElement.dir = 'rtl' } catch {}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../lichess-style.css">
+  <link rel="stylesheet" href="assets/pages.css">
+</head>
+<body>
+  <header id="top"></header>
+  <div id="main-wrap">
+    <main class="page-menu">
+      <aside class="page-menu__menu subnav">
+        <div class="subnav__inner">
+          <a href="settings.html">Settings</a>
+          <a href="#notifications-sec">Notifications</a>
+          <a href="#users">Users</a>
+          <a href="#danger">Close the pharmacy</a>
+        </div>
+      </aside>
+
+      <div class="page-menu__content box box-pad">
+        <div class="box__top"><h1>Settings</h1></div>
+        <div class="flash" id="saved" hidden>Settings saved.</div>
+
+        <form class="form3" onsubmit="event.preventDefault(); document.getElementById('saved').hidden = false; scrollTo(0, 0)">
+          <h2 class="section-title" style="margin-top:0">Pharmacy</h2>
+          <div class="form-split">
+            <div class="form-group form-half"><label class="form-label" for="s-name">Name</label><input class="form-control" id="s-name" value="Al Amal Pharmacy"></div>
+            <div class="form-group form-half"><label class="form-label" for="s-phone">Phone</label><input class="form-control" id="s-phone" dir="ltr" value="+961 1 553 210"></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="s-addr">Address</label><textarea class="form-control" id="s-addr" rows="2">Haret Hreik, main street, next to the bakery</textarea></div>
+          <div class="form-split">
+            <div class="form-group form-third"><label class="form-label" for="s-cur">Currency</label><select class="form-control" id="s-cur"><option>US dollar</option><option>Lebanese pound</option></select></div>
+            <div class="form-group form-third"><label class="form-label" for="s-rate">Dollar rate</label><input class="form-control" id="s-rate" type="number" value="89500"><p class="form-help">Lebanese pounds for one dollar.</p></div>
+            <div class="form-group form-third"><label class="form-label" for="s-vat">VAT</label><input class="form-control" id="s-vat" type="number" value="11" aria-invalid="true" style="border-color:var(--c-error)"><p class="error">VAT on medicine is 0% in Lebanon.</p></div>
+          </div>
+
+          <h2 class="section-title">Look</h2>
+          <div class="form-group">
+            <label class="form-label">Theme</label>
+            <group class="radio" id="theme-choice">
+              <div><input type="radio" id="th-dark" name="th" value="dark"><label for="th-dark">Dark</label></div>
+              <div><input type="radio" id="th-light" name="th" value="light"><label for="th-light">Light</label></div>
+            </group>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Language</label>
+            <group class="radio">
+              <div><input type="radio" id="l-ar" name="l" checked><label for="l-ar">العربية</label></div>
+              <div><input type="radio" id="l-en" name="l"><label for="l-en">English</label></div>
+            </group>
+          </div>
+
+          <h2 class="section-title" id="notifications-sec">Notifications</h2>
+          <div class="switch-row"><span>A product falls below its minimum</span><span class="cmn-toggle"><input id="n1" type="checkbox" checked><label for="n1"></label></span></div>
+          <div class="switch-row"><span>A batch expires within 30 days</span><span class="cmn-toggle"><input id="n2" type="checkbox" checked><label for="n2"></label></span></div>
+          <div class="switch-row"><span>An order is late</span><span class="cmn-toggle"><input id="n3" type="checkbox" checked><label for="n3"></label></span></div>
+          <div class="switch-row"><span>Daily sales summary by email</span><span class="cmn-toggle"><input id="n4" type="checkbox"><label for="n4"></label></span></div>
+          <div class="switch-row"><span>Weekly report (only the owner can change this)</span><span class="cmn-toggle"><input id="n5" type="checkbox" disabled checked><label for="n5"></label></span></div>
+
+          <div class="form-actions"><button class="button button-empty button-dim" type="reset">Undo changes</button><button class="button button-green">Save</button></div>
+        </form>
+
+        <h2 class="section-title" id="users">Users</h2>
+        <table class="slist">
+          <thead><tr><th>Name</th><th>Role</th><th>Last seen</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Rana Haddad</td><td>Owner</td><td><time>Now</time></td><td class="num"></td></tr>
+            <tr><td>Karim Nasser</td><td>Pharmacist</td><td><time>Today, 09:40</time></td><td class="num"><button class="button button-thin button-empty" data-open="user-dialog">Edit</button></td></tr>
+            <tr><td>Lina Farhat</td><td>Cashier</td><td><time>Nov 13</time></td><td class="num"><button class="button button-thin button-empty" data-open="user-dialog">Edit</button></td></tr>
+          </tbody>
+        </table>
+        <div class="button-set" style="margin-top:1.5rem"><button class="button button-metal" data-open="user-dialog">Add a user</button></div>
+
+        <h2 class="section-title" id="danger">Close the pharmacy</h2>
+        <div class="flash flash-quiet">Closing removes every user's access and stops orders. Sales history is kept for 7 years.</div>
+        <button class="button button-red" data-open="close-dialog">Close the pharmacy</button>
+      </div>
+    </main>
+
+  <dialog id="user-dialog">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content dialog-form">
+      <h2>User</h2>
+      <form class="form3" onsubmit="event.preventDefault(); this.closest('dialog').close()">
+        <div class="form-group"><label class="form-label" for="u-name">Name</label><input class="form-control" id="u-name" value="Karim Nasser"></div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <group class="radio">
+            <div><input type="radio" id="r-ph" name="r" checked><label for="r-ph">Pharmacist</label></div>
+            <div><input type="radio" id="r-ca" name="r"><label for="r-ca">Cashier</label></div>
+            <div><input type="radio" id="r-ow" name="r"><label for="r-ow">Owner</label></div>
+          </group>
+        </div>
+        <div class="form-check__container"><span class="form-check__input"><input type="checkbox" id="u-disc" checked><label class="form-check__label" for="u-disc"></label></span><label class="form-label" for="u-disc">Can give discounts</label></div>
+        <div class="form-actions"><button class="button button-empty button-red" type="button" data-close>Remove user</button><button class="button button-green">Save</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="close-dialog">
+    <div class="dialog-content alert">
+      <h2>Close Al Amal Pharmacy?</h2>
+      <p>Type the pharmacy's name to confirm. This can't be undone.</p>
+      <input placeholder="Al Amal Pharmacy" aria-label="Pharmacy name">
+      <div class="button-set"><button class="button button-metal" data-close>Cancel</button><button class="button button-red" data-close>Close it</button></div>
+    </div>
+  </dialog>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    const isLight = document.documentElement.classList.contains('light')
+    document.getElementById(isLight ? 'th-light' : 'th-dark').checked = true
+    document.getElementById('theme-choice').addEventListener('change', e => {
+      const want = e.target.value === 'light'
+      if (want !== document.documentElement.classList.contains('light')) document.getElementById('theme-toggle').click()
+    })
+  </script>
+</body>
+</html>

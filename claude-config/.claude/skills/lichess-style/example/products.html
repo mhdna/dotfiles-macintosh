@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Products, Stockroom</title>
+  <script>try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light'); if (localStorage.getItem('dir') === 'rtl') document.documentElement.dir = 'rtl' } catch {}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../lichess-style.css">
+  <link rel="stylesheet" href="assets/pages.css">
+</head>
+<body>
+  <header id="top"></header>
+  <div id="main-wrap">
+    <main class="page-menu">
+      <aside class="page-menu__menu subnav">
+        <div class="subnav__inner">
+          <a href="products.html">All products</a>
+          <a href="products.html#low">Low stock</a>
+          <a href="products.html#expiring">Expiring soon</a>
+          <span class="sep"></span>
+          <a href="products.html#pain">Pain relief</a>
+          <a href="products.html#antibiotics">Antibiotics</a>
+          <a href="products.html#respiratory">Respiratory</a>
+          <a href="products.html#supplies">Supplies</a>
+        </div>
+      </aside>
+
+      <div class="page-menu__content box">
+        <div class="box__top">
+          <h1>Products</h1>
+          <div class="box__top__actions">
+            <button class="button button-metal" data-open="import-dialog">Import</button>
+            <button class="button" data-open="add-dialog">Add product</button>
+          </div>
+        </div>
+
+        <div class="filters">
+          <input type="search" id="search" placeholder="Search by name or barcode" aria-label="Search products">
+          <select aria-label="Category"><option>All categories</option><option>Pain relief</option><option>Antibiotics</option><option>Respiratory</option><option>Supplies</option></select>
+          <group class="radio">
+            <div><input type="radio" id="f-all" name="f" checked><label for="f-all">All</label></div>
+            <div><input type="radio" id="f-in" name="f"><label for="f-in">In stock</label></div>
+            <div><input type="radio" id="f-low" name="f"><label for="f-low">Low</label></div>
+            <div><input type="radio" id="f-out" name="f"><label for="f-out">Out</label></div>
+          </group>
+        </div>
+
+        <div class="tabs-horiz" data-tabs="store" role="tablist">
+          <span class="active" data-tab="main" role="tab">Main pharmacy</span>
+          <span data-tab="clinic" role="tab">Clinic store</span>
+          <span data-tab="warehouse" role="tab">Warehouse</span>
+        </div>
+
+        <div data-panel-group="store" data-panel="main">
+          <div class="slist-wrapper">
+            <table class="slist slist-pad" id="products">
+              <thead><tr><th>Product</th><th>Category</th><th>Barcode</th><th class="num">In stock</th><th class="num">Price</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><a href="product.html">Panadol 500 mg, 24 tablets</a></td><td>Pain relief</td><td>6281086012345</td><td class="num qty-low">3</td><td class="num">$3.50</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Brufen 400 mg, 30 tablets</a></td><td>Pain relief</td><td>5000456012788</td><td class="num">42</td><td class="num">$4.20</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Augmentin 1 g, 14 tablets</a></td><td>Antibiotics</td><td>5000123000981</td><td class="num qty-low">1</td><td class="num">$12.90</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Zithromax 500 mg, 3 tablets</a></td><td>Antibiotics</td><td>5415062300147</td><td class="num">17</td><td class="num">$9.40</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Ventolin inhaler 100 mcg</a></td><td>Respiratory</td><td>5000283651216</td><td class="num">4</td><td class="num">$7.80</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Seretide 250, 60 doses</a></td><td>Respiratory</td><td>5000283655146</td><td class="num">9</td><td class="num">$31.00</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Saline 0.9%, 500 ml</a></td><td>Supplies</td><td>6291100801236</td><td class="num qty-low">0</td><td class="num">$1.90</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Insulin pen needles, box of 100</a></td><td>Supplies</td><td>4015630060745</td><td class="num">2</td><td class="num">$18.50</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Omeprazole 20 mg, 28 capsules</a></td><td>Stomach</td><td>5012617012557</td><td class="num">6</td><td class="num">$5.60</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+                <tr><td><a href="product.html">Vitamin D3 1000 IU, 60 capsules</a></td><td>Supplements</td><td>8711744030452</td><td class="num">55</td><td class="num">$8.00</td><td class="num"><a class="button button-thin button-empty" href="product.html">Open</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="empty" id="no-match" hidden><strong>Nothing matches</strong>Try part of the name, or scan the barcode.</p>
+          <div class="pager-row">
+            <span class="dim">10 of 312 products</span>
+            <nav class="pagination"><span>&lsaquo;</span><span class="current">1</span><a href="#">2</a><a href="#">3</a><span>&hellip;</span><a href="#">32</a><a href="#">&rsaquo;</a></nav>
+          </div>
+        </div>
+
+        <div data-panel-group="store" data-panel="clinic" hidden>
+          <div class="empty"><strong>The clinic store is empty</strong>Transfer stock from the main pharmacy to start using it.<br><br><button class="button button-metal" data-open="add-dialog">Transfer stock</button></div>
+        </div>
+
+        <div data-panel-group="store" data-panel="warehouse" hidden>
+          <div class="box__pad"><div class="flash flash-warning">The warehouse stocktake is 9 days late. Counts there may be wrong.</div></div>
+          <table class="slist slist-pad">
+            <thead><tr><th>Product</th><th class="num">In stock</th><th class="num">Last counted</th></tr></thead>
+            <tbody>
+              <tr><td>Saline 0.9%, 500 ml</td><td class="num">240</td><td class="num"><time>Oct 21</time></td></tr>
+              <tr><td>Insulin pen needles, box of 100</td><td class="num">35</td><td class="num"><time>Oct 21</time></td></tr>
+              <tr><td>Panadol 500 mg, 24 tablets</td><td class="num">180</td><td class="num"><time>Oct 21</time></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+  <dialog id="add-dialog">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content dialog-form">
+      <h2>Add a product</h2>
+      <form class="form3" onsubmit="event.preventDefault(); this.closest('dialog').close()">
+        <div class="form-group">
+          <label class="form-label" for="p-name">Name</label>
+          <input class="form-control" id="p-name" placeholder="Panadol Extra, 24 tablets" required>
+        </div>
+        <div class="form-split">
+          <div class="form-group form-half">
+            <label class="form-label" for="p-cat">Category</label>
+            <select class="form-control" id="p-cat"><option>Pain relief</option><option>Antibiotics</option><option>Respiratory</option><option>Supplies</option></select>
+          </div>
+          <div class="form-group form-half">
+            <label class="form-label" for="p-price">Price</label>
+            <input class="form-control" id="p-price" type="number" step="0.01" placeholder="3.50">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="p-bar">Barcode</label>
+          <input class="form-control" id="p-bar" placeholder="Scan or type it">
+          <p class="form-help">Leave it empty and one is made for you.</p>
+        </div>
+        <div class="form-check__container">
+          <span class="form-check__input"><input type="checkbox" id="p-rx" checked><label class="form-check__label" for="p-rx"></label></span>
+          <label class="form-label" for="p-rx">Needs a prescription</label>
+        </div>
+        <div class="form-actions">
+          <button class="button button-empty button-dim" type="button" data-close>Cancel</button>
+          <button class="button button-green" type="submit">Add product</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="import-dialog">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content alert">
+      <h2>Import from Excel</h2>
+      <p>Pick a sheet with one product per row: name, barcode, price and quantity. Rows that match an existing barcode update that product.</p>
+      <input type="file" accept=".xlsx,.csv">
+      <div class="button-set"><button class="button button-metal" data-close>Cancel</button><button class="button" data-close>Import</button></div>
+    </div>
+  </dialog>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    const rows = [...document.querySelectorAll('#products tbody tr')]
+    document.getElementById('search').addEventListener('input', e => {
+      const q = e.target.value.trim().toLowerCase()
+      let shown = 0
+      rows.forEach(r => { const hit = r.textContent.toLowerCase().includes(q); r.hidden = !hit; shown += hit })
+      document.getElementById('no-match').hidden = shown > 0
+    })
+  </script>
+</body>
+</html>

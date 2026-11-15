@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orders, Stockroom</title>
+  <script>try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light'); if (localStorage.getItem('dir') === 'rtl') document.documentElement.dir = 'rtl' } catch {}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../lichess-style.css">
+  <link rel="stylesheet" href="assets/pages.css">
+</head>
+<body>
+  <header id="top"></header>
+  <div id="main-wrap">
+    <main class="page-menu">
+      <aside class="page-menu__menu subnav">
+        <div class="subnav__inner">
+          <a href="orders.html">Open orders</a>
+          <a href="orders.html#received">Received</a>
+          <a href="orders.html#suppliers">Suppliers</a>
+        </div>
+      </aside>
+
+      <div class="page-menu__content box">
+        <div class="box__top">
+          <h1>Orders</h1>
+          <div class="box__top__actions"><button class="button" data-open="new-order">New order</button></div>
+        </div>
+
+        <div class="tabs-horiz" data-tabs="orders" role="tablist">
+          <span class="active" data-tab="open" role="tab">Open <span class="dim">3</span></span>
+          <span data-tab="received" role="tab">Received</span>
+          <span data-tab="suppliers" role="tab">Suppliers</span>
+        </div>
+
+        <div data-panel-group="orders" data-panel="open">
+          <table class="slist slist-pad">
+            <thead><tr><th>Order</th><th>Supplier</th><th>Sent</th><th class="num">Items</th><th class="num">Total</th><th>State</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><a href="#" data-open="order-1045">1045</a></td><td>Mersaco</td><td><time>Nov 14</time></td><td class="num">6</td><td class="num">$412.80</td><td class="status-open">On the way</td><td class="num"><button class="button button-thin button-empty" data-open="receive">Receive</button></td></tr>
+              <tr><td><a href="#" data-open="order-1045">1044</a></td><td>Pharmaline</td><td><time>Nov 12</time></td><td class="num">3</td><td class="num">$96.00</td><td class="status-late">2 days late</td><td class="num"><button class="button button-thin button-empty" data-open="receive">Receive</button></td></tr>
+              <tr><td><a href="#" data-open="order-1045">1043</a></td><td>Medco Lebanon</td><td><time>Nov 10</time></td><td class="num">12</td><td class="num">$1,280.00</td><td class="status-open">Packed</td><td class="num"><button class="button button-thin button-empty" data-open="receive">Receive</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div data-panel-group="orders" data-panel="received" hidden>
+          <table class="slist slist-pad">
+            <thead><tr><th>Order</th><th>Supplier</th><th>Received</th><th class="num">Total</th><th>Checked by</th></tr></thead>
+            <tbody>
+              <tr><td><a href="#" data-open="order-1045">1042</a></td><td>Mersaco</td><td><time>Nov 15</time></td><td class="num">$388.20</td><td>Rana</td></tr>
+              <tr><td><a href="#" data-open="order-1045">1041</a></td><td>Benta Pharma</td><td><time>Nov 9</time></td><td class="num">$154.00</td><td>Karim</td></tr>
+              <tr><td><a href="#" data-open="order-1045">1040</a></td><td>Pharmaline</td><td><time>Nov 6</time></td><td class="num">$720.50</td><td>Rana</td></tr>
+              <tr><td><a href="#" data-open="order-1045">1039</a></td><td>Mersaco</td><td><time>Nov 2</time></td><td class="num">$301.75</td><td>Karim</td></tr>
+            </tbody>
+          </table>
+          <div class="pager-row"><span class="dim">4 of 186 orders</span><nav class="pagination"><span>&lsaquo;</span><span class="current">1</span><a href="#">2</a><a href="#">3</a><a href="#">&rsaquo;</a></nav></div>
+        </div>
+
+        <div data-panel-group="orders" data-panel="suppliers" hidden>
+          <table class="slist slist-pad">
+            <thead><tr><th>Supplier</th><th>Phone</th><th>Delivers in</th><th class="num">Bought this year</th></tr></thead>
+            <tbody>
+              <tr><td>Mersaco</td><td dir="ltr">+961 1 512 300</td><td>2 days</td><td class="num">$18,420</td></tr>
+              <tr><td>Pharmaline</td><td dir="ltr">+961 1 480 777</td><td>3 days</td><td class="num">$9,860</td></tr>
+              <tr><td>Medco Lebanon</td><td dir="ltr">+961 5 456 120</td><td>4 days</td><td class="num">$7,310</td></tr>
+              <tr><td>Benta Pharma</td><td dir="ltr">+961 4 726 900</td><td>2 days</td><td class="num">$3,350</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+  <dialog id="order-1045">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content dialog-form">
+      <h2>Order 1045, Mersaco</h2>
+      <p class="dim" style="margin-top:0.5em">Sent Nov 14 by Rana, expected Nov 16.</p>
+      <table class="slist" style="margin:1.5em 0">
+        <thead><tr><th>Product</th><th class="num">Boxes</th><th class="num">Cost</th></tr></thead>
+        <tbody>
+          <tr><td>Panadol 500 mg</td><td class="num">40</td><td class="num">$96.00</td></tr>
+          <tr><td>Brufen 400 mg</td><td class="num">24</td><td class="num">$72.00</td></tr>
+          <tr><td>Ventolin inhaler</td><td class="num">12</td><td class="num">$73.20</td></tr>
+          <tr><td>Omeprazole 20 mg</td><td class="num">30</td><td class="num">$130.50</td></tr>
+          <tr><td>Saline 0.9%, 500 ml</td><td class="num">30</td><td class="num">$36.00</td></tr>
+          <tr><td>Vitamin D3 1000 IU</td><td class="num">1</td><td class="num">$5.10</td></tr>
+        </tbody>
+        <tfoot><tr><td><strong>Total</strong></td><td class="num">137</td><td class="num"><strong>$412.80</strong></td></tr></tfoot>
+      </table>
+      <div class="form-actions"><button class="button button-empty button-red" data-close>Cancel order</button><button class="button" data-close data-open="receive">Receive it</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="receive">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content dialog-form">
+      <h2>Receive the delivery</h2>
+      <p class="dim" style="margin:0.5em 0 1.5em">Tick what arrived. Anything left unticked stays on the order.</p>
+      <div class="stack" style="gap:0.9rem">
+        <div class="form-check__container"><span class="form-check__input"><input type="checkbox" id="r1" checked><label class="form-check__label" for="r1"></label></span><label class="form-label" for="r1">40 Panadol 500 mg</label></div>
+        <div class="form-check__container"><span class="form-check__input"><input type="checkbox" id="r2" checked><label class="form-check__label" for="r2"></label></span><label class="form-label" for="r2">24 Brufen 400 mg</label></div>
+        <div class="form-check__container"><span class="form-check__input"><input type="checkbox" id="r3"><label class="form-check__label" for="r3"></label></span><label class="form-label" for="r3">12 Ventolin inhaler</label></div>
+        <div class="form-check__container"><span class="form-check__input"><input type="checkbox" id="r4" checked><label class="form-check__label" for="r4"></label></span><label class="form-label" for="r4">30 Omeprazole 20 mg</label></div>
+      </div>
+      <div class="form-actions"><button class="button button-empty button-dim" data-close>Later</button><button class="button button-green" data-close>Add to stock</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="new-order">
+    <button class="close-button" data-close aria-label="Close">&times;</button>
+    <div class="dialog-content dialog-form">
+      <h2>New order</h2>
+      <form class="form3" onsubmit="event.preventDefault(); this.closest('dialog').close()">
+        <div class="form-group"><label class="form-label" for="o-sup">Supplier</label><select class="form-control" id="o-sup"><option>Mersaco</option><option>Pharmaline</option><option>Medco Lebanon</option><option>Benta Pharma</option></select></div>
+        <div class="switch-row"><span>Add everything below its minimum</span><span class="cmn-toggle"><input id="o-low" type="checkbox" checked><label for="o-low"></label></span></div>
+        <div class="switch-row"><span>Send it to the supplier by WhatsApp</span><span class="cmn-toggle"><input id="o-wa" type="checkbox"><label for="o-wa"></label></span></div>
+        <div class="form-actions"><button class="button button-empty button-dim" type="button" data-close>Cancel</button><button class="button">Create order</button></div>
+      </form>
+    </div>
+  </dialog>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

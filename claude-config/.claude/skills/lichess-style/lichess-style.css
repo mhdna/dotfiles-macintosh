@@ -609,3 +609,109 @@ dialog .close-button:hover { background: var(--c-bad); color: #fff; box-shadow: 
 /* Text set directly on the page background (outside a .box). */
 .page-text { color: var(--c-font-page); text-shadow: 0 1px 0 var(--c-font-shadow); }
 .dim { color: var(--c-font-dim); }
+
+/* ------------------------------------------------------------------ */
+/* 12. Segmented radio (group.radio): metal tray, green selected cell  */
+/* ------------------------------------------------------------------ */
+group.radio, .radio-group {
+  display: flex; flex-flow: row wrap;
+  overflow: hidden;
+  padding: 3px; gap: 3px;
+  border-radius: var(--box-radius);
+  background-image: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom));
+  box-shadow: 0 2px 2px 0 rgb(0 0 0 / 0.08), 0 3px 1px -2px rgb(0 0 0 / 0.18), 0 1px 5px 0 rgb(0 0 0 / 0.1);
+}
+group.radio > div, .radio-group > div { flex: 1 1 auto; position: relative; }
+group.radio input, .radio-group input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+group.radio label, .radio-group label {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px; height: 100%; cursor: pointer; user-select: none;
+  border-radius: max(calc(var(--box-radius) - 2px), 0px);
+}
+@media (hover: hover) {
+  group.radio label:hover, .radio-group label:hover {
+    background: linear-gradient(to bottom, var(--c-metal-top-hover), var(--c-metal-bottom-hover));
+    text-shadow: 0 1px 0 var(--c-font-shadow);
+  }
+}
+group.radio input:checked + label, .radio-group input:checked + label {
+  background: var(--c-secondary); color: #fff;
+  text-shadow: 0 1px 2px #111d;
+  box-shadow: 0 3px 5px hsl(0 0% 0% / 0.12) inset;
+}
+group.radio input:focus-visible + label, .radio-group input:focus-visible + label { outline: var(--outline); outline-offset: -2px; }
+
+/* ------------------------------------------------------------------ */
+/* 13. Checkbox: 24px square, green when checked                       */
+/* ------------------------------------------------------------------ */
+.form-check__container { display: flex; align-items: center; user-select: none; gap: 0.75rem; }
+.form-check__input { position: relative; cursor: pointer; }
+.form-check__input input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.form-check__label {
+  display: block; position: relative; cursor: pointer;
+  width: 24px; height: 24px;
+  border-radius: var(--box-radius);
+  background-color: var(--c-bg-input);
+  border: 1px solid var(--c-border);
+  transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out;
+}
+.form-check__label:hover, .form-check__container:hover .form-check__label { border-color: var(--c-good); }
+.form-check__input input:checked + .form-check__label { background-color: var(--c-good); border-color: var(--c-good); }
+.form-check__input input:checked + .form-check__label::after {
+  content: ''; position: absolute; top: 5px; inset-inline-start: 5px;
+  width: 12px; height: 6px;
+  border: 2.5px solid #fff; border-top: none; border-right: none;
+  transform: rotate(-45deg);
+}
+.form-check__input input:focus-visible + .form-check__label { outline: var(--outline); }
+.form-check__container .form-label { margin-bottom: 0; cursor: pointer; font-weight: normal; }
+
+/* ------------------------------------------------------------------ */
+/* 14. Toggle box (collapsible fieldset)                               */
+/* ------------------------------------------------------------------ */
+.toggle-box {
+  border-radius: var(--box-radius);
+  border: 1px solid var(--c-border);
+  background: var(--c-bg-zebra);
+  margin: 1rem 0 3rem 0;
+  padding: 2rem var(--box-padding) 0;
+}
+.toggle-box legend {
+  border-radius: var(--box-radius);
+  background: var(--c-bg-zebra);
+  padding: 0.5em 2.5em 0.5em 1.5em;
+  font-size: 1.2em; line-height: 26px;
+  border: 1px solid transparent; border-top-color: var(--c-border);
+  cursor: pointer; position: relative; user-select: none;
+}
+.toggle-box legend::after { content: '›'; position: absolute; inset-inline-end: 1em; transform: rotate(90deg); opacity: 0.66; transition: transform 0.2s ease-in-out; }
+.toggle-box legend:hover { color: var(--c-primary); }
+.toggle-box--off { background: none; border-color: transparent; border-top-color: var(--c-border); border-radius: 0; padding-top: 0; }
+.toggle-box--off legend { border: 1px solid var(--c-border); background: none; }
+.toggle-box--off legend::after { transform: none; }
+.toggle-box--off > *:not(legend) { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* 15. Charts (Chart.js, styled as Lichess does it)                    */
+/* ------------------------------------------------------------------ */
+.chart-container { position: relative; height: 350px; }
+.chart-container.small { height: 240px; }
+/* Period buttons above a chart: joined metal buttons, the chosen one sunk. */
+.time-selector-buttons { display: inline-flex; margin: 4px 0 -4px 4px; }
+.time-selector-buttons button {
+  display: inline-flex; text-transform: uppercase;
+  font-family: Roboto, 'Noto Sans Arabic', sans-serif; font-weight: 500; font-size: 0.9em;
+  padding: 0.3em 0.8em;
+  border: 1px solid var(--c-border); border-inline-end: 0;
+  background: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom));
+  color: var(--c-font);
+}
+.time-selector-buttons button:first-child { border-start-start-radius: var(--box-radius); border-end-start-radius: var(--box-radius); }
+.time-selector-buttons button:last-child { border-inline-end: 1px solid var(--c-border); border-start-end-radius: var(--box-radius); border-end-end-radius: var(--box-radius); }
+.time-selector-buttons button:hover { background: linear-gradient(to bottom, var(--c-metal-top-hover), var(--c-metal-bottom-hover)); }
+.time-selector-buttons button.active { background: #262421; color: var(--c-font); }
+html.light .time-selector-buttons button.active { background: #dbebfc; }
+
+/* Alert dialog: a 3px primary frame around the content. */
+.dialog-content.alert { display: flex; flex-direction: column; gap: 2em; width: 480px; max-width: 100%; font-size: 16px; border: 3px solid var(--c-primary); border-radius: var(--box-radius); }
+.dialog-content.alert .button-set { justify-content: flex-end; }
