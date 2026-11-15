@@ -98,6 +98,10 @@ The principle comes before the list: if your first idea would fit any business o
 
 **The same composition in every section** (centered title, button below, image behind). Alternative: one visual idea per section. Why: repeating one layout makes the page read as a single idea stretched out.
 
+## My own additions (always on)
+
+**Live dots and status circles.** The small colored circle (red, green or orange, often pulsing or glowing) placed next to a clock, a "live" or "online" label, a breaking news line, a status, a menu item or a card title. This includes the red dot next to a live time display, the pulsing "LIVE" badge, green "online" dots and colored bullet dots used as decoration. Alternative: let the content itself show that it is live or current (the time ticking, a fresh timestamp such as "قبل دقيقتين", the word "مباشر" set in the headline type, a change in color or weight of the text itself, or an element from the concept's universe). Only use a dot when it is the established, functional convention of the interface (for example an unread indicator a user actually acts on), and never as decoration. Why: it is one of the most repeated tics of generated dashboards and news sites, and it adds urgency the content has not earned.
+
 ## The author's own pet peeves (on by default, release freely)
 
 These are matters of taste more than signs of AI. They are on by default because the author of this skill dislikes them. Release any of them in Step 0.
@@ -159,7 +163,7 @@ Everything above applies to every format: poster, slide, social post, banner, co
 
 ## Final review (before showing)
 
-1. Check the person's adjustments and the habits above, item by item. Look especially for forgotten pills, numbers, slashes and dashes in menus, footers, cards and supporting text.
+1. Check the person's adjustments and the habits above, item by item. Look especially for forgotten pills, live dots and status circles, numbers, slashes and dashes in menus, footers, cards and supporting text.
 2. Check the result against your Step 2 decisions: dominant element, type scale, spacing unit, three composition moves.
 3. If you can render, render at desktop and phone sizes and run the first six tests below. If you cannot, say that you did not check the visual result. The last test always applies.
 4. Report what you found and what you changed.
