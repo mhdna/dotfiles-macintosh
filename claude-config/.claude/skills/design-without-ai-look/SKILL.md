@@ -1,13 +1,39 @@
 ---
 name: "design-without-ai-look"
-description: "Use when designing or coding templates, websites and other graphic material (posters, slides, social posts, banners, covers) and the result should have an identity of its own instead of the generic AI look: decisions written before drawing, customizable default habits to avoid, realistic copy and a final review you can run."
+description: "Use for any visual or UI work: building or changing screens, components and pages in an existing product (light mode), and designing new websites, templates, posters, slides, social posts, banners or covers (full mode). Keeps the result from the generic AI look: habits to avoid, human-design principles, Arabic and right-to-left rules, and a final review."
 ---
 
 # Design without the AI look
 
 Use this skill whenever you design any graphic material (a website or template, poster, slide, social post, banner, cover), build a design in a tool (Figma, Canva and so on) or turn a design into code. The goal: give each project a better chance of an identity of its own, one that is not the generator default.
 
+## Pick the mode first
+
+**Light mode (the default).** Use it when the product already has a design: a dashboard page, a component on an existing site, a layout fix, a new screen inside an app that has its own colors and fonts. Most day to day work is light mode.
+
+**Full mode.** Use it when there is no design yet to follow: a new site or template, a landing page with its own identity, a poster, slide deck, social post, banner or cover. Also use it when the person says "full mode", "redesign", "new look" or asks for an identity.
+
+If unsure, use light mode and say in one line that full mode is available. The person can switch either way at any time ("full mode for this", "light mode").
+
+## Light mode
+
+Do not ask questions, do not write directions, and do not invent a new identity. The existing product is the identity.
+
+1. **Follow the existing system.** Read the nearby code first and reuse its colors, fonts, spacing, components and CSS variables. Do not add a new color, font, shadow style or radius unless the task needs it, and say so when you do.
+2. **Avoid the habits.** Everything in "Habits that give AI work away", "My own additions" and "The author's own pet peeves" applies, in new code and in the code you touch. Do not go hunting through untouched files, but mention any you saw nearby.
+3. **Apply the principles** in "What makes it feel designed by a person": a clear most important element, unequal weight for unequal content, real copy, states for everything that can be touched, layouts that survive messy content, calm over decoration.
+4. **Arabic and right-to-left** rules apply whenever the UI has Arabic.
+5. **Short review before showing.** Check the habits item by item in what you changed, plus the Messy content, Touch and Judgment tests from the final review. If you can render, look at desktop and phone width; if you cannot, say you did not check the visual result. Report in a line or two what you avoided or fixed.
+
+Skip Steps 0, 1 and 2 and the rest of the final review table in light mode.
+
+## Full mode
+
+Run every step below: Step 0, Step 1, Step 2, then the full final review.
+
 ## Step 0: the person's adjustments (they override every rule below)
+
+The person's standing adjustments are already in this skill: "My own additions" (always on), and the Arabic and right-to-left rules. Treat them as found adjustments, so do not ask the adjustments question again; ask only for taste if it is still missing.
 
 The list of habits in this skill is a starting point. The person can change it in three ways:
 
