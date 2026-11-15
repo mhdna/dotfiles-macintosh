@@ -131,10 +131,14 @@ local GROUPS = {
 	{ "App time limits (Morganize)", "#e07a4f", {
 		{ { "ctrl", "cmd" }, "o", "open Morganize (vim keys)" },
 	} },
+	{ "Life wallpaper (Mlife)", "#ff6b33", {
+		{ { "ctrl", "alt" }, "w", "redraw the wallpaper now" },
+	} },
 	{ "Second brain (LBrain)", "#c792ea", {
 		{ { "ctrl", "cmd" }, "j", "LBrain list: word, todo, journal, news, calendar (opens in Obsidian)" },
 	} },
 	{ "Hammerspoon & misc", "#d0d0d0", {
+		{ { "alt" }, "d", "show the desktop (again to bring windows back)" },
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },
 		{ { "ctrl", "alt" }, "f", "Finder → LFGUI redirect on/off" },
 		{ { "cmd", "alt" }, "t", "Terminal at Finder's folder" },

@@ -29,3 +29,12 @@
 - Each entry is short: the date and a title, then **Symptom** (what the user saw), **Cause**
   (why it happened) and **Fix** (what changed, with the files and the test that covers it).
 - Only bug fixes go in it, not features or refactors.
+
+## No long dashes or dot separators in text people see
+
+- Never write an em dash (—) or en dash (–) in any user-facing text: UI titles, dialog headers,
+  labels, buttons, messages, copy, release notes, in Arabic or English. Use a colon, comma or
+  period instead («تعديل الرموز: فئة الطبيب», not «تعديل الرموز — فئة الطبيب»).
+- Never separate items with a middle dot (·) or bullet (•) ("5 events · last 24h"). Use a comma,
+  a line break or real space in the layout.
+- This holds for every UI change, with or without the design-without-ai-look skill loaded.
