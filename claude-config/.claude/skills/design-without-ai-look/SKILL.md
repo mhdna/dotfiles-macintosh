@@ -7,6 +7,10 @@ description: "Use for any visual or UI work: building or changing screens, compo
 
 Use this skill whenever you design any graphic material (a website or template, poster, slide, social post, banner, cover), build a design in a tool (Figma, Canva and so on) or turn a design into code. The goal: give each project a better chance of an identity of its own, one that is not the generator default.
 
+## Read my-rules.md first
+
+`my-rules.md`, in this skill's folder, holds the person's own rules: things never to do (live dots, long dashes, dot separators), the principles of "What makes it feel designed by a person", and the Arabic and right-to-left rules. Read it before any design or UI work, in both modes. Its rules are always on and override anything below. Wherever this file mentions "What makes it feel designed by a person" or "Arabic and right-to-left", it means those sections of my-rules.md.
+
 ## Pick the mode first
 
 **Light mode (the default).** Use it when the product already has a design: a dashboard page, a component on an existing site, a layout fix, a new screen inside an app that has its own colors and fonts. Most day to day work is light mode.
@@ -20,7 +24,7 @@ If unsure, use light mode and say in one line that full mode is available. The p
 Do not ask questions, do not write directions, and do not invent a new identity. The existing product is the identity.
 
 1. **Follow the existing system.** Read the nearby code first and reuse its colors, fonts, spacing, components and CSS variables. Do not add a new color, font, shadow style or radius unless the task needs it, and say so when you do.
-2. **Avoid the habits.** Long dashes and dot separators are never allowed in any text you write or touch. Everything in "Habits that give AI work away", "My own additions" and "The author's own pet peeves" applies, in new code and in the code you touch. Do not go hunting through untouched files, but mention any you saw nearby.
+2. **Avoid the habits.** Long dashes and dot separators are never allowed in any text you write or touch. Everything in my-rules.md, "Habits that give AI work away" and "The author's own pet peeves" applies, in new code and in the code you touch. Do not go hunting through untouched files, but mention any you saw nearby.
 3. **Apply the principles** in "What makes it feel designed by a person": a clear most important element, unequal weight for unequal content, real copy, states for everything that can be touched, layouts that survive messy content, calm over decoration.
 4. **Arabic and right-to-left** rules apply whenever the UI has Arabic.
 5. **Short review before showing.** Check the habits item by item in what you changed, plus the Messy content, Touch and Judgment tests from the final review. If you can render, look at desktop and phone width; if you cannot, say you did not check the visual result. Report in a line or two what you avoided or fixed.
@@ -33,7 +37,7 @@ Run every step below: Step 0, Step 1, Step 2, then the full final review.
 
 ## Step 0: the person's adjustments (they override every rule below)
 
-The person's standing adjustments are already in this skill: "My own additions" (always on), and the Arabic and right-to-left rules. Treat them as found adjustments, so do not ask the adjustments question again; ask only for taste if it is still missing.
+The person's standing adjustments are in my-rules.md (always on). Treat them as found adjustments, so do not ask the adjustments question again; ask only for taste if it is still missing.
 
 The list of habits in this skill is a starting point. The person can change it in three ways:
 
@@ -86,20 +90,6 @@ Write these decisions down, with real numbers, before you draw. They are also th
 | Spacing unit | One base unit (for example 8) and the few multiples you will use |
 | Three composition moves | Three choices that shape the layout, such as an off center anchor, a deliberate crop or a change of density between sections. Not decoration |
 
-## What makes it feel designed by a person
-
-These principles sit above the habit list. When a habit and a principle seem to conflict, follow the principle and say why.
-
-- **Small, intentional imperfections.** One element that breaks the grid on purpose (an image that bleeds off the edge, a headline that overlaps a photo, a hand drawn underline, a slightly rotated sticker of real content). One or two per page, each with a reason. Never random jitter, and never imperfection that looks like a bug.
-- **Meaning and flow over strict alignment.** Align things that belong together, and let things that are different sit differently. A quote can hang outside the text column, a price can sit close to what it prices. Perfect alignment of everything to one grid reads as generated.
-- **Clear visual judgments, not uniform layouts.** Decide what matters most and make it much bigger, much bolder or much emptier around it. Give unequal space to unequal content: one large item and two small ones, not three equal ones. If every block has the same weight, nothing was decided.
-- **Typography with personality.** Chosen for this concept, as Step 1 says, and then used with intent: real contrast in size and weight, a considered line length, one typographic moment per page that only this concept would have.
-- **Copy the way people actually speak.** Short, direct, specific. Buttons say what happens ("احجز طاولة", "Send the file"), not "Get started" or "Learn more". Errors and empty states say what went wrong and what to do, in a human voice.
-- **Small pauses and feedback in interactions.** Hover, press, loading and success states for everything that can be touched. Short, purposeful timing (about 120 to 250 ms), easing that feels physical, a brief confirmation after an action. Respect `prefers-reduced-motion`. No entrance animation on every block.
-- **Design for real, messy content early.** Test with the longest name, a two line title, a missing photo, one item and fifty items, a very long Arabic word next to a Latin one, a price with many digits. The layout must survive the worst real case, not just the demo.
-- **Personality sparingly and with intent.** One or two brand moments (the brand element of Step 1, a line of copy with a wink, an illustration in an empty state). Everywhere else stays quiet so those moments land.
-- **Clarity and calm over polish.** Fewer colors, fewer sizes, fewer effects, more space. A calm page that is easy to use beats a busy page full of details. When in doubt, remove something.
-
 ## Habits that give AI work away (each one can be released in Step 0)
 
 The principle comes before the list: if your first idea would fit any business of the same type, discard it and start again from this business.
@@ -124,21 +114,11 @@ The principle comes before the list: if your first idea would fit any business o
 
 **The same composition in every section** (centered title, button below, image behind). Alternative: one visual idea per section. Why: repeating one layout makes the page read as a single idea stretched out.
 
-## My own additions (always on)
-
-**Live dots and status circles.** The small colored circle (red, green or orange, often pulsing or glowing) placed next to a clock, a "live" or "online" label, a breaking news line, a status, a menu item or a card title. This includes the red dot next to a live time display, the pulsing "LIVE" badge, green "online" dots and colored bullet dots used as decoration. Alternative: let the content itself show that it is live or current (the time ticking, a fresh timestamp such as "قبل دقيقتين", the word "مباشر" set in the headline type, a change in color or weight of the text itself, or an element from the concept's universe). Only use a dot when it is the established, functional convention of the interface (for example an unread indicator a user actually acts on), and never as decoration. Why: it is one of the most repeated tics of generated dashboards and news sites, and it adds urgency the content has not earned.
-
-**Long dashes, anywhere.** No em dash (—) or en dash (–) in any text a person will see: page and dialog titles, labels, buttons, menus, tooltips, messages, copy, release notes, Arabic or English. This includes the title pattern "Action — Context" (for example «تعديل الرموز — فئة الطبيب»). Alternatives: a colon («تعديل الرموز: فئة الطبيب»), a comma, a period, or the context on its own line in a smaller or lighter style. For a range use "to" or «إلى» («من ١ إلى ٥»), or a plain hyphen only in numeric ranges like 10-20. Why: long dashes are one of the most recognizable habits of generated text.
-
-**Dots as separators.** No middle dot (·), bullet (•) or similar dot between items in a line ("5 events · last 24h", «زيارة • ٢٥$», "Admin · 3 users"). Alternatives: a comma, a line break, real space between the items (a gap in the layout), a thin vertical line drawn in CSS, or different weight or color for each part. Why: it is the stock separator of generated metadata lines.
-
-Both rules apply in light mode and full mode, in new text and in any text you touch.
-
 ## The author's own pet peeves (on by default, release freely)
 
 These are matters of taste more than signs of AI. They are on by default because the author of this skill dislikes them. Release any of them in Step 0.
 
-**Slashes as separators.** A single slash ("/") or double slash ("//") between words, in menus, labels, dates or credits. Alternative: a comma, real space between the items, a thin line, or an element from the concept (never a middle dot, see My own additions). Why: it is a decorative stand-in for a separator, common in generated menus, dates and credits.
+**Slashes as separators.** A single slash ("/") or double slash ("//") between words, in menus, labels, dates or credits. Alternative: a comma, real space between the items, a thin line, or an element from the concept (never a middle dot, see my-rules.md). Why: it is a decorative stand-in for a separator, common in generated menus, dates and credits.
 
 **Italic serif** as an automatic "elegant touch". Why: it is an automatic way of looking elegant that turns up in a lot of generated work.
 
@@ -163,18 +143,6 @@ Seen in November 2026 with Claude Sonnet 5.5, on the prompt "first screen of a n
 - When turning an existing design into code, keep fidelity to it: same sections, order, texts, colors and fonts.
 - Animation with a purpose tied to the concept, not a generic entrance effect on everything.
 - Illustrations and brand elements in SVG, not raster images.
-
-## Arabic and right-to-left
-
-When the piece is in Arabic (or any right-to-left language), design right-to-left from the start, not a left-to-right layout flipped at the end.
-
-- The reading order starts at the right: the dominant element, the anchor of an off center layout and the first thing read sit where an Arabic reader looks first. Do not just mirror a Latin composition: decide the composition for right-to-left reading.
-- In code: `dir="rtl"` and `lang="ar"` on the root, and logical CSS properties (`margin-inline-start`, `padding-inline-end`, `inset-inline-start`, `text-align: start`) instead of left and right. Mixed Arabic and Latin runs (names, URLs, prices) are isolated with `<bdi>` or `unicode-bidi: isolate` so they do not jump around.
-- Mirror what has direction (arrows, progress, chevrons, a timeline, a carousel order) and do not mirror what does not (logos, media play icons, clocks, charts with numeric axes, phone numbers).
-- Arabic punctuation: ، ؛ ؟ and Arabic quotation marks « ». Choose Western digits (123) or Arabic-Indic digits (١٢٣) once for the project and use them consistently.
-- Arabic needs more line height than Latin (often 1.6 to 1.9 for body text) and does not use letter spacing or fake uppercase. Never add `letter-spacing` to Arabic: it breaks the joining. The "tiny uppercase label" habit has no Arabic form, so do not invent one with small bold text and tracking.
-- Copy in a real Arabic voice, not translated marketing English. Use the register the audience actually reads (Modern Standard Arabic or the local dialect, as the brief says).
-- In the final review, render with real Arabic text and check: joining is intact, diacritics do not clip at line edges, nothing is left aligned by mistake, mixed runs read in the right order.
 
 ## Other formats
 
