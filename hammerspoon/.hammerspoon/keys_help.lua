@@ -140,6 +140,7 @@ local GROUPS = {
 	{ "Hammerspoon & misc", "#d0d0d0", {
 		{ { "alt" }, "d", "show the desktop (again to bring windows back)" },
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },
+		{ { "alt", "shift" }, "o", "open what's in the clipboard (link, path, or search)" },
 		{ { "ctrl", "alt" }, "f", "Finder → LFGUI redirect on/off" },
 		{ { "cmd", "alt" }, "t", "Terminal at Finder's folder" },
 		{ { "cmd", "alt" }, "r", "auto-press F+X on/off" },

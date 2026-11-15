@@ -65,6 +65,7 @@ require("moji")
 require("mlife")
 require("show_desktop")
 require("lbrain")
+require("clip_open")
 
 -- require("silent_alttab")
 
