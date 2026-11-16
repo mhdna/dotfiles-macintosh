@@ -15,7 +15,7 @@ local M = {}
 local SOUND = "Glass"
 local RING_FOR = 30 -- seconds
 local RECENT_KEY = "quick_timer.recent"
-local DEFAULTS = { "5m", "10m", "25m" }
+local DEFAULTS = { "5m", "10m", "15m", "25m" } -- always offered, after the recent ones
 
 local timers = {} -- { id, label, ends }
 local nextId = 1
@@ -90,8 +90,24 @@ end
 
 local function recent()
 	local list = hs.settings.get(RECENT_KEY)
-	if type(list) ~= "table" or #list == 0 then return DEFAULTS end
+	if type(list) ~= "table" then return {} end
 	return list
+end
+
+-- recent times first, then any default not already among them
+local function presets()
+	local out, seen = {}, {}
+	for _, list in ipairs({ recent(), DEFAULTS }) do
+		for _, t in ipairs(list) do
+			local s, l = parse(t)
+			local key = tostring(s) .. "|" .. tostring(l)
+			if s and not seen[key] then
+				seen[key] = true
+				table.insert(out, t)
+			end
+		end
+	end
+	return out
 end
 
 local function remember(text)
@@ -221,13 +237,13 @@ local function rows(query)
 				action = "cancel", id = t.id,
 			})
 		end
-		for _, r in ipairs(recent()) do
+		for _, r in ipairs(presets()) do
 			local s, l = parse(r)
 			if s then
 				local name = l ~= "" and (l .. ", ") or ""
 				table.insert(out, {
 					text = "Start " .. name .. words(s),
-					subText = "recent",
+					subText = "preset",
 					action = "start", secs = s, label = l, query = r,
 				})
 			end
@@ -256,7 +272,7 @@ function M.open()
 			end
 		end)
 		chooser:placeholderText("Timer: 5, 90s, 1h30, 2:30, 25m tea")
-		chooser:rows(6)
+		chooser:rows(8)
 		chooser:queryChangedCallback(function(q) chooser:choices(rows(q)) end)
 	end
 	chooser:query("")
