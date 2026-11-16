@@ -59,6 +59,7 @@ local GROUPS = {
 		{ { "ctrl" }, "space", "quick shell command" },
 		{ { "cmd", "shift" }, "space", "find files (recent first)" },
 		{ { "ctrl", "cmd" }, "space", "emoji picker (ctrl+c inserts)" },
+		{ { "ctrl", "cmd" }, "t", "quick timer (5, 90s, 1h30, 25m tea)" },
 		{ { "alt", "shift" }, "s", "run a script" },
 		{ { "cmd", "shift" }, "\\", "now playing (space toggles)" },
 		{ { "ctrl", "alt" }, "-", "pick microphone" },
@@ -76,7 +77,7 @@ local GROUPS = {
 		{ { "alt", "shift" }, "\\", "cycle back" },
 		{ { "alt" }, { "tab", "`" }, "Mission Control" },
 		{ { "alt" }, { "[", "]" }, "previous / next space" },
-		{ { "ctrl", "cmd" }, "t", "keep window on top" },
+		{ { "alt", "shift" }, "t", "keep window on top" },
 		{ { "ctrl", "cmd" }, "x", "kill an app: click its window" },
 	} },
 	{ "Media & system", "#e83662", {

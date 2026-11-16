@@ -66,6 +66,7 @@ require("mlife")
 require("show_desktop")
 require("lbrain")
 require("clip_open")
+require("quick_timer")
 
 -- require("silent_alttab")
 

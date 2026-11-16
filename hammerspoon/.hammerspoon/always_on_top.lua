@@ -90,7 +90,7 @@ function unpin(id, windowGone)
 	end
 end
 
-hs.hotkey.bind({ "ctrl", "cmd" }, "t", function()
+hs.hotkey.bind({ "alt", "shift" }, "t", function()
 	local win = hs.window.focusedWindow()
 	if not win then
 		return
