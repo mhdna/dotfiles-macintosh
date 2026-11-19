@@ -22,23 +22,6 @@
   feature branched off), or ask me when it's unclear where it belongs. Finished feature
   branches get merged and deleted, not reused for the next thing.
 
-## Never ship a refusal of something the screen lets people do
-
-- If a screen lets a person build it (a cart, an exchange, a return, a form), the backend
-  must accept it. Never write or ship code that rejects a valid combination: two of the same
-  item, the same product at two prices, several "unknown" or custom-priced lines, a line
-  added twice, lines in any order, an empty optional field, the biggest and smallest values.
-- Any code that merges, groups or de-duplicates by a key (code, barcode, name, id) must be
-  checked against every way two different things share that key. Placeholders ("UNKNOWN"
-  items, walk-in clients, "No salesperson") share it by design: keep them apart.
-- Every such path gets a strong randomized test: hundreds of combinations built the way the
-  screen builds them, each one taken all the way through (quote, checkout, save), asserting
-  it is accepted and that what is stored equals what was shown, line for line. Write it in
-  the same change, prove it bites by breaking the code once, and never call work done
-  without it. When you touch a path that lacks such a test, add one.
-- Errors people can see are words for them ("Pick a size first"), never developer notes
-  ("send X as a single line"). An internal-sounding error reaching a screen is a bug.
-
 ## Keep a log of fixed bugs
 
 - Every project keeps a `docs/FIXED_BUGS.md` (make it if it isn't there). Whenever you fix a
