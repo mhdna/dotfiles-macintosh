@@ -6,6 +6,8 @@
 --   a file copied in Finder                               → opens that file
 --   any other text                                        → searches Google for it
 
+local t = require("i18n").t
+
 local function trim(s)
 	return (s:gsub("^%s+", ""):gsub("%s+$", ""))
 end
@@ -23,7 +25,7 @@ local function openClipboard()
 		if url and url.url then
 			hs.urlevent.openURL(url.url)
 		else
-			hs.alert.show("Clipboard is empty")
+			hs.alert.show(t("Clipboard is empty"))
 		end
 		return
 	end
@@ -42,7 +44,7 @@ local function openClipboard()
 		if hs.fs.attributes(path) then
 			openWith(path)
 		else
-			hs.alert.show("No such file: " .. text)
+			hs.alert.show(t("No such file: %s", text))
 		end
 		return
 	end

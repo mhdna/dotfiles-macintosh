@@ -14,6 +14,7 @@ local M = {}
 
 local SOUND = "Glass"
 local RING_FOR = 30 -- seconds
+local tr = require("i18n").t -- "tr", not "t": ring(t) and others use t for a timer
 local RECENT_KEY = "quick_timer.recent"
 local DEFAULTS = { "5m", "10m", "15m", "25m" } -- always offered, after the recent ones
 
@@ -130,7 +131,7 @@ end
 
 local function ring(t)
 	stopRinging()
-	local text = t.label ~= "" and ("Time's up: " .. t.label) or "Time's up"
+	local text = t.label ~= "" and tr("Time's up: %s", t.label) or tr("Time's up")
 	local style = { textSize = 44, padding = 36, radius = 18 }
 	local alerts = {}
 	for _, screen in ipairs(hs.screen.allScreens()) do
@@ -147,7 +148,7 @@ local function ring(t)
 		stopper = hs.timer.doAfter(RING_FOR, stopRinging),
 		escKey = hs.hotkey.bind({}, "escape", stopRinging),
 	}
-	hs.notify.new({ title = text, subTitle = words(t.duration) .. " timer", withdrawAfter = 0 }):send()
+	hs.notify.new({ title = text, subTitle = tr("%s timer", words(t.duration)), withdrawAfter = 0 }):send()
 end
 
 local function sorted()
@@ -189,13 +190,13 @@ local function refresh()
 		local n = hs.timer.secondsSinceEpoch()
 		for _, t in ipairs(sorted()) do
 			local name = t.label ~= "" and t.label or words(t.duration)
-			table.insert(items, { title = string.format("Cancel %s (%s left)", name, fmt(t.ends - n)), fn = function()
+			table.insert(items, { title = string.format(tr("Cancel %s (%s left)"), name, fmt(t.ends - n)), fn = function()
 				remove(t.id)
 				refresh()
 			end })
 		end
 		table.insert(items, { title = "-" })
-		table.insert(items, { title = "New timer", fn = function() M.open() end })
+		table.insert(items, { title = tr("New timer"), fn = function() M.open() end })
 		return items
 	end)
 end
@@ -211,7 +212,7 @@ local function start(secs, label)
 	if not ticker then ticker = hs.timer.doEvery(1, refresh) end
 	refresh()
 	local name = (label and label ~= "") and (label .. ", ") or ""
-	hs.alert.show("Timer: " .. name .. words(secs), 1)
+	hs.alert.show(tr("Timer: ") .. name .. words(secs), 1)
 end
 
 local chooser
@@ -222,8 +223,8 @@ local function rows(query)
 	if secs then
 		local name = label ~= "" and (label .. ", ") or ""
 		table.insert(out, {
-			text = "Start " .. name .. words(secs),
-			subText = "ends at " .. os.date("%H:%M", os.time() + secs),
+			text = tr("Start ") .. name .. words(secs),
+			subText = tr("ends at ") .. os.date("%H:%M", os.time() + secs),
 			action = "start", secs = secs, label = label, query = query,
 		})
 	end
@@ -232,8 +233,8 @@ local function rows(query)
 		for _, t in ipairs(sorted()) do
 			local name = t.label ~= "" and t.label or words(t.duration)
 			table.insert(out, {
-				text = "Cancel " .. name,
-				subText = fmt(t.ends - now) .. " left",
+				text = tr("Cancel ") .. name,
+				subText = fmt(t.ends - now) .. tr(" left"),
 				action = "cancel", id = t.id,
 			})
 		end
@@ -242,15 +243,15 @@ local function rows(query)
 			if s then
 				local name = l ~= "" and (l .. ", ") or ""
 				table.insert(out, {
-					text = "Start " .. name .. words(s),
-					subText = "preset",
+					text = tr("Start ") .. name .. words(s),
+					subText = tr("preset"),
 					action = "start", secs = s, label = l, query = r,
 				})
 			end
 		end
 	end
 	if #out == 0 then
-		table.insert(out, { text = "Type a time: 5, 90s, 1h30, 2:30, 25m tea", action = "none" })
+		table.insert(out, { text = tr("Type a time: 5, 90s, 1h30, 2:30, 25m tea"), action = "none" })
 	end
 	return out
 end
@@ -271,7 +272,7 @@ function M.open()
 				refresh()
 			end
 		end)
-		chooser:placeholderText("Timer: 5, 90s, 1h30, 2:30, 25m tea")
+		chooser:placeholderText(tr("Timer: 5, 90s, 1h30, 2:30, 25m tea"))
 		chooser:rows(8)
 		chooser:queryChangedCallback(function(q) chooser:choices(rows(q)) end)
 	end

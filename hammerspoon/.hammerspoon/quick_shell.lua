@@ -6,6 +6,7 @@
 -- This used to be a custom web view, which was slow to appear; hs.chooser is
 -- native and opens as fast as the cmd+space launcher.
 local menuPosition = require("menu_position")
+local t = require("i18n").t
 
 local ALERT_DURATION = 4
 local escWatcher = nil
@@ -53,7 +54,7 @@ local function run(choice)
 				local output = (stdOut or "") .. (stdErr or "")
 				output = output:gsub("%s+$", "")
 				if output == "" then
-					output = "(no output, exit " .. exitCode .. ")"
+					output = t("(no output, exit %s)", exitCode)
 				end
 				showOutput(output)
 			end, { "-i", "-c", cmd })
@@ -66,7 +67,7 @@ chooser:choices({})
 chooser:enableDefaultForQuery(true)
 chooser:rows(0)
 chooser:bgDark(true)
-chooser:placeholderText("Run command...")
+chooser:placeholderText(t("Run command..."))
 
 local function showQuickShell()
 	chooser:query("")

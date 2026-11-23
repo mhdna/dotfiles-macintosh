@@ -11,6 +11,7 @@ configFileWatcher:start()
 
 -- opt+/ help window; loaded before anything binds a hotkey, so it sees them all
 require("keys_help")
+local t = require("i18n").t
 
 -- all hs.alert.show(...) notifications: dark warm gray-brown (matches the
 -- Driftwood browser theme), soft taupe border, warm off-white text
@@ -398,12 +399,12 @@ local function toggleSelected(selected)
 	-- reset scroll/selection every time you hit space
 	selected.state = selected.state == "playing" and "paused" or "playing"
 	if selected.kind == "app" then
-		selected.subText = selected.state == "playing" and "▶ Playing — space to pause"
-			or "⏸ Paused — space to play"
+		selected.subText = selected.state == "playing" and t("▶ Playing — space to pause")
+			or t("⏸ Paused — space to play")
 	elseif selected.kind == "tab" then
-		selected.subText = (selected.state == "playing" and "▶ Playing — " or "⏸ Paused — ")
+		selected.subText = (selected.state == "playing" and t("▶ Playing — ") or t("⏸ Paused — "))
 			.. selected.browser.name
-			.. " — space to toggle"
+			.. t(" — space to toggle")
 	end
 end
 
@@ -415,7 +416,7 @@ local function appChoices()
 			if state then
 				table.insert(choices, {
 					text = app.name,
-					subText = state == "playing" and "▶ Playing — space to pause" or "⏸ Paused — space to play",
+					subText = state == "playing" and t("▶ Playing — space to pause") or t("⏸ Paused — space to play"),
 					kind = "app",
 					appName = app.name,
 					state = state,
@@ -445,9 +446,9 @@ local function buildMediaChoicesAsync(onUpdate)
 			for _, tab in ipairs(tabs) do
 				table.insert(choices, {
 					text = tab.title,
-					subText = (tab.state == "playing" and "▶ Playing — " or "⏸ Paused — ")
+					subText = (tab.state == "playing" and t("▶ Playing — ") or t("⏸ Paused — "))
 						.. browser.name
-						.. " — space to toggle",
+						.. t(" — space to toggle"),
 					kind = "tab",
 					browser = browser,
 					window = tab.window,
@@ -462,7 +463,7 @@ end
 
 local mediaChooser = hs.chooser.new(function() end)
 mediaChooser:width(30)
-mediaChooser:placeholderText("Now playing...")
+mediaChooser:placeholderText(t("Now playing..."))
 
 local mediaEventtap = nil
 local currentMediaChoices = {}
@@ -478,12 +479,12 @@ mediaChooser:hideCallback(stopMediaEventtap)
 
 hs.hotkey.bind({ "cmd", "shift" }, "\\", function()
 	local initial = appChoices()
-	currentMediaChoices = #initial == 0 and { { text = "Loading…", kind = "none" } } or initial
+	currentMediaChoices = #initial == 0 and { { text = t("Loading…"), kind = "none" } } or initial
 	mediaChooser:choices(currentMediaChoices)
 	menuPosition.showChooser(mediaChooser, 30)
 
 	buildMediaChoicesAsync(function(choices)
-		currentMediaChoices = #choices == 0 and { { text = "Nothing playing", kind = "none" } } or choices
+		currentMediaChoices = #choices == 0 and { { text = t("Nothing playing"), kind = "none" } } or choices
 		mediaChooser:choices(currentMediaChoices)
 	end)
 
@@ -516,7 +517,7 @@ local micChooser = hs.chooser.new(function(choice)
 end)
 micChooser:width(20)
 micChooser:rows(4)
-micChooser:placeholderText("Select INPUT (microphone)...")
+micChooser:placeholderText(t("Select INPUT (microphone)..."))
 
 -- opt+ctrl+- opens it (opt+shift+- is mute)
 local function showMicChooser()
@@ -526,7 +527,7 @@ local function showMicChooser()
 	for _, dev in ipairs(hs.audiodevice.allInputDevices()) do
 		local choice = {
 			text = dev:name(),
-			subText = dev:uid() == currentUID and "Current" or nil,
+			subText = dev:uid() == currentUID and t("Current") or nil,
 		}
 		if dev:uid() == currentUID then
 			currentChoice = choice
@@ -553,7 +554,7 @@ local outputChooser = hs.chooser.new(function(choice)
 end)
 outputChooser:width(20)
 outputChooser:rows(4)
-outputChooser:placeholderText("Select OUTPUT (speakers / headphones)...")
+outputChooser:placeholderText(t("Select OUTPUT (speakers / headphones)..."))
 
 hs.hotkey.bind({ "ctrl", "alt" }, "=", function()
 	local currentUID = hs.audiodevice.defaultOutputDevice():uid()
@@ -562,7 +563,7 @@ hs.hotkey.bind({ "ctrl", "alt" }, "=", function()
 	for _, dev in ipairs(hs.audiodevice.allOutputDevices()) do
 		local choice = {
 			text = dev:name(),
-			subText = dev:uid() == currentUID and "Current" or nil,
+			subText = dev:uid() == currentUID and t("Current") or nil,
 		}
 		if dev:uid() == currentUID then
 			currentChoice = choice
@@ -669,7 +670,7 @@ hs.hotkey.bind({ "alt", "shift" }, "m", function()
 	toggleStretch("horizontal")
 end)
 
-hs.alert.show("configuration reloaded", 0.3)
+hs.alert.show(t("configuration reloaded"), 0.3)
 
 local isRunning = false
 local timer = nil
@@ -722,11 +723,11 @@ hs.hotkey.bind({ "cmd", "alt" }, "R", function()
 			timer = nil
 		end
 		isRunning = false
-		hs.alert.show("stopped", 0.3)
+		hs.alert.show(t("stopped"), 0.3)
 	else
 		timer = hs.timer.doEvery(0.05, pressFX)
 		isRunning = true
-		hs.alert.show("started", 0.3)
+		hs.alert.show(t("started"), 0.3)
 	end
 end)
 
@@ -781,7 +782,7 @@ end)
 hs.hotkey.bind({ "alt", "shift" }, "p", function()
 	local mpv = hs.application.get("mpv")
 	if not mpv then
-		hs.alert.show("mpv isn't running", 0.6)
+		hs.alert.show(t("mpv isn't running"), 0.6)
 		return
 	end
 	for _, win in ipairs(mpv:allWindows()) do

@@ -1,5 +1,6 @@
 -- cmd+space: small centered, searchable app launcher (Spotlight-style)
 local menuPosition = require("menu_position")
+local tr = require("i18n").t
 
 local home = os.getenv("HOME")
 
@@ -253,7 +254,7 @@ local CHOOSER_WIDTH_PERCENT = 20
 local appChooser = hs.chooser.new(chooserSelected)
 appChooser:searchSubText(false)
 appChooser:width(CHOOSER_WIDTH_PERCENT)
-appChooser:placeholderText("Open application...")
+appChooser:placeholderText(tr("Open application..."))
 appChooser:queryChangedCallback(function(query)
 	appChooser:choices(filtered(query))
 end)

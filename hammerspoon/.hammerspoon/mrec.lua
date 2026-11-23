@@ -12,6 +12,7 @@
 -- toggles (v, shift+m, shift+s) only change the next recording.
 
 local BUNDLE = "com.mahdi.mrec"
+local tr = require("i18n").t
 local STATE = os.getenv("HOME") .. "/Library/Application Support/Mrec/state.json"
 
 local function running()
@@ -23,13 +24,13 @@ local function clock(seconds)
 end
 
 local function describe(s)
-	local label = { recording = "● Recording", paused = "‖ Paused", idle = "Mrec stopped" }
+	local label = { recording = tr("● Recording"), paused = tr("‖ Paused"), idle = tr("Mrec stopped") }
 	local lines = { (label[s.state] or s.state) .. (s.state ~= "idle" and (" " .. clock(s.elapsed)) or "") }
 	local inputs = {}
-	if s.screen then table.insert(inputs, "screen") end
-	if s.system then table.insert(inputs, "system audio" .. (s.muteSystem and " (muted)" or "")) end
-	if s.mic then table.insert(inputs, "mic" .. (s.muteMic and " (muted)" or "")) end
-	table.insert(lines, #inputs > 0 and table.concat(inputs, " + ") or "nothing selected")
+	if s.screen then table.insert(inputs, tr("screen")) end
+	if s.system then table.insert(inputs, tr("system audio") .. (s.muteSystem and tr(" (muted)") or "")) end
+	if s.mic then table.insert(inputs, tr("mic") .. (s.muteMic and tr(" (muted)") or "")) end
+	table.insert(lines, #inputs > 0 and table.concat(inputs, " + ") or tr("nothing selected"))
 	if s.status ~= "" then table.insert(lines, s.status) end
 	return table.concat(lines, "\n")
 end
@@ -48,7 +49,7 @@ end
 local function send(path, launches)
 	local wasRunning = running()
 	if not wasRunning and not launches then
-		hs.alert.show("Mrec isn't running", 0.6)
+		hs.alert.show(tr("Mrec isn't running"), 0.6)
 		return
 	end
 	hs.task.new("/usr/bin/open", nil, { "-g", "mrec://" .. path }):start()
@@ -75,17 +76,17 @@ hs.hotkey.bind(MODS, "w", function()
 end)
 
 hs.hotkey.bind(MODS, "i", function()
-	if running() then report(0) else hs.alert.show("Mrec isn't running", 0.6) end
+	if running() then report(0) else hs.alert.show(tr("Mrec isn't running"), 0.6) end
 end)
 
 hs.hotkey.bind(MODS, "l", function()
 	local state = hs.json.read(STATE)
 	local current = state and state.folder or (os.getenv("HOME") .. "/Movies/Mrec")
 	hs.focus()
-	local picked = hs.dialog.chooseFileOrFolder("Mrec save location", current, false, true, false)
+	local picked = hs.dialog.chooseFileOrFolder(tr("Mrec save location"), current, false, true, false)
 	local path = picked and picked["1"]
 	if path then
 		send("folder?path=" .. hs.http.encodeForQuery(path), true)
-		hs.alert.show("Saving to " .. (path:gsub("^" .. os.getenv("HOME"), "~")), 1.5)
+		hs.alert.show(tr("Saving to %s", (path:gsub("^" .. os.getenv("HOME"), "~"))), 1.5)
 	end
 end)

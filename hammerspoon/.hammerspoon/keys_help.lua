@@ -8,6 +8,7 @@
 -- other binding still shows up, under "Other", so nothing goes missing.
 
 local M = {}
+local t = require("i18n").t
 
 local recorded = {} -- "alt+shift+e" -> true, for every bound hotkey
 local MOD_ORDER = { "ctrl", "alt", "shift", "cmd" }
@@ -184,11 +185,11 @@ local function buildHTML()
 			end
 			if #labels > 0 then
 				table.insert(rows, string.format('<div class="row"><span class="keys">%s</span><span class="desc">%s</span></div>',
-					escape(table.concat(labels, " ")), escape(e[3])))
+					escape(table.concat(labels, " ")), escape(t(e[3]))))
 			end
 		end
 		if #rows > 0 then
-			table.insert(html, string.format('<section><h2 style="color:%s">%s</h2>%s</section>', color, escape(title), table.concat(rows)))
+			table.insert(html, string.format('<section><h2 style="color:%s">%s</h2>%s</section>', color, escape(t(title)), table.concat(rows)))
 		end
 	end
 	local others = {}
@@ -199,12 +200,12 @@ local function buildHTML()
 		table.sort(others)
 		local rows = {}
 		for _, combo in ipairs(others) do
-			table.insert(rows, string.format('<div class="row"><span class="keys">%s</span><span class="desc dim">no description yet</span></div>', escape(label(combo))))
+			table.insert(rows, string.format('<div class="row"><span class="keys">%s</span><span class="desc dim">' .. escape(t("no description yet")) .. '</span></div>', escape(label(combo))))
 		end
-		table.insert(html, '<section><h2 style="color:#6c6c6c">Other</h2>' .. table.concat(rows) .. "</section>")
+		table.insert(html, '<section><h2 style="color:#6c6c6c">' .. escape(t("Other")) .. '</h2>' .. table.concat(rows) .. "</section>")
 	end
 
-	return [[<!doctype html><html><head><meta charset="utf-8"><style>
+	return (([[<!doctype html><html><head><meta charset="utf-8"><style>
 html, body { margin: 0; height: 100%; background: #1c1c1c; color: #e8e6e1;
   font: 14px/1.5 "Comic Mono", ui-monospace, Menlo, monospace; -webkit-user-select: none; cursor: default; }
 body { box-sizing: border-box; padding: 22px 28px; border: 2px solid #3a3a3a; overflow: auto; }
@@ -219,8 +220,9 @@ h2 { margin: 0 0 6px; font-size: 14px; }
 .keys { flex: 0 0 auto; min-width: 7.5em; color: #f0c049; white-space: nowrap; }
 .desc { color: #e8e6e1; }
 .dim { color: #6c6c6c; }
-</style></head><body><header><h1>Hammerspoon keys</h1><span>esc / ⌥/ / click to close</span></header><main>]]
-		.. table.concat(html) .. [[</main></body></html>]]
+</style></head><body><header><h1>@TITLE@</h1><span>@CLOSE@</span></header><main>]]
+		.. table.concat(html) .. [[</main></body></html>]])
+		:gsub("@TITLE@", t("Hammerspoon keys")):gsub("@CLOSE@", t("esc / ⌥/ / click to close")))
 end
 
 local view, previous, keyTap, clickTap

@@ -1,10 +1,11 @@
 -- opt+shift+s: pick a script from a list and run it (via zsh, aliases/PATH loaded).
 -- Add entries to SCRIPTS below.
 local menuPosition = require("menu_position")
+local t = require("i18n").t
 
 local SCRIPTS = {
-	{ text = "BNC report", subText = "Today's report: image + PDF to drag, text copied", cmd = "cd ~/Code/bnc && make report" },
-	{ text = "BNC weekly report", subText = "Last 7 days: image + PDF to drag, text copied", cmd = "cd ~/Code/bnc && make report-weekly" },
+	{ text = "BNC report", subText = t("Today's report: image + PDF to drag, text copied"), cmd = "cd ~/Code/bnc && make report" },
+	{ text = "BNC weekly report", subText = t("Last 7 days: image + PDF to drag, text copied"), cmd = "cd ~/Code/bnc && make report-weekly" },
 }
 
 local function run(choice)
@@ -16,10 +17,10 @@ local function run(choice)
 		hs.task
 			.new("/bin/zsh", function(exitCode, stdOut, stdErr)
 				if exitCode == 0 then
-					hs.alert.show(choice.text .. ": ready", 1.5)
+					hs.alert.show(t("%s: ready", choice.text), 1.5)
 				else
 					local err = ((stdErr or "") .. (stdOut or "")):gsub("%s+$", "")
-					hs.alert.show(choice.text .. " failed:\n" .. err:sub(-300), 6)
+					hs.alert.show(t("%s failed:\n%s", choice.text, err:sub(-300)), 6)
 				end
 			end, { "-i", "-c", choice.cmd })
 			:start()

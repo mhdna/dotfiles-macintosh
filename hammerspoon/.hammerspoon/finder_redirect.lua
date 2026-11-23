@@ -7,6 +7,7 @@
 -- Needs permission for Hammerspoon to control Finder (macOS asks once).
 local lfGui = "com.mahdi.lf-gui"
 local enabled = true
+local tr = require("i18n").t
 
 -- Returns the selected item if it's inside the window's folder, else the
 -- folder itself. Special windows (Recents, AirDrop, Trash) have no folder
@@ -63,7 +64,7 @@ end)
 
 hs.hotkey.bind({ "ctrl", "alt" }, "f", function()
 	enabled = not enabled
-	hs.alert.show(enabled and "Finder → lf-gui: on" or "Finder → lf-gui: off (Finder works normally)", 1)
+	hs.alert.show(enabled and tr("Finder → lf-gui: on") or tr("Finder → lf-gui: off (Finder works normally)"), 1)
 end)
 
 -- keep the watcher from being garbage-collected

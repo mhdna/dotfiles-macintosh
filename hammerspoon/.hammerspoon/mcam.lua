@@ -8,6 +8,7 @@
 -- Inside the window: ⏎ shares, s stops, a sends only the shared app's sound to Mmix, c the cursor.
 
 local MODS = { "ctrl", "cmd" }
+local tr = require("i18n").t
 
 hs.hotkey.bind(MODS, "s", function()
 	hs.task.new("/usr/bin/open", nil, { "mcam://popup" }):start()
@@ -19,7 +20,7 @@ local function send(path)
 		local state = hs.json.read(os.getenv("HOME") .. "/Library/Application Support/Mcam/state.json")
 		if state then
 			hs.alert.closeAll(0)
-			hs.alert.show("Mcam zoom: " .. state.zoom, 0.6)
+			hs.alert.show(tr("Mcam zoom: ") .. state.zoom, 0.6)
 		end
 	end)
 end

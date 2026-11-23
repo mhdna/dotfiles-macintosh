@@ -12,6 +12,7 @@
 -- The shell command box that used to live on cmd+shift+space is still on
 -- ctrl+space (quick_shell.lua).
 local menuPosition = require("menu_position")
+local tr = require("i18n").t
 
 local HOME = os.getenv("HOME")
 
@@ -325,7 +326,7 @@ local function pick(choice)
 		hs.task.new("/usr/bin/open", nil, { "-R", choice.path }):start()
 	elseif mods.alt then
 		hs.pasteboard.setContents(choice.path)
-		hs.alert.show("path copied", 0.6)
+		hs.alert.show(tr("path copied"), 0.6)
 	else
 		hs.task.new("/usr/bin/open", nil, { choice.path }):start()
 	end
@@ -335,7 +336,7 @@ M.chooser = hs.chooser.new(pick)
 M.chooser:bgDark(true)
 M.chooser:rows(MAX_ROWS)
 M.chooser:searchSubText(false)
-M.chooser:placeholderText("Find files   (↩ open · ⌘↩ reveal · ⌥↩ copy path)")
+M.chooser:placeholderText(tr("Find files   (↩ open · ⌘↩ reveal · ⌥↩ copy path)"))
 M.chooser:queryChangedCallback(function(query)
 	if debounce then
 		debounce:stop()

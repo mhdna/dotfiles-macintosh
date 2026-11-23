@@ -7,6 +7,7 @@
 -- partially disabled and `sudo yabai --load-sa` done (see yabairc).
 local yabai = "/opt/homebrew/bin/yabai"
 local badgeSize = 22
+local tr = require("i18n").t
 local pinned = {} -- window id -> { win = hs.window, badge = hs.canvas }
 
 local function yabaiCmd(args)
@@ -67,10 +68,10 @@ local function pin(win, quiet)
 	if not quiet then
 		local ok, out = yabaiCmd(string.format("window %d --sub-layer above", id))
 		if not ok then
-			hs.alert.show("Always on top failed: " .. (out ~= "" and out or "is yabai running?"), 3)
+			hs.alert.show(tr("Always on top failed: ") .. (out ~= "" and out or tr("is yabai running?")), 3)
 			return
 		end
-		hs.alert.show("Always on top: on", 0.3)
+		hs.alert.show(tr("Always on top: on"), 0.3)
 	end
 	pinned[id] = { win = win, badge = makeBadge(id) }
 	refreshBadge(pinned[id])
@@ -86,7 +87,7 @@ function unpin(id, windowGone)
 	pinned[id] = nil
 	if not windowGone then
 		yabaiCmd(string.format("window %d --sub-layer auto", id))
-		hs.alert.show("Always on top: off", 0.3)
+		hs.alert.show(tr("Always on top: off"), 0.3)
 	end
 end
 

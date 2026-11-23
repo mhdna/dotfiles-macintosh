@@ -16,14 +16,15 @@
 
 local BUNDLE = "com.mahdi.mmix"
 local STATE = os.getenv("HOME") .. "/Library/Application Support/Mmix/state.json"
+local tr = require("i18n").t
 
 local function describe(s)
-	local lines = { s.running and "● Sharing audio" or "Mmix stopped" }
-	table.insert(lines, "computer audio " .. (s.system and "on" or "muted") .. (s.only and " (selected apps only)" or ""))
-	table.insert(lines, "mic " .. (s.mic and "on" or "muted") .. (s.monitor and " (monitoring)" or ""))
-	if s.noise then table.insert(lines, "noise suppression on") end
-	if s.gain and s.gain ~= 1 then table.insert(lines, "mic volume ×" .. s.gain) end
-	if s.systemGain and s.systemGain ~= 1 then table.insert(lines, "computer volume ×" .. s.systemGain) end
+	local lines = { s.running and tr("● Sharing audio") or tr("Mmix stopped") }
+	table.insert(lines, tr("computer audio") .. " " .. (s.system and tr("on") or tr("muted")) .. (s.only and tr(" (selected apps only)") or ""))
+	table.insert(lines, tr("mic") .. " " .. (s.mic and tr("on") or tr("muted")) .. (s.monitor and tr(" (monitoring)") or ""))
+	if s.noise then table.insert(lines, tr("noise suppression on")) end
+	if s.gain and s.gain ~= 1 then table.insert(lines, tr("mic volume") .. " ×" .. s.gain) end
+	if s.systemGain and s.systemGain ~= 1 then table.insert(lines, tr("computer volume") .. " ×" .. s.systemGain) end
 	if s.error ~= "" then table.insert(lines, s.error) end
 	return table.concat(lines, "\n")
 end
@@ -41,7 +42,7 @@ end
 local function send(path, launches)
 	local wasRunning = hs.application.get(BUNDLE) ~= nil
 	if not wasRunning and not launches then
-		hs.alert.show("Mmix isn't running", 0.6)
+		hs.alert.show(tr("Mmix isn't running"), 0.6)
 		return
 	end
 	hs.task.new("/usr/bin/open", nil, { "-g", "mmix://" .. path }):start()
@@ -58,7 +59,7 @@ end)
 -- ~/Library/Application Support/Mmix/Sounds, named here without its extension.
 local function sound(name)
 	if hs.application.get(BUNDLE) == nil then
-		hs.alert.show("Mmix isn't running", 0.6)
+		hs.alert.show(tr("Mmix isn't running"), 0.6)
 		return
 	end
 	-- A distributed notification reaches Mmix in a few ms; `open mmix://…` takes ~100.
