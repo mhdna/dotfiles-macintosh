@@ -58,6 +58,7 @@ require("script_launcher")
 require("time_tracker")
 require("finder_redirect")
 require("mrec")
+require("mlive")
 require("mmix")
 require("mcam")
 require("mclaude")
@@ -145,11 +146,6 @@ end)
 
 hs.hotkey.bind({ "alt" }, "[", function()
 	hs.spaces.goLeft()
-end)
-
--- opt+shift+d: show desktop
-hs.hotkey.bind({ "alt", "shift" }, "d", function()
-	hs.spaces.toggleShowDesktop()
 end)
 
 -- -- opt+1..4: jump straight to that space on the screen being used

@@ -49,6 +49,7 @@ local GROUPS = {
 		{ { "alt" }, "n", "Obsidian" },
 		{ { "alt", "shift" }, "i", "Discord" },
 		{ { "alt", "shift" }, "v", "OBS" },
+		{ { "alt", "shift" }, "r", "Raawi" },
 		{ { "alt" }, "s", "System Settings" },
 		{ { "alt" }, "g", "QuickTime" },
 		{ { "cmd" }, "f2", "Mail" },
@@ -122,6 +123,9 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "4", "play the anime wow" },
 		{ { "ctrl", "cmd" }, "5", "play the sudden suspense sound" },
 	} },
+	{ "Live captions (Mlive)", "#3a8dff", {
+		{ { "ctrl", "cmd" }, "e", "start / stop live captions and translation" },
+	} },
 	{ "Virtual camera (Mcam)", "#7be0a0", {
 		{ { "ctrl", "cmd" }, "s", "pick a screen or window to share (vim keys)" },
 		{ { "ctrl", "cmd" }, { "-", "=" }, "zoom out / in" },
@@ -140,7 +144,7 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "j", "LBrain list: word, todo, journal, news, calendar (opens in Obsidian)" },
 	} },
 	{ "Hammerspoon & misc", "#d0d0d0", {
-		{ { "alt" }, "d", "show the desktop (again to bring windows back)" },
+		{ { "alt", "shift" }, "d", "show the desktop (again to bring windows back)" },
 		{ { "ctrl", "alt" }, "r", "reload Hammerspoon" },
 		{ { "alt", "shift" }, "o", "open what's in the clipboard (link, path, or search)" },
 		{ { "ctrl", "alt" }, "f", "Finder → LFGUI redirect on/off" },
