@@ -124,7 +124,8 @@ local GROUPS = {
 		{ { "ctrl", "cmd" }, "5", "play the sudden suspense sound" },
 	} },
 	{ "Live captions (Mlive)", "#3a8dff", {
-		{ { "ctrl", "cmd" }, "e", "start / stop live captions and translation" },
+		{ { "ctrl", "cmd" }, "e", "open the Mlive window (vim keys)" },
+		{ { "ctrl", "cmd", "shift" }, "e", "start / stop live captions and translation" },
 	} },
 	{ "Virtual camera (Mcam)", "#7be0a0", {
 		{ { "ctrl", "cmd" }, "s", "pick a screen or window to share (vim keys)" },
